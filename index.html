@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rituel — Votre archive beauté personnelle</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Georgia, serif; background: #08080E; color: #F5F0F8; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; border-bottom: 1px solid #1C1C2E; }
+    .logo { font-size: 24px; color: #C9A96E; letter-spacing: 4px; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { color: #6B6278; font-size: 13px; text-decoration: none; letter-spacing: 1px; }
+    .nav-links a:hover { color: #C9A96E; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 100px 24px 80px; max-width: 720px; margin: 0 auto; }
+    .hero-badge { display: inline-block; border: 1px solid rgba(201,169,110,0.3); color: #C9A96E; font-size: 11px; letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 32px; }
+    .hero h1 { font-size: 52px; font-weight: 400; color: #F5F0F8; line-height: 1.2; margin-bottom: 20px; }
+    .hero h1 span { color: #C9A96E; }
+    .hero p { font-size: 17px; color: #B8B0C4; line-height: 1.8; margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: #C9A96E; color: #1A1208; padding: 16px 32px; border-radius: 14px; font-size: 14px; font-weight: 600; text-decoration: none; letter-spacing: 1px; }
+    .btn-secondary { border: 1px solid #1C1C2E; color: #B8B0C4; padding: 16px 32px; border-radius: 14px; font-size: 14px; text-decoration: none; letter-spacing: 1px; }
+    .btn-secondary:hover { border-color: #C9A96E; color: #C9A96E; }
+
+    /* FEATURES */
+    .features { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 10px; color: #6B6278; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 48px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .feature-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 18px; padding: 28px; }
+    .feature-icon { font-size: 28px; margin-bottom: 16px; }
+    .feature-title { font-size: 16px; color: #F5F0F8; margin-bottom: 10px; }
+    .feature-desc { font-size: 13px; color: #6B6278; line-height: 1.7; }
+
+    /* STATS */
+    .stats { background: #11111A; border-top: 1px solid #1C1C2E; border-bottom: 1px solid #1C1C2E; padding: 60px 48px; }
+    .stats-inner { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 32px; text-align: center; }
+    .stat-val { font-size: 42px; color: #C9A96E; margin-bottom: 8px; }
+    .stat-label { font-size: 12px; color: #6B6278; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* DOWNLOAD */
+    .download { text-align: center; padding: 80px 24px; }
+    .download h2 { font-size: 36px; color: #F5F0F8; margin-bottom: 16px; font-weight: 400; }
+    .download p { font-size: 15px; color: #B8B0C4; margin-bottom: 40px; }
+    .store-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .store-btn { background: #11111A; border: 1px solid #1C1C2E; border-radius: 14px; padding: 14px 28px; color: #F5F0F8; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .store-btn:hover { border-color: #C9A96E; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid #1C1C2E; padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-size: 18px; color: #C9A96E; letter-spacing: 4px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: #6B6278; font-size: 12px; text-decoration: none; }
+    .footer-links a:hover { color: #C9A96E; }
+    .footer-copy { font-size: 12px; color: #6B6278; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">✦ rituel</div>
+    <div class="nav-links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#download">Télécharger</a>
+      <a href="privacy.html">Confidentialité</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">✦ VOTRE ARCHIVE BEAUTÉ</div>
+    <h1>Prenez soin de vous<br>avec <span>rituel</span></h1>
+    <p>Archivez vos produits, créez vos routines et rejoignez une communauté de femmes passionnées par la beauté.</p>
+    <div class="hero-btns">
+      <a href="#download" class="btn-primary">Télécharger gratuitement</a>
+      <a href="#features" class="btn-secondary">En savoir plus</a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stats-inner">
+      <div>
+        <div class="stat-val">30+</div>
+        <div class="stat-label">Marques référencées</div>
+      </div>
+      <div>
+        <div class="stat-val">8</div>
+        <div class="stat-label">Fonctionnalités</div>
+      </div>
+      <div>
+        <div class="stat-val">2</div>
+        <div class="stat-label">Langues</div>
+      </div>
+      <div>
+        <div class="stat-val">100%</div>
+        <div class="stat-label">Gratuit pour commencer</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <p class="section-label">Ce que vous pouvez faire</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🗂</div>
+        <div class="feature-title">Archive personnelle</div>
+        <div class="feature-desc">Archivez tous vos produits, suivez vos dépenses et gérez votre stock beauté.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✦</div>
+        <div class="feature-title">Routine sur mesure</div>
+        <div class="feature-desc">Créez votre routine matin et soir, étape par étape, adaptée à votre peau.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📸</div>
+        <div class="feature-title">Journal peau</div>
+        <div class="feature-desc">Photographiez votre peau chaque semaine et suivez son évolution dans le temps.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧪</div>
+        <div class="feature-title">Test de compatibilité</div>
+        <div class="feature-desc">Vérifiez si vos ingrédients actifs sont compatibles avant de les mélanger.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <div class="feature-title">Communauté</div>
+        <div class="feature-desc">Partagez vos routines et découvrez celles des femmes qui ont votre type de peau.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📷</div>
+        <div class="feature-title">Scanner de produits</div>
+        <div class="feature-desc">Scannez le code-barre de n'importe quel produit pour l'ajouter instantanément.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <h2>Téléchargez Rituel</h2>
+    <p>Disponible sur iOS. Android bientôt disponible.</p>
+    <div class="store-btns">
+      <a href="#" class="store-btn">
+        <span style="font-size:22px">🍎</span>
+        <div>
+          <div style="font-size:10px;color:#6B6278;letter-spacing:1px">DISPONIBLE SUR</div>
+          <div style="font-weight:600">App Store</div>
+        </div>
+      </a>
+      <a href="#" class="store-btn" style="opacity:0.5;cursor:not-allowed">
+        <span style="font-size:22px">▶</span>
+        <div>
+          <div style="font-size:10px;color:#6B6278;letter-spacing:1px">BIENTÔT SUR</div>
+          <div style="font-weight:600">Google Play</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">✦ rituel</div>
+    <div class="footer-links">
+      <a href="privacy.html">Politique de confidentialité</a>
+      <a href="mailto:contact@rituel.app">Contact</a>
+    </div>
+    <div class="footer-copy">© 2026 Rituel. Tous droits réservés.</div>
+  </footer>
+
+</body>
+</html>

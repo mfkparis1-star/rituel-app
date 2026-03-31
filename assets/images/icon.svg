@@ -1,0 +1,28 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="224" fill="#0A0810"/>
+  <rect width="1024" height="1024" rx="224" fill="none" stroke="#C9A96E" stroke-width="1.5" opacity="0.15"/>
+  <circle cx="512" cy="475" r="270" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.06"/>
+  <circle cx="512" cy="475" r="202" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.05"/>
+  <ellipse cx="512" cy="328" rx="48" ry="123" fill="#C9A96E" opacity="0.88"/>
+  <ellipse cx="512" cy="622" rx="48" ry="123" fill="#C9A96E" opacity="0.88"/>
+  <ellipse cx="365" cy="475" rx="123" ry="48" fill="#C9A96E" opacity="0.88"/>
+  <ellipse cx="659" cy="475" rx="123" ry="48" fill="#C9A96E" opacity="0.88"/>
+  <ellipse cx="424" cy="382" rx="33" ry="33" fill="#C9A96E" opacity="0.3" transform="rotate(45 424 382)"/>
+  <ellipse cx="600" cy="382" rx="33" ry="33" fill="#C9A96E" opacity="0.3" transform="rotate(45 600 382)"/>
+  <ellipse cx="424" cy="568" rx="33" ry="33" fill="#C9A96E" opacity="0.3" transform="rotate(45 424 568)"/>
+  <ellipse cx="600" cy="568" rx="33" ry="33" fill="#C9A96E" opacity="0.3" transform="rotate(45 600 568)"/>
+  <circle cx="512" cy="475" r="78" fill="#0A0810"/>
+  <circle cx="512" cy="475" r="63" fill="none" stroke="#C9A96E" stroke-width="1" opacity="0.35"/>
+  <circle cx="512" cy="475" r="42" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.25"/>
+  <circle cx="512" cy="475" r="18" fill="#C9A96E" opacity="0.6"/>
+  <circle cx="512" cy="475" r="7" fill="#C9A96E"/>
+  <circle cx="348" cy="300" r="3.8" fill="#C9A96E" opacity="0.4"/>
+  <circle cx="672" cy="300" r="3.8" fill="#C9A96E" opacity="0.4"/>
+  <circle cx="348" cy="650" r="3.8" fill="#C9A96E" opacity="0.35"/>
+  <circle cx="672" cy="650" r="3.8" fill="#C9A96E" opacity="0.35"/>
+  <circle cx="408" cy="268" r="2.7" fill="#E87FAC" opacity="0.45"/>
+  <circle cx="616" cy="268" r="2.7" fill="#E87FAC" opacity="0.45"/>
+  <line x1="408" y1="712" x2="616" y2="712" stroke="#C9A96E" stroke-width="0.6" opacity="0.18"/>
+  <text x="512" y="770" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="400" fill="#C9A96E" letter-spacing="20" opacity="0.88">rituel</text>
+  <line x1="408" y1="792" x2="616" y2="792" stroke="#C9A96E" stroke-width="0.5" opacity="0.15"/>
+</svg>

@@ -1,24 +1,28 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Tabs } from 'expo-router';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Tabs screenOptions={{
+      headerShown: false,
+      tabBarStyle: {
+        backgroundColor: '#08080E',
+        borderTopColor: '#1C1C2E',
+        height: 60,
+      },
+      tabBarActiveTintColor: '#C9A96E',
+      tabBarInactiveTintColor: '#6B6278',
+      tabBarLabelStyle: {
+        fontSize: 9,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+      },
+    }}>
+      <Tabs.Screen name="index" options={{ title: 'Ana Sayfa', tabBarIcon: () => null }} />
+      <Tabs.Screen name="archive" options={{ title: 'Arşiv', tabBarIcon: () => null }} />
+      <Tabs.Screen name="routine" options={{ title: 'Rutin', tabBarIcon: () => null }} />
+      <Tabs.Screen name="community" options={{ title: 'Topluluk', tabBarIcon: () => null }} />
+      <Tabs.Screen name="explore" options={{ href: null }} />
+    </Tabs>
   );
 }
