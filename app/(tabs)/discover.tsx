@@ -31,8 +31,9 @@ export default function DiscoverScreen() {
   useEffect(() => { loadArticles(); }, []);
 
   const loadArticles = async () => {
-    const { data } = await supabase.from('articles').select('*').order('created_at', { ascending: false });
-    if (data) setArticles(data);
+    const { data, error } = await supabase.from('articles').select('*').order('created_at', { ascending: false });
+    if (error) { console.warn('loadArticles error:', error.message); }
+    else if (data) setArticles(data);
     setLoading(false);
   };
 

@@ -31,6 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen name="scanner" options={{ href: null }} />
       <Tabs.Screen name="onboarding" options={{ href: null }} />
       <Tabs.Screen name="explore" options={{ href: null }} />
+      <Tabs.Screen name="skin-analysis" options={{ href: null }} />
     </Tabs>
   );
 }

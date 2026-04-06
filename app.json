@@ -14,15 +14,18 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.rituel.app",
-      "buildNumber": "1"
+      "bundleIdentifier": "com.mfkparis.rituel",
+      "buildNumber": "8",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#08080E"
       },
-      "package": "com.rituel.app",
+      "package": "com.mfkparis.rituel",
       "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",

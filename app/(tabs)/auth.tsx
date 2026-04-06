@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -17,7 +17,7 @@ const SKIN_IDS = ['dry', 'oily', 'combination', 'normal', 'sensitive'];
 
 export default function AuthScreen() {
   const { t, lang } = useTranslation();
-  const [mode, setMode] = useState<'login' | 'register' | 'reset' | 'profile' | 'editProfile'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'reset' | 'profile' | 'editProfile' | 'deleteAccount'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -30,8 +30,11 @@ export default function AuthScreen() {
   const [editName, setEditName] = useState('');
   const [editSkin, setEditSkin] = useState('');
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const SKIN_LABELS = lang === 'fr' ? SKIN_TYPES_FR : SKIN_TYPES_EN;
 
@@ -39,7 +42,6 @@ export default function AuthScreen() {
     { icon: '✦', label: t.routine.title, route: '/routine', desc: lang === 'fr' ? 'Gérer ma routine matin & soir' : 'Manage my morning & evening routine' },
     { icon: '📸', label: t.journal.title, route: '/journal', desc: lang === 'fr' ? 'Suivre l\'évolution de ma peau' : 'Track my skin\'s evolution' },
     { icon: '🧪', label: t.compatibility.title, route: '/compatibility', desc: lang === 'fr' ? 'Tester mes ingrédients' : 'Test my ingredients' },
-    { icon: '📷', label: t.scanner.title, route: '/scanner', desc: lang === 'fr' ? 'Scanner un produit' : 'Scan a product' },
   ];
 
   useEffect(() => {
@@ -64,32 +66,37 @@ export default function AuthScreen() {
   }, []);
 
   const loadProfile = async (id: string) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
+    if (error && error.code !== 'PGRST116') { console.warn('loadProfile error:', error.message); return; }
     if (data) { setProfile(data); setEditName(data.full_name || ''); setEditSkin(data.skin_type || ''); setAvatarUri(data.avatar_url || null); }
   };
 
   const pickAvatar = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.7 });
-    if (!result.canceled) setAvatarUri(result.assets[0].uri);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.6, base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setAvatarUri(result.assets[0].uri);
+      setAvatarBase64(result.assets[0].base64 ? `data:image/jpeg;base64,${result.assets[0].base64}` : null);
+    }
   };
 
-  const uploadAvatar = async (uri: string, uid: string): Promise<string | null> => {
+  const uploadAvatar = async (base64: string, uid: string): Promise<string | null> => {
     try {
       setUploading(true);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const fileExt = uri.split('.').pop() || 'jpg';
-      const fileName = `${uid}/avatar.${fileExt}`;
-      const { error } = await supabase.storage.from('avatars').upload(fileName, blob, { contentType: `image/${fileExt}`, upsert: true });
-      if (error) return null;
+      const fileName = `${uid}/avatar.jpg`;
+      const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+      const byteArray = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      const { error } = await supabase.storage.from('avatars').upload(fileName, byteArray, { contentType: 'image/jpeg', upsert: true });
+      if (error) { console.warn('uploadAvatar error:', error.message); return null; }
       const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
       return data.publicUrl + '?t=' + Date.now();
-    } catch { return null; }
+    } catch (e) { console.warn('uploadAvatar exception:', e); return null; }
     finally { setUploading(false); }
   };
 
   const handleAuth = async () => {
-    if (!email || !password) { window.alert(lang === 'fr' ? 'Veuillez remplir tous les champs' : 'Please fill in all fields'); return; }
+    if (!email || !password) { Alert.alert('', lang === 'fr' ? 'Veuillez remplir tous les champs' : 'Please fill in all fields'); return; }
     setLoading(true);
     try {
       if (mode === 'register') {
@@ -97,7 +104,7 @@ export default function AuthScreen() {
         if (error) throw error;
         if (data.user) {
           await supabase.from('profiles').upsert({ id: data.user.id, email, full_name: name, referral_code: 'RITUEL-' + Math.random().toString(36).slice(2,8).toUpperCase() });
-          window.alert(lang === 'fr' ? 'Compte créé! Connectez-vous.' : 'Account created! Sign in now.');
+          Alert.alert('', lang === 'fr' ? 'Compte créé! Connectez-vous.' : 'Account created! Sign in now.');
           setMode('login');
         }
       } else {
@@ -105,15 +112,15 @@ export default function AuthScreen() {
         if (error) throw error;
         if (data.user) { setLoggedIn(true); setUserEmail(data.user.email || ''); setUserId(data.user.id); setMode('profile'); loadProfile(data.user.id); }
       }
-    } catch (e: any) { window.alert('Erreur: ' + e.message); }
+    } catch (e: any) { Alert.alert('Erreur', e.message); }
     finally { setLoading(false); }
   };
 
   const handleReset = async () => {
-    if (!email) { window.alert(lang === 'fr' ? 'Entrez votre email' : 'Enter your email'); return; }
+    if (!email) { Alert.alert('', lang === 'fr' ? 'Entrez votre email' : 'Enter your email'); return; }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) { window.alert('Erreur: ' + error.message); }
+    if (error) { Alert.alert('Erreur', error.message); }
     else { setResetSent(true); }
     setLoading(false);
   };
@@ -122,10 +129,10 @@ export default function AuthScreen() {
     if (!userId) return;
     setSaving(true);
     let avatarUrl = profile?.avatar_url || null;
-    if (avatarUri && !avatarUri.startsWith('http')) avatarUrl = await uploadAvatar(avatarUri, userId);
+    if (avatarBase64) avatarUrl = await uploadAvatar(avatarBase64, userId);
     const { error } = await supabase.from('profiles').upsert({ id: userId, full_name: editName, skin_type: editSkin, avatar_url: avatarUrl });
-    if (error) { window.alert('Erreur: ' + error.message); }
-    else { window.alert(lang === 'fr' ? 'Profil mis à jour! ✓' : 'Profile updated! ✓'); loadProfile(userId); setMode('profile'); }
+    if (error) { Alert.alert('Erreur', error.message); }
+    else { setAvatarBase64(null); Alert.alert('', lang === 'fr' ? 'Profil mis à jour! ✓' : 'Profile updated! ✓', [{ text: 'OK', onPress: () => { loadProfile(userId); setMode('profile'); } }]); }
     setSaving(false);
   };
 
@@ -134,10 +141,68 @@ export default function AuthScreen() {
     setLoggedIn(false); setUserEmail(''); setUserId(''); setProfile(null); setMode('login');
   };
 
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      Alert.alert('', lang === 'fr' ? 'Entrez votre mot de passe pour confirmer' : 'Enter your password to confirm');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: userEmail, password: deletePassword });
+      if (signInError) { Alert.alert('Erreur', lang === 'fr' ? 'Mot de passe incorrect' : 'Incorrect password'); setDeleting(false); return; }
+      await supabase.from('products').delete().eq('user_id', userId);
+      await supabase.from('routine_steps').delete().eq('user_id', userId);
+      await supabase.from('skin_journal').delete().eq('user_id', userId);
+      await supabase.from('post_likes').delete().eq('user_id', userId);
+      await supabase.from('posts').delete().eq('user_id', userId);
+      await supabase.from('profiles').delete().eq('id', userId);
+      const { error } = await supabase.auth.admin?.deleteUser?.(userId) || { error: null };
+      await supabase.auth.signOut();
+      Alert.alert(
+        lang === 'fr' ? 'Compte supprimé' : 'Account deleted',
+        lang === 'fr' ? 'Vos données ont été supprimées.' : 'Your data has been deleted.',
+      );
+    } catch (e: any) {
+      Alert.alert('Erreur', e.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const getSkinLabel = (id: string) => {
     const idx = SKIN_IDS.indexOf(id);
     return idx >= 0 ? SKIN_LABELS[idx] : id;
   };
+
+  if (loggedIn && mode === 'deleteAccount') return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.logoText}>✦ rituel</Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{lang === 'fr' ? '🗑 Supprimer mon compte' : '🗑 Delete my account'}</Text>
+        <Text style={styles.deleteWarning}>
+          {lang === 'fr'
+            ? 'Cette action est irréversible. Toutes vos données (archive, journal, routine, posts) seront définitivement supprimées.'
+            : 'This action is irreversible. All your data (archive, journal, routine, posts) will be permanently deleted.'}
+        </Text>
+        <Text style={styles.fieldLabel}>{lang === 'fr' ? 'Confirmez votre mot de passe' : 'Confirm your password'}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="••••••••"
+          placeholderTextColor={T.textSoft}
+          value={deletePassword}
+          onChangeText={setDeletePassword}
+          secureTextEntry
+          blurOnSubmit={false}
+        />
+        <TouchableOpacity style={styles.deleteConfirmBtn} onPress={handleDeleteAccount} disabled={deleting}>
+          <Text style={styles.deleteConfirmBtnText}>{deleting ? '...' : lang === 'fr' ? 'Supprimer définitivement' : 'Permanently delete'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cancelBtn} onPress={() => { setDeletePassword(''); setMode('profile'); }}>
+          <Text style={styles.cancelBtnText}>{lang === 'fr' ? 'Annuler' : 'Cancel'}</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
 
   if (loggedIn && mode === 'profile') return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -166,6 +231,15 @@ export default function AuthScreen() {
         )}
       </View>
 
+      <TouchableOpacity style={styles.aiAnalysisBtn} onPress={() => router.push('/skin-analysis' as any)}>
+        <Text style={styles.aiAnalysisBtnTitle}>
+          {lang === 'fr' ? '✦ Analyse IA de ma peau' : lang === 'tr' ? '✦ AI Cilt Analizim' : '✦ AI Skin Analysis'}
+        </Text>
+        <Text style={styles.aiAnalysisBtnSub}>
+          {lang === 'fr' ? 'Découvrez votre type de peau en 1 photo' : lang === 'tr' ? '1 fotoğrafla cilt tipinizi öğrenin' : 'Discover your skin type in 1 photo'}
+        </Text>
+      </TouchableOpacity>
+
       <Text style={styles.sectionLabel}>{t.auth.tools}</Text>
       <View style={styles.menuGrid}>
         {MENU_ITEMS.map((item) => (
@@ -182,6 +256,9 @@ export default function AuthScreen() {
       </TouchableOpacity>
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Text style={styles.logoutText}>{t.auth.logout}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteBtn} onPress={() => setMode('deleteAccount')}>
+        <Text style={styles.deleteBtnText}>{lang === 'fr' ? 'Supprimer mon compte' : 'Delete my account'}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -335,9 +412,17 @@ const styles = StyleSheet.create({
   menuLabel: { fontSize: 13, fontWeight: '700', color: T.text, marginBottom: 4 },
   menuDesc: { fontSize: 11, color: T.textSoft, lineHeight: 16 },
   editBtn: { backgroundColor: 'rgba(201,169,110,0.12)', borderRadius: 14, padding: 14, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: 'rgba(201,169,110,0.2)' },
+  aiAnalysisBtn: { backgroundColor: '#0D1A12', borderRadius: 16, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(82,219,168,0.25)' },
+  aiAnalysisBtnTitle: { fontSize: 15, fontWeight: '700', color: '#52DBA8', marginBottom: 4 },
+  aiAnalysisBtnSub: { fontSize: 12, color: T.textSoft },
   editBtnText: { fontSize: 14, color: T.accent, fontWeight: '600' },
-  logoutBtn: { borderWidth: 1, borderColor: T.border, borderRadius: 14, padding: 14, alignItems: 'center' },
+  logoutBtn: { borderWidth: 1, borderColor: T.border, borderRadius: 14, padding: 14, alignItems: 'center', marginBottom: 10 },
   logoutText: { fontSize: 14, color: T.textSoft },
+  deleteBtn: { borderWidth: 1, borderColor: '#3D1A1A', borderRadius: 14, padding: 14, alignItems: 'center', marginBottom: 20 },
+  deleteBtnText: { fontSize: 14, color: '#FF5272' },
+  deleteWarning: { fontSize: 13, color: T.textSoft, lineHeight: 20, marginBottom: 20, textAlign: 'center' },
+  deleteConfirmBtn: { backgroundColor: '#3D1A1A', borderRadius: 14, padding: 16, alignItems: 'center', marginBottom: 10 },
+  deleteConfirmBtnText: { fontSize: 15, fontWeight: '700', color: '#FF5272' },
   avatarPicker: { alignItems: 'center', marginBottom: 20 },
   avatarPickerImage: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: T.accent },
   avatarPickerPlaceholder: { width: 100, height: 100, borderRadius: 50, backgroundColor: T.bg, borderWidth: 1.5, borderColor: T.border, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
@@ -349,7 +434,7 @@ const styles = StyleSheet.create({
   skinChipText: { fontSize: 12, color: T.textSoft, fontWeight: '500' },
   skinChipTextActive: { color: '#1A1208', fontWeight: '700' },
   modalBtns: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.border, alignItems: 'center' },
+  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.border, alignItems: 'center', marginTop: 8 },
   cancelBtnText: { fontSize: 14, color: T.textSoft },
   saveBtn: { flex: 2, padding: 14, borderRadius: 12, backgroundColor: T.accent, alignItems: 'center' },
   saveBtnText: { fontSize: 14, fontWeight: '700', color: '#1A1208' },

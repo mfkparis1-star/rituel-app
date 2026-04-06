@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Clipboard, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -19,6 +19,16 @@ const SKIN_LABELS: Record<string, Record<string, string>> = {
   fr: { dry: 'sèche', oily: 'grasse', combination: 'mixte', normal: 'normale', sensitive: 'sensible' },
   en: { dry: 'dry', oily: 'oily', combination: 'combination', normal: 'normal', sensitive: 'sensitive' },
 };
+
+const PUBLISHER_ID = '2836964';
+
+const PARTNER_BRANDS = [
+  { name: 'Diamond Smile', emoji: '💎', mid: '27135', desc_fr: 'Blanchiment dentaire professionnel', desc_en: 'Professional teeth whitening' },
+  { name: 'Blissim', emoji: '🎁', mid: '15574', desc_fr: 'Box beauté personnalisée', desc_en: 'Personalized beauty box' },
+  { name: 'Laboratoires Uma', emoji: '🌿', mid: '85413', desc_fr: 'Compléments naturels pour femmes', desc_en: 'Natural supplements for women' },
+  { name: 'Perfumeria Comas', emoji: '🌸', mid: '105475', desc_fr: 'Parfums & cosmétiques premium', desc_en: 'Premium perfumes & cosmetics' },
+  { name: 'Dr Pierre Ricaud', emoji: '✨', mid: '6977', desc_fr: 'Soins anti-âge experts', desc_en: 'Expert anti-ageing skincare' },
+];
 
 export default function HomeScreen() {
   const { t, lang } = useTranslation();
@@ -47,7 +57,8 @@ export default function HomeScreen() {
   }, []);
 
   const loadProducts = async (userId: string) => {
-    const { data } = await supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    if (error) { console.warn('loadProducts error:', error.message); return; }
     if (data) {
       setProducts(data);
       setStats({
@@ -60,7 +71,8 @@ export default function HomeScreen() {
   };
 
   const loadProfile = async (userId: string) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (error && error.code !== 'PGRST116') { console.warn('loadProfile error:', error.message); return; }
     if (data) setProfile(data);
   };
 
@@ -207,12 +219,37 @@ export default function HomeScreen() {
         </View>
       )}
 
-      <View style={styles.premiumBanner}>
-        <Text style={styles.premiumLabel}>{t.home.premium_label}</Text>
-        <Text style={styles.premiumText}>{t.home.premium_text}</Text>
-        <TouchableOpacity style={styles.premiumBtn}>
-          <Text style={styles.premiumBtnText}>{t.home.premium_btn}</Text>
-        </TouchableOpacity>
+      {/* PARTNER BRANDS */}
+      <View style={styles.partnersSection}>
+        <Text style={styles.partnersLabel}>
+          {lang === 'fr' ? '🛍️ NOS PARTENAIRES' : lang === 'tr' ? '🛍️ ORTAKLARIMIZ' : '🛍️ OUR PARTNERS'}
+        </Text>
+        <Text style={styles.partnersSub}>
+          {lang === 'fr' ? 'Sélectionnés pour vous' : lang === 'tr' ? 'Sizin için seçildi' : 'Selected for you'}
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.partnersScroll}>
+          {PARTNER_BRANDS.map(brand => (
+            <TouchableOpacity
+              key={brand.mid}
+              style={styles.partnerCard}
+              onPress={() => {
+                const url = `https://www.awin1.com/cread.php?awinmid=${brand.mid}&awinaffid=${PUBLISHER_ID}`;
+                Linking.openURL(url);
+              }}
+            >
+              <Text style={styles.partnerEmoji}>{brand.emoji}</Text>
+              <Text style={styles.partnerName}>{brand.name}</Text>
+              <Text style={styles.partnerDesc}>
+                {lang === 'fr' ? brand.desc_fr : brand.desc_en}
+              </Text>
+              <View style={styles.partnerBtn}>
+                <Text style={styles.partnerBtnText}>
+                  {lang === 'fr' ? 'Découvrir →' : lang === 'tr' ? 'Keşfet →' : 'Discover →'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       <View style={styles.inviteBox}>
@@ -224,8 +261,8 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity style={styles.copyBtn} onPress={() => {
             const code = profile?.referral_code || 'RITUEL-CODE';
-            if (navigator?.clipboard) navigator.clipboard.writeText(code);
-            window.alert(lang === 'fr' ? 'Code copié! ' + code : 'Code copied! ' + code);
+            Clipboard.setString(code);
+            Alert.alert('', lang === 'fr' ? 'Code copié ! ' + code : 'Code copied! ' + code);
           }}>
             <Text style={styles.copyBtnText}>{t.home.invite_copy}</Text>
           </TouchableOpacity>
@@ -279,11 +316,16 @@ const styles = StyleSheet.create({
   trendLabel: { fontSize: 10, color: T.accent, fontWeight: '700', letterSpacing: 1, marginBottom: 6 },
   trendProduct: { fontSize: 18, fontWeight: '700', color: T.text, marginBottom: 4 },
   trendSub: { fontSize: 11, color: T.textSoft },
-  premiumBanner: { backgroundColor: '#1E1628', borderRadius: 18, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: '#2A1F35' },
-  premiumLabel: { fontSize: 10, color: T.accent, fontWeight: '700', letterSpacing: 2, marginBottom: 6 },
-  premiumText: { fontSize: 13, color: T.textMid, marginBottom: 12 },
-  premiumBtn: { backgroundColor: T.accent, borderRadius: 12, padding: 12, alignItems: 'center' },
-  premiumBtnText: { fontSize: 13, fontWeight: '700', color: '#1A1208' },
+  partnersSection: { marginBottom: 16 },
+  partnersLabel: { fontSize: 10, color: T.accent, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
+  partnersSub: { fontSize: 12, color: T.textSoft, marginBottom: 12 },
+  partnersScroll: { marginHorizontal: -4 },
+  partnerCard: { backgroundColor: T.surface, borderRadius: 16, padding: 16, marginHorizontal: 6, borderWidth: 1, borderColor: T.border, width: 160, alignItems: 'center' },
+  partnerEmoji: { fontSize: 32, marginBottom: 8 },
+  partnerName: { fontSize: 13, fontWeight: '700', color: T.text, marginBottom: 4, textAlign: 'center' },
+  partnerDesc: { fontSize: 11, color: T.textSoft, textAlign: 'center', marginBottom: 12, lineHeight: 16 },
+  partnerBtn: { backgroundColor: 'rgba(201,169,110,0.15)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(201,169,110,0.3)' },
+  partnerBtnText: { fontSize: 11, color: T.accent, fontWeight: '700' },
   inviteBox: { backgroundColor: 'rgba(232,127,172,0.08)', borderRadius: 18, padding: 18, marginBottom: 40, borderWidth: 1, borderColor: 'rgba(232,127,172,0.2)' },
   inviteTitle: { fontSize: 13, fontWeight: '700', color: T.text, marginBottom: 6 },
   inviteSub: { fontSize: 12, color: T.textSoft, marginBottom: 12, lineHeight: 18 },

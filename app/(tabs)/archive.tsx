@@ -1,8 +1,9 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
+import { getAwinLink } from '../../utils/awin';
 
 const T = {
   bg: '#08080E', surface: '#11111A', border: '#1C1C2E',
@@ -27,15 +28,42 @@ const STATUSES_EN = [
   { id: 'stocked', label: 'In stock', color: '#5BC4F8' },
 ];
 
+const PAO_MONTHS: Record<string, number> = {
+  'Nettoyant': 12, 'Cleanser': 12,
+  'Hydratant': 12, 'Moisturizer': 12,
+  'Sérum': 6, 'Serum': 6,
+  'SPF': 12,
+  'Tonique': 12, 'Toner': 12,
+  'Masque': 6, 'Mask': 6,
+  'Maquillage': 6, 'Makeup': 6,
+  'Parfum': 36, 'Perfume': 36,
+  'Corps': 18, 'Body': 18,
+  'Cheveux': 12, 'Hair': 12,
+};
+
 type Product = {
   id: string; brand: string; name: string; category: string;
   status: string; price: number; icon: string; notes: string;
-  image_url?: string; created_at: string;
+  image_url?: string; created_at: string; opened_at?: string;
 };
 
 type BeautyProduct = {
   id: string; brand: string; name: string; category: string; description: string;
 };
+
+function getPAOStatus(product: Product): { label: string; color: string; daysLeft: number } | null {
+  if (!product.opened_at || product.status !== 'active') return null;
+  const opened = new Date(product.opened_at);
+  const paoMonths = PAO_MONTHS[product.category] || 12;
+  const expiry = new Date(opened);
+  expiry.setMonth(expiry.getMonth() + paoMonths);
+  const today = new Date();
+  const daysLeft = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysLeft < 0) return { label: '⚠️ Expiré', color: '#FF5272', daysLeft };
+  if (daysLeft <= 30) return { label: `⚠️ ${daysLeft}j`, color: '#F5A623', daysLeft };
+  if (daysLeft <= 60) return { label: `⏰ ${daysLeft}j`, color: '#FFD60A', daysLeft };
+  return { label: `✓ ${daysLeft}j`, color: '#52DBA8', daysLeft };
+}
 
 function DBSearch({ onSelect, lang }: { onSelect: (p: BeautyProduct) => void; lang: string }) {
   const [query, setQuery] = useState('');
@@ -110,7 +138,9 @@ export default function ArchiveScreen() {
   const [price, setPrice] = useState('');
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState('active');
+  const [openedAt, setOpenedAt] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -131,21 +161,24 @@ export default function ArchiveScreen() {
   }, []);
 
   const loadProducts = async (userId: string) => {
-    const { data } = await supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-    if (data) setProducts(data);
+    const { data, error } = await supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    if (error) { console.warn('loadProducts error:', error.message); }
+    else if (data) setProducts(data);
     setLoading(false);
   };
 
   const resetForm = () => {
     setBrand(''); setName(''); setCategory(CATEGORIES[1]);
-    setPrice(''); setNotes(''); setStatus('active'); setImageUri(null);
+    setPrice(''); setNotes(''); setStatus('active');
+    setOpenedAt(''); setImageUri(null); setImageBase64(null);
   };
 
   const openEdit = (p: Product) => {
     setSelectedProduct(p); setBrand(p.brand); setName(p.name);
     setCategory(p.category); setPrice(p.price?.toString() || '');
     setNotes(p.notes || ''); setStatus(p.status);
-    setImageUri(p.image_url || null); setShowEditModal(true);
+    setOpenedAt(p.opened_at || '');
+    setImageUri(p.image_url || null); setImageBase64(null); setShowEditModal(true);
   };
 
   const handleDBSelect = (p: BeautyProduct) => {
@@ -154,39 +187,42 @@ export default function ArchiveScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.7,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.6, base64: true,
     });
-    if (!result.canceled) setImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+      setImageBase64(result.assets[0].base64 ? `data:image/jpeg;base64,${result.assets[0].base64}` : null);
+    }
   };
 
-  const uploadImage = async (uri: string, userId: string): Promise<string | null> => {
-    if (uri.startsWith('http')) return uri;
+  const uploadImage = async (base64OrUrl: string, userId: string): Promise<string | null> => {
+    if (base64OrUrl.startsWith('http')) return base64OrUrl;
     try {
       setUploading(true);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const fileExt = uri.split('.').pop() || 'jpg';
-      const fileName = `${userId}/${Date.now()}.${fileExt}`;
-      const { error } = await supabase.storage.from('product-images').upload(fileName, blob, { contentType: `image/${fileExt}` });
-      if (error) return null;
+      const fileName = `${userId}/${Date.now()}.jpg`;
+      const base64Data = base64OrUrl.replace(/^data:image\/\w+;base64,/, '');
+      const byteArray = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      const { error } = await supabase.storage.from('product-images').upload(fileName, byteArray, { contentType: 'image/jpeg' });
+      if (error) { console.warn('uploadImage error:', error.message); return null; }
       const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
       return data.publicUrl;
-    } catch { return null; }
+    } catch (e) { console.warn('uploadImage exception:', e); return null; }
     finally { setUploading(false); }
   };
 
   const addProduct = async () => {
-    if (!brand || !name) { window.alert(lang === 'fr' ? 'Marque et nom sont obligatoires' : 'Brand and name are required'); return; }
+    if (!brand || !name) { Alert.alert('', lang === 'fr' ? 'Marque et nom sont obligatoires' : 'Brand and name are required'); return; }
     if (!user) return;
     setSaving(true);
     let imageUrl = null;
-    if (imageUri) imageUrl = await uploadImage(imageUri, user.id);
+    if (imageBase64) imageUrl = await uploadImage(imageBase64, user.id);
     const { error } = await supabase.from('products').insert({
       user_id: user.id, brand, name, category,
       price: parseFloat(price) || 0, notes,
       icon: ICONS[category] || '✨', status, image_url: imageUrl,
+      opened_at: openedAt || null,
     });
-    if (error) { window.alert('Erreur: ' + error.message); }
+    if (error) { Alert.alert('Erreur', error.message); }
     else { setShowAddModal(false); resetForm(); loadProducts(user.id); }
     setSaving(false);
   };
@@ -195,18 +231,22 @@ export default function ArchiveScreen() {
     if (!selectedProduct || !user) return;
     setSaving(true);
     let imageUrl = selectedProduct.image_url || null;
-    if (imageUri && imageUri !== selectedProduct.image_url) imageUrl = await uploadImage(imageUri, user.id);
+    if (imageBase64) imageUrl = await uploadImage(imageBase64, user.id);
+    else if (imageUri && imageUri.startsWith('http')) imageUrl = imageUri;
     const { error } = await supabase.from('products').update({
       brand, name, category, price: parseFloat(price) || 0,
       notes, status, icon: ICONS[category] || '✨', image_url: imageUrl,
+      opened_at: openedAt || null,
     }).eq('id', selectedProduct.id);
-    if (error) { window.alert('Erreur: ' + error.message); }
+    if (error) { Alert.alert('Erreur', error.message); }
     else { setShowEditModal(false); resetForm(); loadProducts(user.id); }
     setSaving(false);
   };
 
   const deleteProduct = async (id: string) => {
-    const confirmed = window.confirm(t.archive.delete_confirm);
+    const confirmed = window.confirm(
+      lang === 'fr' ? 'Supprimer ce produit ?' : 'Delete this product?'
+    );
     if (confirmed) {
       await supabase.from('products').delete().eq('id', id);
       if (user) loadProducts(user.id);
@@ -220,6 +260,12 @@ export default function ArchiveScreen() {
   const total = products.reduce((s, p) => s + (p.price || 0), 0).toFixed(2);
   const getStatusColor = (s: string) => STATUSES.find(x => x.id === s)?.color || '#fff';
   const getStatusLabel = (s: string) => STATUSES.find(x => x.id === s)?.label || s;
+  const expiringCount = products.filter(p => { const pao = getPAOStatus(p); return pao && pao.daysLeft <= 30; }).length;
+
+  const paoMonthsLabel = (cat: string) => {
+    const m = PAO_MONTHS[cat] || 12;
+    return lang === 'fr' ? `PAO: ${m} mois` : `PAO: ${m} months`;
+  };
 
   if (!user) return (
     <View style={styles.center}>
@@ -235,6 +281,14 @@ export default function ArchiveScreen() {
         <Text style={styles.title}>{t.archive.title}</Text>
         <Text style={styles.sub}>{products.length} {lang === 'fr' ? 'produits' : 'products'} · €{total} {lang === 'fr' ? 'au total' : 'total'}</Text>
       </View>
+
+      {expiringCount > 0 && (
+        <View style={styles.expiryAlert}>
+          <Text style={styles.expiryAlertText}>
+            ⚠️ {expiringCount} {lang === 'fr' ? `produit${expiringCount > 1 ? 's' : ''} expire${expiringCount > 1 ? 'nt' : ''} bientôt` : `product${expiringCount > 1 ? 's' : ''} expiring soon`}
+          </Text>
+        </View>
+      )}
 
       <TextInput style={styles.searchInput} placeholder={t.archive.search} placeholderTextColor={T.textSoft} value={search} onChangeText={setSearch} autoCorrect={false} blurOnSubmit={false} />
 
@@ -264,25 +318,50 @@ export default function ArchiveScreen() {
           <Text style={styles.emptyTitle}>{search ? (lang === 'fr' ? 'Aucun résultat' : 'No results') : t.archive.empty_title}</Text>
           <Text style={styles.emptySub}>{search ? `"${search}"` : t.archive.empty_sub}</Text>
         </View>
-      ) : filteredProducts.map(p => (
-        <TouchableOpacity key={p.id} onPress={() => openEdit(p)} style={styles.card}>
-          {p.image_url ? <Image source={{ uri: p.image_url }} style={styles.cardImage} /> : <Text style={styles.icon}>{p.icon}</Text>}
-          <View style={styles.info}>
-            <View style={styles.row}>
-              <Text style={styles.name}>{p.name}</Text>
-              <Text style={[styles.badge, { color: getStatusColor(p.status) }]}>{getStatusLabel(p.status)}</Text>
+      ) : filteredProducts.map(p => {
+        const pao = getPAOStatus(p);
+        const awinLink = getAwinLink(p.brand);
+        return (
+          <TouchableOpacity key={p.id} onPress={() => openEdit(p)} style={styles.card}>
+            {p.image_url ? <Image source={{ uri: p.image_url }} style={styles.cardImage} /> : <Text style={styles.icon}>{p.icon}</Text>}
+            <View style={styles.info}>
+              <View style={styles.row}>
+                <Text style={styles.name}>{p.name}</Text>
+                <Text style={[styles.badge, { color: getStatusColor(p.status) }]}>{getStatusLabel(p.status)}</Text>
+              </View>
+              <Text style={styles.brand}>{p.brand} · {p.category}</Text>
+              {pao && (
+                <Text style={[styles.paoText, { color: pao.color }]}>{pao.label}</Text>
+              )}
+              {p.notes ? <Text style={styles.notes}>{p.notes}</Text> : null}
             </View>
-            <Text style={styles.brand}>{p.brand} · {p.category}</Text>
-            {p.notes ? <Text style={styles.notes}>{p.notes}</Text> : null}
-          </View>
-          <View style={styles.cardRight}>
-            <Text style={styles.price}>€{p.price}</Text>
-            <TouchableOpacity onPress={(e: any) => { e.stopPropagation?.(); deleteProduct(p.id); }}>
-              <Text style={styles.deleteBtnText}>🗑</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      ))}
+            <View style={styles.cardRight}>
+              <Text style={styles.price}>€{p.price}</Text>
+              {p.status === 'finished' && awinLink && (
+                <TouchableOpacity
+                  onPress={(e: any) => {
+                    e.stopPropagation?.();
+                    e.preventDefault?.();
+                    Linking.openURL(awinLink);
+                  }}
+                  style={styles.rebuyBtn}
+                >
+                  <Text style={styles.rebuyText}>🛒</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={(e: any) => {
+                  e.stopPropagation?.();
+                  e.preventDefault?.();
+                  deleteProduct(p.id);
+                }}
+              >
+                <Text style={styles.deleteBtnText}>🗑</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
 
       <TouchableOpacity style={styles.addBtn} onPress={() => { resetForm(); setShowAddModal(true); }}>
         <Text style={styles.addText}>{t.archive.add_product}</Text>
@@ -323,6 +402,19 @@ export default function ArchiveScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+              <Text style={styles.fieldLabel}>
+                {lang === 'fr' ? '📅 Date d\'ouverture (optionnel)' : '📅 Opening date (optional)'}
+              </Text>
+              <Text style={styles.paoHint}>{paoMonthsLabel(category)}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD (ex: 2024-01-15)"
+                placeholderTextColor={T.textSoft}
+                value={openedAt}
+                onChangeText={setOpenedAt}
+                autoCorrect={false}
+                blurOnSubmit={false}
+              />
               <Text style={styles.fieldLabel}>{t.archive.price}</Text>
               <TextInput style={styles.input} placeholder="ex: 18.50" placeholderTextColor={T.textSoft} value={price} onChangeText={setPrice} keyboardType="numeric" blurOnSubmit={false} />
               <Text style={styles.fieldLabel}>{t.archive.notes}</Text>
@@ -375,6 +467,19 @@ export default function ArchiveScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+              <Text style={styles.fieldLabel}>
+                {lang === 'fr' ? '📅 Date d\'ouverture (optionnel)' : '📅 Opening date (optional)'}
+              </Text>
+              <Text style={styles.paoHint}>{paoMonthsLabel(category)}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD (ex: 2024-01-15)"
+                placeholderTextColor={T.textSoft}
+                value={openedAt}
+                onChangeText={setOpenedAt}
+                autoCorrect={false}
+                blurOnSubmit={false}
+              />
               <Text style={styles.fieldLabel}>{t.archive.price}</Text>
               <TextInput style={styles.input} placeholder="ex: 18.50" placeholderTextColor={T.textSoft} value={price} onChangeText={setPrice} keyboardType="numeric" blurOnSubmit={false} />
               <Text style={styles.fieldLabel}>{t.archive.notes}</Text>
@@ -400,6 +505,8 @@ const styles = StyleSheet.create({
   header: { paddingTop: 60, paddingBottom: 16 },
   title: { fontSize: 26, fontWeight: '700', color: T.text, marginBottom: 4 },
   sub: { fontSize: 13, color: T.textSoft },
+  expiryAlert: { backgroundColor: 'rgba(255,82,114,0.1)', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,82,114,0.3)' },
+  expiryAlertText: { fontSize: 13, color: '#FF5272', fontWeight: '600', textAlign: 'center' },
   searchInput: { backgroundColor: T.surface, borderRadius: 14, padding: 14, color: T.text, fontSize: 14, borderWidth: 1, borderColor: T.border, marginBottom: 12 },
   filterRow: { marginBottom: 14 },
   filterChip: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 20, backgroundColor: T.surface, marginRight: 8, borderWidth: 1, borderColor: T.border },
@@ -421,9 +528,12 @@ const styles = StyleSheet.create({
   name: { fontSize: 13, fontWeight: '700', color: T.text, flex: 1 },
   badge: { fontSize: 10, fontWeight: '600', marginLeft: 8 },
   brand: { fontSize: 11, color: T.textSoft, marginBottom: 2 },
+  paoText: { fontSize: 10, fontWeight: '600', marginBottom: 2 },
   notes: { fontSize: 11, color: T.textMid, fontStyle: 'italic' },
   cardRight: { alignItems: 'flex-end', gap: 8 },
   price: { fontSize: 14, fontWeight: '700', color: T.accent },
+  rebuyBtn: { backgroundColor: 'rgba(201,169,110,0.15)', borderRadius: 8, padding: 6, borderWidth: 1, borderColor: 'rgba(201,169,110,0.3)' },
+  rebuyText: { fontSize: 16 },
   deleteBtnText: { fontSize: 16 },
   addBtn: { borderWidth: 1.5, borderColor: T.border, borderStyle: 'dashed', borderRadius: 14, padding: 16, alignItems: 'center', marginTop: 4, marginBottom: 40 },
   addText: { fontSize: 14, color: T.textSoft },
@@ -445,6 +555,7 @@ const styles = StyleSheet.create({
   modalContent: { backgroundColor: T.surface, borderRadius: 24, padding: 24, paddingBottom: 40, borderWidth: 1, borderColor: T.border },
   modalTitle: { fontSize: 20, fontWeight: '700', color: T.text, marginBottom: 20 },
   fieldLabel: { fontSize: 12, color: T.textSoft, marginBottom: 6, fontWeight: '500' },
+  paoHint: { fontSize: 10, color: T.accent, marginBottom: 6, fontWeight: '500' },
   input: { backgroundColor: T.bg, borderRadius: 12, padding: 14, color: T.text, fontSize: 14, borderWidth: 1, borderColor: T.border, marginBottom: 14 },
   catChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, backgroundColor: T.bg, marginRight: 8, borderWidth: 1, borderColor: T.border },
   catChipActive: { backgroundColor: T.accent, borderColor: T.accent },

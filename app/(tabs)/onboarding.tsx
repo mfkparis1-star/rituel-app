@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -45,6 +46,7 @@ export default function OnboardingScreen() {
       await supabase.from('profiles').upsert({ id: userId, skin_type: skinType });
     }
     setSaving(false);
+    router.replace('/');
   };
 
   const slides = [

@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -27,6 +27,7 @@ export default function CommunityScreen() {
   const [caption, setCaption] = useState('');
   const [productNames, setProductNames] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -55,39 +56,43 @@ export default function CommunityScreen() {
   }, []);
 
   const loadPosts = async () => {
-    const { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
-    if (data) setPosts(data);
+    const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+    if (error) { console.warn('loadPosts error:', error.message); }
+    else if (data) setPosts(data);
     setLoading(false);
   };
 
   const loadLikedPosts = async (userId: string) => {
-    const { data } = await supabase.from('post_likes').select('post_id').eq('user_id', userId);
+    const { data, error } = await supabase.from('post_likes').select('post_id').eq('user_id', userId);
+    if (error) { console.warn('loadLikedPosts error:', error.message); return; }
     if (data) setLikedPosts(data.map((l: any) => l.post_id));
   };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, aspect: [4, 3], quality: 0.7,
+      allowsEditing: true, aspect: [4, 3], quality: 0.6, base64: true,
     });
-    if (!result.canceled) setImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+      setImageBase64(result.assets[0].base64 ? `data:image/jpeg;base64,${result.assets[0].base64}` : null);
+    }
   };
 
-  const uploadImage = async (uri: string, userId: string): Promise<string | null> => {
+  const uploadImage = async (base64: string, userId: string): Promise<string | null> => {
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const fileExt = uri.split('.').pop() || 'jpg';
-      const fileName = `${userId}/${Date.now()}.${fileExt}`;
-      const { error } = await supabase.storage.from('post-images').upload(fileName, blob, { contentType: `image/${fileExt}` });
-      if (error) return null;
+      const fileName = `${userId}/${Date.now()}.jpg`;
+      const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+      const byteArray = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      const { error } = await supabase.storage.from('post-images').upload(fileName, byteArray, { contentType: 'image/jpeg' });
+      if (error) { console.warn('uploadImage error:', error.message); return null; }
       const { data } = supabase.storage.from('post-images').getPublicUrl(fileName);
       return data.publicUrl;
-    } catch { return null; }
+    } catch (e) { console.warn('uploadImage exception:', e); return null; }
   };
 
   const toggleLike = async (postId: string) => {
-    if (!user) { window.alert(lang === 'fr' ? 'Connectez-vous pour aimer' : 'Sign in to like'); return; }
+    if (!user) { Alert.alert('', lang === 'fr' ? 'Connectez-vous pour aimer' : 'Sign in to like'); return; }
     const liked = likedPosts.includes(postId);
     const post = posts.find(p => p.id === postId)!;
     if (liked) {
@@ -104,7 +109,9 @@ export default function CommunityScreen() {
   };
 
   const deletePost = async (postId: string) => {
-    const confirmed = window.confirm(t.community.delete_confirm);
+    const confirmed = window.confirm(
+      lang === 'fr' ? 'Supprimer ce post ?' : 'Delete this post?'
+    );
     if (confirmed) {
       await supabase.from('post_likes').delete().eq('post_id', postId);
       await supabase.from('posts').delete().eq('id', postId);
@@ -113,13 +120,14 @@ export default function CommunityScreen() {
   };
 
   const sharePost = async () => {
-    if (!user) { window.alert(lang === 'fr' ? 'Connectez-vous pour partager' : 'Sign in to share'); return; }
-    if (!caption.trim()) { window.alert(lang === 'fr' ? 'Écrivez quelque chose' : 'Write something'); return; }
+    if (!user) { Alert.alert('', lang === 'fr' ? 'Connectez-vous pour partager' : 'Sign in to share'); return; }
+    if (!caption.trim()) { Alert.alert('', lang === 'fr' ? 'Écrivez quelque chose' : 'Write something'); return; }
     setSaving(true);
     let imageUrl = null;
-    if (imageUri) {
-      uploading;
-      imageUrl = await uploadImage(imageUri, user.id);
+    if (imageBase64) {
+      setUploading(true);
+      imageUrl = await uploadImage(imageBase64, user.id);
+      setUploading(false);
     }
     const { error } = await supabase.from('posts').insert({
       user_id: user.id, user_email: user.email,
@@ -128,8 +136,8 @@ export default function CommunityScreen() {
       product_names: productNames.split(',').map((p: string) => p.trim()).filter(Boolean),
       likes_count: 0, image_url: imageUrl,
     });
-    if (error) { window.alert('Erreur: ' + error.message); }
-    else { setShowModal(false); setCaption(''); setProductNames(''); setImageUri(null); loadPosts(); }
+    if (error) { Alert.alert('Erreur', error.message); }
+    else { setShowModal(false); setCaption(''); setProductNames(''); setImageUri(null); setImageBase64(null); loadPosts(); }
     setSaving(false);
   };
 
@@ -226,11 +234,11 @@ export default function CommunityScreen() {
               <Text style={styles.fieldLabel}>{t.community.products_used}</Text>
               <TextInput style={styles.input} placeholder="ex: La Roche-Posay, CeraVe" placeholderTextColor={T.textSoft} value={productNames} onChangeText={setProductNames} autoCorrect={false} blurOnSubmit={false} />
               <View style={styles.modalBtns}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); setImageUri(null); }}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); setImageUri(null); setImageBase64(null); }}>
                   <Text style={styles.cancelBtnText}>{lang === 'fr' ? 'Annuler' : 'Cancel'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saveBtn} onPress={sharePost} disabled={saving || uploading}>
-                  <Text style={styles.saveBtnText}>{saving ? '...' : t.community.publish}</Text>
+                  <Text style={styles.saveBtnText}>{uploading ? 'Upload...' : saving ? '...' : t.community.publish}</Text>
                 </TouchableOpacity>
               </View>
             </View>

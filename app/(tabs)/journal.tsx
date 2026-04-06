@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -23,6 +23,7 @@ export default function JournalScreen() {
   const [showModal, setShowModal] = useState(false);
   const [showCompare, setShowCompare] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -44,54 +45,63 @@ export default function JournalScreen() {
   }, []);
 
   const loadEntries = async (userId: string) => {
-    const { data } = await supabase.from('skin_journal').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-    if (data) setEntries(data);
+    const { data, error } = await supabase.from('skin_journal').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    if (error) { console.warn('loadEntries error:', error.message); }
+    else if (data) setEntries(data);
     setLoading(false);
   };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, aspect: [1, 1], quality: 0.8,
+      allowsEditing: true, aspect: [1, 1], quality: 0.6, base64: true,
     });
-    if (!result.canceled) setImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+      setImageBase64(result.assets[0].base64 ? `data:image/jpeg;base64,${result.assets[0].base64}` : null);
+    }
   };
 
-  const uploadPhoto = async (uri: string, userId: string): Promise<string | null> => {
+  const uploadPhoto = async (base64: string, userId: string): Promise<string | null> => {
     try {
       setUploading(true);
-      const response = await fetch(uri);
-      const blob = await response.blob();
       const fileName = `${userId}/${Date.now()}.jpg`;
-      const { error } = await supabase.storage.from('skin-journal').upload(fileName, blob, { contentType: 'image/jpeg' });
-      if (error) return null;
+      const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+      const byteArray = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      const { error } = await supabase.storage.from('skin-journal').upload(fileName, byteArray, { contentType: 'image/jpeg' });
+      if (error) { console.warn('uploadPhoto error:', error.message); return null; }
       const { data } = supabase.storage.from('skin-journal').getPublicUrl(fileName);
       return data.publicUrl;
-    } catch { return null; }
+    } catch (e) { console.warn('uploadPhoto exception:', e); return null; }
     finally { setUploading(false); }
   };
 
   const addEntry = async () => {
-    if (!imageUri) { window.alert(lang === 'fr' ? 'Veuillez ajouter une photo' : 'Please add a photo'); return; }
+    if (!imageUri || !imageBase64) { Alert.alert('', lang === 'fr' ? 'Veuillez ajouter une photo' : 'Please add a photo'); return; }
     if (!user) return;
     setSaving(true);
-    const photoUrl = await uploadPhoto(imageUri, user.id);
-    if (!photoUrl) { window.alert('Erreur upload'); setSaving(false); return; }
+    const photoUrl = await uploadPhoto(imageBase64, user.id);
+    if (!photoUrl) { Alert.alert('Erreur', lang === 'fr' ? 'Échec du téléchargement' : 'Upload failed'); setSaving(false); return; }
     const { error } = await supabase.from('skin_journal').insert({
       user_id: user.id, photo_url: photoUrl,
       notes: notes.trim(), week_number: entries.length + 1,
     });
-    if (error) { window.alert('Erreur: ' + error.message); }
-    else { setShowModal(false); setImageUri(null); setNotes(''); loadEntries(user.id); }
+    if (error) { Alert.alert('Erreur', error.message); }
+    else { setShowModal(false); setImageUri(null); setImageBase64(null); setNotes(''); loadEntries(user.id); }
     setSaving(false);
   };
 
   const deleteEntry = async (id: string) => {
-    const confirmed = window.confirm(lang === 'fr' ? 'Supprimer cette entrée?' : 'Delete this entry?');
-    if (confirmed) {
-      await supabase.from('skin_journal').delete().eq('id', id);
-      if (user) loadEntries(user.id);
-    }
+    Alert.alert(
+      lang === 'fr' ? 'Supprimer cette entrée?' : 'Delete this entry?', '',
+      [
+        { text: lang === 'fr' ? 'Annuler' : 'Cancel', style: 'cancel' },
+        { text: lang === 'fr' ? 'Supprimer' : 'Delete', style: 'destructive', onPress: async () => {
+          await supabase.from('skin_journal').delete().eq('id', id);
+          if (user) loadEntries(user.id);
+        }},
+      ]
+    );
   };
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -202,7 +212,7 @@ export default function JournalScreen() {
               <Text style={styles.fieldLabel}>{t.journal.notes}</Text>
               <TextInput style={[styles.input, { height: 80 }]} placeholder={lang === 'fr' ? 'Comment va votre peau cette semaine?' : 'How is your skin this week?'} placeholderTextColor={T.textSoft} value={notes} onChangeText={setNotes} multiline blurOnSubmit={false} />
               <View style={styles.modalBtns}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); setImageUri(null); setNotes(''); }}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); setImageUri(null); setImageBase64(null); setNotes(''); }}>
                   <Text style={styles.cancelBtnText}>{lang === 'fr' ? 'Annuler' : 'Cancel'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saveBtn} onPress={addEntry} disabled={saving || uploading}>

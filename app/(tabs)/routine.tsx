@@ -33,6 +33,12 @@ export default function RoutineScreen() {
       if (u) loadSteps(u.id, tab);
       else setLoading(false);
     });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const u = session?.user;
+      setUser(u || null);
+      if (!u) setLoading(false);
+    });
+    return () => listener.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -41,8 +47,9 @@ export default function RoutineScreen() {
 
   const loadSteps = async (userId: string, type: string) => {
     setLoading(true);
-    const { data } = await supabase.from('routine_steps').select('*').eq('user_id', userId).eq('routine_type', type).order('step_order', { ascending: true });
-    if (data) setSteps(data);
+    const { data, error } = await supabase.from('routine_steps').select('*').eq('user_id', userId).eq('routine_type', type).order('step_order', { ascending: true });
+    if (error) { console.warn('loadSteps error:', error.message); }
+    else if (data) setSteps(data);
     setLoading(false);
   };
 
@@ -61,7 +68,8 @@ export default function RoutineScreen() {
   };
 
   const deleteStep = async (id: string) => {
-    await supabase.from('routine_steps').delete().eq('id', id);
+    const { error } = await supabase.from('routine_steps').delete().eq('id', id);
+    if (error) { Alert.alert('Erreur', error.message); return; }
     if (user) loadSteps(user.id, tab);
   };
 
