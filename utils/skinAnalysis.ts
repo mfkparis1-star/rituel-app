@@ -1,5 +1,5 @@
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const ANTHROPIC_API_KEY = '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';
+const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY || '';
 
 export type SkinAnalysisResult = {
   skinType: 'dry' | 'oily' | 'combination' | 'normal' | 'sensitive';
