@@ -7,6 +7,7 @@ const MERCHANTS: Record<string, { mid: string }> = {
   'perfumeria comas': { mid: '105475' },
   'dr pierre ricaud': { mid: '6977'   },
   'pierre ricaud':    { mid: '6977'   },
+  'foreo':            { mid: '73932'  },
 };
 
 export function getAwinLink(brand: string): string | null {
