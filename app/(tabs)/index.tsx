@@ -1,24 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Alert, Clipboard, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Clipboard, Linking, PanResponder, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
 const T = {
-  bg: '#FDF8F5',
-  bg2: '#F5EDE6',
-  accent: '#B8856A',
-  accent2: '#8C5E46',
-  dark: '#1A1310',
-  mid: '#6B5245',
-  light: '#E8D5C8',
-  white: '#FFFFFF',
+  bg: '#FDF8F5', bg2: '#F5EDE6', accent: '#B8856A', accent2: '#8C5E46',
+  dark: '#1A1310', mid: '#6B5245', light: '#E8D5C8', white: '#FFFFFF',
   green: '#5B9B6B',
-};
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'Nettoyant': '○', 'Hydratant': '○', 'Sérum': '○', 'SPF': '○',
-  'Tonique': '○', 'Masque': '○', 'Maquillage': '○',
-  'Parfum': '○', 'Corps': '○', 'Cheveux': '○',
 };
 
 const SKIN_LABELS: Record<string, Record<string, string>> = {
@@ -30,11 +19,11 @@ const SKIN_LABELS: Record<string, Record<string, string>> = {
 const PUBLISHER_ID = '2836964';
 
 const PARTNER_BRANDS = [
-  { name: 'Diamond Smile', mid: '27135', desc_fr: 'Blanchiment dentaire', desc_en: 'Teeth whitening' },
-  { name: 'Blissim', mid: '15574', desc_fr: 'Box beauté', desc_en: 'Beauty box' },
-  { name: 'Uma', mid: '85413', desc_fr: 'Compléments naturels', desc_en: 'Natural supplements' },
-  { name: 'Perfumeria Comas', mid: '105475', desc_fr: 'Parfums premium', desc_en: 'Premium perfumes' },
-  { name: 'Dr Pierre Ricaud', mid: '6977', desc_fr: 'Soins anti-âge', desc_en: 'Anti-ageing care' },
+  { name: 'Diamond Smile', mid: '27135', desc_fr: 'Blanchiment dentaire', desc_en: 'Teeth whitening', desc_tr: 'Diş beyazlatma' },
+  { name: 'Blissim', mid: '15574', desc_fr: 'Box beauté', desc_en: 'Beauty box', desc_tr: 'Güzellik kutusu' },
+  { name: 'Uma', mid: '85413', desc_fr: 'Compléments naturels', desc_en: 'Natural supplements', desc_tr: 'Doğal takviyeler' },
+  { name: 'Perfumeria Comas', mid: '105475', desc_fr: 'Parfums premium', desc_en: 'Premium perfumes', desc_tr: 'Premium parfümler' },
+  { name: 'Dr Pierre Ricaud', mid: '6977', desc_fr: 'Soins anti-âge', desc_en: 'Anti-ageing care', desc_tr: 'Yaşlanma karşıtı bakım' },
 ];
 
 export default function HomeScreen() {
@@ -44,6 +33,16 @@ export default function HomeScreen() {
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({ active: 0, finished: 0, stocked: 0, total: 0 });
   const [communityStats, setCommunityStats] = useState({ totalUsers: 0, topProduct: '' });
+
+  const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
+
+  const panResponder = useRef(PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx < -60) router.push('/(tabs)/archive' as any);
+      if (g.dx > 60) router.push('/(tabs)/auth' as any);
+    },
+  })).current;
 
   const heure = new Date().getHours();
   const bonjour = heure < 12 ? t.home.greeting_morning : heure < 17 ? t.home.greeting_afternoon : t.home.greeting_evening;
@@ -104,17 +103,16 @@ export default function HomeScreen() {
   }, {});
   const topCategories = Object.entries(categorySpend).sort((a, b) => b[1] - a[1]).slice(0, 3);
 
-  // GUEST VIEW
   if (!user) return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.guestHero}>
         <Text style={styles.guestLogo}>Rituel</Text>
-        <Text style={styles.guestTagline}>votre archive beauté</Text>
+        <Text style={styles.guestTagline}>{lbl('votre archive beauté', 'güzellik arşiviniz', 'your beauty archive')}</Text>
         {communityStats.totalUsers > 0 && (
           <View style={styles.socialProof}>
             <Text style={styles.socialProofNum}>{communityStats.totalUsers}</Text>
             <Text style={styles.socialProofTxt}>
-              {lang === 'fr' ? 'femmes utilisent déjà Rituel' : lang === 'tr' ? 'kadın Rituel kullanıyor' : 'women already use Rituel'}
+              {lbl('femmes utilisent déjà Rituel', 'kadın Rituel kullanıyor', 'women already use Rituel')}
             </Text>
           </View>
         )}
@@ -127,7 +125,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={styles.container} showsVerticalScrollIndicator={false}>
 
       {/* HEADER */}
       <View style={styles.header}>
@@ -136,7 +134,7 @@ export default function HomeScreen() {
           {skinLabel && (
             <View style={styles.skinBadge}>
               <Text style={styles.skinBadgeText}>
-                {lang === 'fr' ? `Peau ${skinLabel}` : lang === 'tr' ? `${skinLabel} cilt` : `${skinLabel} skin`}
+                {lbl(`Peau ${skinLabel}`, `${skinLabel} cilt`, `${skinLabel} skin`)}
               </Text>
             </View>
           )}
@@ -152,9 +150,9 @@ export default function HomeScreen() {
       {/* STATS ROW */}
       <View style={styles.statsRow}>
         {[
-          { label: lang === 'fr' ? 'Actifs' : lang === 'tr' ? 'Aktif' : 'Active', val: stats.active, color: T.green },
-          { label: lang === 'fr' ? 'Terminés' : lang === 'tr' ? 'Bitti' : 'Finished', val: stats.finished, color: T.accent },
-          { label: lang === 'fr' ? 'En stock' : lang === 'tr' ? 'Stok' : 'Stock', val: stats.stocked, color: '#5BC4F8' },
+          { label: lbl('Actifs', 'Aktif', 'Active'), val: stats.active, color: T.green },
+          { label: lbl('Terminés', 'Bitti', 'Finished'), val: stats.finished, color: T.accent },
+          { label: lbl('En stock', 'Stok', 'Stock'), val: stats.stocked, color: '#5BC4F8' },
         ].map(s => (
           <View key={s.label} style={styles.statBox}>
             <Text style={[styles.statVal, { color: s.color }]}>{s.val}</Text>
@@ -166,12 +164,12 @@ export default function HomeScreen() {
       {/* SKIN ANALYSIS CARD */}
       <View style={styles.skinCard}>
         <Text style={styles.skinCardLabel}>
-          {lang === 'fr' ? 'Analyse peau' : lang === 'tr' ? 'Cilt analizi' : 'Skin analysis'}
+          {lbl('Analyse peau', 'Cilt analizi', 'Skin analysis')}
         </Text>
         <Text style={styles.skinCardTitle}>
           {skinLabel
-            ? (lang === 'fr' ? `Peau ${skinLabel}` : lang === 'tr' ? `${skinLabel} cilt` : `${skinLabel} skin`)
-            : (lang === 'fr' ? 'Analysez votre peau' : lang === 'tr' ? 'Cildinizi analiz edin' : 'Analyse your skin')}
+            ? lbl(`Peau ${skinLabel}`, `${skinLabel} cilt`, `${skinLabel} skin`)
+            : lbl('Analysez votre peau', 'Cildinizi analiz edin', 'Analyse your skin')}
         </Text>
         {skinLabel && (
           <View style={styles.skinTags}>
@@ -180,9 +178,9 @@ export default function HomeScreen() {
             <View style={styles.skinTag}><Text style={styles.skinTagText}>SPF</Text></View>
           </View>
         )}
-        <TouchableOpacity style={styles.analyseBtn}>
+        <TouchableOpacity style={styles.analyseBtn} onPress={() => router.push('/(tabs)/scanner' as any)}>
           <Text style={styles.analyseBtnText}>
-            {lang === 'fr' ? 'Nouvelle analyse' : lang === 'tr' ? 'Yeni analiz' : 'New analysis'}
+            {lbl('Nouvelle analyse', 'Yeni analiz', 'New analysis')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -191,24 +189,22 @@ export default function HomeScreen() {
       {products.length > 0 && (
         <View style={styles.spendCard}>
           <Text style={styles.sectionLabel}>
-            {lang === 'fr' ? 'Dépenses totales' : lang === 'tr' ? 'Toplam harcama' : 'Total spending'}
+            {lbl('Dépenses totales', 'Toplam harcama', 'Total spending')}
           </Text>
           <Text style={styles.spendTotal}>€{stats.total.toFixed(2)}</Text>
           <Text style={styles.spendSub}>
-            {products.length} {lang === 'fr' ? 'produits archivés' : lang === 'tr' ? 'ürün arşivlendi' : 'products archived'}
+            {products.length} {lbl('produits archivés', 'ürün arşivlendi', 'products archived')}
           </Text>
           {topCategories.map(([cat, amount]) => {
             const pct = Math.round((amount / stats.total) * 100);
             return (
               <View key={cat} style={styles.catRow}>
-                <View style={styles.catInfo}>
-                  <View style={styles.catHeader}>
-                    <Text style={styles.catName}>{cat}</Text>
-                    <Text style={styles.catAmount}>€{amount.toFixed(2)}</Text>
-                  </View>
-                  <View style={styles.catBarBg}>
-                    <View style={[styles.catBarFill, { width: `${pct}%` as any }]} />
-                  </View>
+                <View style={styles.catHeader}>
+                  <Text style={styles.catName}>{cat}</Text>
+                  <Text style={styles.catAmount}>€{amount.toFixed(2)}</Text>
+                </View>
+                <View style={styles.catBarBg}>
+                  <View style={[styles.catBarFill, { width: `${pct}%` as any }]} />
                 </View>
               </View>
             );
@@ -221,11 +217,13 @@ export default function HomeScreen() {
         <View style={styles.recentSection}>
           <View style={styles.sectionRow}>
             <Text style={styles.sectionTitle}>
-              {lang === 'fr' ? 'Récents' : lang === 'tr' ? 'Son ürünler' : 'Recent'}
+              {lbl('Récents', 'Son ürünler', 'Recent')}
             </Text>
-            <Text style={styles.sectionLink}>
-              {lang === 'fr' ? 'Tout voir →' : lang === 'tr' ? 'Tümü →' : 'See all →'}
-            </Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/archive' as any)}>
+              <Text style={styles.sectionLink}>
+                {lbl('Tout voir →', 'Tümü →', 'See all →')}
+              </Text>
+            </TouchableOpacity>
           </View>
           {products.slice(0, 3).map(p => (
             <View key={p.id} style={styles.productRow}>
@@ -254,10 +252,10 @@ export default function HomeScreen() {
       <View style={styles.partnersSection}>
         <View style={styles.sectionRow}>
           <Text style={styles.sectionTitle}>
-            {lang === 'fr' ? 'Nos Partenaires' : lang === 'tr' ? 'Ortaklarımız' : 'Our Partners'}
+            {lbl('Nos Partenaires', 'Ortaklarımız', 'Our Partners')}
           </Text>
           <Text style={styles.sectionLink}>
-            {lang === 'fr' ? 'Voir tout →' : lang === 'tr' ? 'Tümü →' : 'See all →'}
+            {lbl('Voir tout →', 'Tümü →', 'See all →')}
           </Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -275,11 +273,11 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.partnerName}>{brand.name}</Text>
               <Text style={styles.partnerDesc}>
-                {lang === 'fr' ? brand.desc_fr : brand.desc_en}
+                {lang === 'fr' ? brand.desc_fr : lang === 'tr' ? brand.desc_tr : brand.desc_en}
               </Text>
               <View style={styles.partnerBtn}>
                 <Text style={styles.partnerBtnText}>
-                  {lang === 'fr' ? 'Découvrir →' : lang === 'tr' ? 'Keşfet →' : 'Discover →'}
+                  {lbl('Découvrir →', 'Keşfet →', 'Discover →')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -302,7 +300,7 @@ export default function HomeScreen() {
             onPress={() => {
               const code = profile?.referral_code || 'RITUEL-CODE';
               Clipboard.setString(code);
-              Alert.alert('', lang === 'fr' ? 'Code copié ! ' + code : 'Code copied! ' + code);
+              Alert.alert('', lbl('Code copié ! ' + code, 'Kod kopyalandı! ' + code, 'Code copied! ' + code));
             }}
           >
             <Text style={styles.copyBtnText}>{t.home.invite_copy}</Text>
@@ -317,26 +315,18 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: T.bg },
-
-  // HEADER
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 22, paddingTop: 60, paddingBottom: 8 },
   logoSmall: { fontSize: 20, fontWeight: '300', color: T.dark, letterSpacing: 3 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   skinBadge: { backgroundColor: 'rgba(184,133,106,0.12)', borderRadius: 100, paddingHorizontal: 12, paddingVertical: 5, borderWidth: 1, borderColor: 'rgba(184,133,106,0.2)' },
   skinBadgeText: { fontSize: 10, color: T.accent, letterSpacing: 0.5 },
-
-  // GREETING
   greetingBlock: { paddingHorizontal: 22, paddingBottom: 18 },
   greetingText: { fontSize: 13, color: T.mid, marginBottom: 2 },
   nameText: { fontSize: 26, fontWeight: '300', color: T.dark, letterSpacing: 0.5 },
-
-  // STATS
   statsRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 22, marginBottom: 16 },
   statBox: { flex: 1, backgroundColor: T.white, borderRadius: 14, padding: 14, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 },
   statVal: { fontSize: 24, fontWeight: '300', letterSpacing: 0.5, marginBottom: 3 },
   statLabel: { fontSize: 8, color: T.mid, textTransform: 'uppercase', letterSpacing: 0.8 },
-
-  // SKIN CARD
   skinCard: { marginHorizontal: 22, marginBottom: 16, backgroundColor: T.dark, borderRadius: 20, padding: 20 },
   skinCardLabel: { fontSize: 9, color: 'rgba(184,133,106,0.6)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
   skinCardTitle: { fontSize: 20, fontWeight: '300', color: T.white, marginBottom: 12, letterSpacing: 0.5 },
@@ -345,21 +335,16 @@ const styles = StyleSheet.create({
   skinTagText: { fontSize: 9, color: T.accent, letterSpacing: 0.5 },
   analyseBtn: { alignSelf: 'flex-start', backgroundColor: T.accent, borderRadius: 100, paddingHorizontal: 16, paddingVertical: 9 },
   analyseBtnText: { fontSize: 11, color: T.white, letterSpacing: 0.5 },
-
-  // SPEND CARD
   spendCard: { marginHorizontal: 22, marginBottom: 16, backgroundColor: T.white, borderRadius: 18, padding: 18, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   sectionLabel: { fontSize: 9, color: T.mid, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 },
   spendTotal: { fontSize: 32, fontWeight: '300', color: T.dark, marginBottom: 3, letterSpacing: 0.5 },
   spendSub: { fontSize: 11, color: T.mid, marginBottom: 16 },
   catRow: { marginBottom: 10 },
-  catInfo: { flex: 1 },
   catHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
   catName: { fontSize: 11, color: T.dark, fontWeight: '500' },
   catAmount: { fontSize: 11, color: T.accent },
   catBarBg: { height: 3, backgroundColor: T.bg2, borderRadius: 2 },
   catBarFill: { height: 3, backgroundColor: T.accent, borderRadius: 2 },
-
-  // RECENT
   recentSection: { marginHorizontal: 22, marginBottom: 16 },
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 },
   sectionTitle: { fontSize: 17, fontWeight: '300', color: T.dark, letterSpacing: 0.3 },
@@ -371,13 +356,9 @@ const styles = StyleSheet.create({
   productBrand: { fontSize: 8, color: T.mid, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 },
   productName: { fontSize: 12, color: T.dark, fontWeight: '500' },
   productPrice: { fontSize: 12, color: T.accent },
-
-  // EMPTY
   emptyCard: { marginHorizontal: 22, marginBottom: 16, backgroundColor: T.white, borderRadius: 18, padding: 24, alignItems: 'center' },
   emptyTitle: { fontSize: 15, fontWeight: '300', color: T.dark, marginBottom: 6 },
   emptySub: { fontSize: 12, color: T.mid, textAlign: 'center' },
-
-  // PARTNERS
   partnersSection: { marginBottom: 16, paddingLeft: 22 },
   partnerCard: { backgroundColor: T.white, borderRadius: 16, padding: 14, marginRight: 10, width: 150, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 },
   partnerLogo: { width: 44, height: 44, borderRadius: 12, backgroundColor: T.bg2, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
@@ -386,8 +367,6 @@ const styles = StyleSheet.create({
   partnerDesc: { fontSize: 10, color: T.mid, marginBottom: 10, lineHeight: 14 },
   partnerBtn: { backgroundColor: T.bg2, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: T.light },
   partnerBtnText: { fontSize: 10, color: T.accent },
-
-  // INVITE
   inviteBox: { marginHorizontal: 22, backgroundColor: T.bg2, borderRadius: 18, padding: 18, borderWidth: 1, borderColor: T.light },
   inviteTitle: { fontSize: 13, fontWeight: '500', color: T.dark, marginBottom: 5 },
   inviteSub: { fontSize: 11, color: T.mid, marginBottom: 12, lineHeight: 17 },
@@ -396,8 +375,6 @@ const styles = StyleSheet.create({
   codeText: { fontSize: 11, color: T.accent, fontWeight: '600', letterSpacing: 2 },
   copyBtn: { backgroundColor: T.accent, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 },
   copyBtnText: { fontSize: 11, fontWeight: '600', color: T.white },
-
-  // GUEST
   guestHero: { paddingTop: 80, alignItems: 'center', padding: 22 },
   guestLogo: { fontSize: 40, fontWeight: '300', color: T.dark, letterSpacing: 4, marginBottom: 6 },
   guestTagline: { fontSize: 13, fontStyle: 'italic', color: T.mid, letterSpacing: 2, marginBottom: 28 },

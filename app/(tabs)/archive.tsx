@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Linking, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Linking, Modal, PanResponder, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 import { getAwinLink } from '../../utils/awin';
@@ -142,6 +143,14 @@ export default function ArchiveScreen() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const panResponder = useRef(PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx < -60) router.push('/(tabs)/scanner' as any);
+      if (g.dx > 60) router.push('/' as any);
+    },
+  })).current;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -285,10 +294,7 @@ export default function ArchiveScreen() {
       <View style={ms.content}>
         <View style={ms.handle} />
         <Text style={ms.title}>{isEdit ? t.archive.edit_product : t.archive.new_product}</Text>
-
         <DBSearch onSelect={(p) => { setName(p.name); setBrand(p.brand); setCategory(p.category || CATEGORIES[1]); }} lang={lang} />
-
-        {/* Photo */}
         <TouchableOpacity onPress={pickImage} style={ms.photoPicker}>
           {imageUri
             ? <Image source={{ uri: imageUri }} style={ms.photoPreview} />
@@ -297,13 +303,10 @@ export default function ArchiveScreen() {
               </View>
           }
         </TouchableOpacity>
-
         <Text style={ms.label}>{t.archive.brand}</Text>
         <TextInput style={ms.input} placeholder="ex: La Roche-Posay" placeholderTextColor={T.light} value={brand} onChangeText={setBrand} autoCorrect={false} />
-
         <Text style={ms.label}>{t.archive.product_name}</Text>
         <TextInput style={ms.input} placeholder="ex: Toleriane Double Repair" placeholderTextColor={T.light} value={name} onChangeText={setName} autoCorrect={false} />
-
         <Text style={ms.label}>{t.archive.category}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 14 }}>
           {CATEGORIES.map(c => (
@@ -312,7 +315,6 @@ export default function ArchiveScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
         <Text style={ms.label}>{t.archive.status}</Text>
         <View style={ms.statusRow}>
           {STATUSES.map(s => (
@@ -322,17 +324,13 @@ export default function ArchiveScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
         <Text style={ms.label}>{lang === 'fr' ? "Date d'ouverture" : lang === 'tr' ? 'Açılış tarihi' : 'Opening date'}</Text>
         <Text style={ms.hint}>{paoMonthsLabel(category)}</Text>
         <TextInput style={ms.input} placeholder="YYYY-MM-DD" placeholderTextColor={T.light} value={openedAt} onChangeText={setOpenedAt} autoCorrect={false} />
-
         <Text style={ms.label}>{t.archive.price}</Text>
         <TextInput style={ms.input} placeholder="ex: 18.50" placeholderTextColor={T.light} value={price} onChangeText={setPrice} keyboardType="numeric" />
-
         <Text style={ms.label}>{t.archive.notes}</Text>
         <TextInput style={[ms.input, { height: 70 }]} placeholder={lang === 'fr' ? 'Votre avis...' : lang === 'tr' ? 'Notunuz...' : 'Your notes...'} placeholderTextColor={T.light} value={notes} onChangeText={setNotes} multiline />
-
         <View style={ms.btns}>
           <TouchableOpacity style={ms.cancelBtn} onPress={() => isEdit ? setShowEditModal(false) : setShowAddModal(false)}>
             <Text style={ms.cancelText}>{t.archive.cancel}</Text>
@@ -346,9 +344,8 @@ export default function ArchiveScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={styles.container} showsVerticalScrollIndicator={false}>
 
-      {/* HEADER */}
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>{t.archive.title}</Text>
@@ -361,7 +358,6 @@ export default function ArchiveScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* EXPIRY ALERT */}
       {expiringCount > 0 && (
         <View style={styles.expiryAlert}>
           <Text style={styles.expiryAlertText}>
@@ -370,7 +366,6 @@ export default function ArchiveScreen() {
         </View>
       )}
 
-      {/* SEARCH */}
       <View style={styles.searchBar}>
         <Text style={styles.searchIcon}>⌕</Text>
         <TextInput
@@ -383,7 +378,6 @@ export default function ArchiveScreen() {
         />
       </View>
 
-      {/* FILTERS */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
         {['all', 'active', 'finished', 'stocked'].map(id => (
           <TouchableOpacity key={id} onPress={() => setFilterStatus(id)} style={[styles.filterChip, filterStatus === id && styles.filterChipActive]}>
@@ -392,7 +386,6 @@ export default function ArchiveScreen() {
         ))}
       </ScrollView>
 
-      {/* LIMIT BAR */}
       <View style={styles.limitCard}>
         <View style={styles.limitRow}>
           <Text style={styles.limitLabel}>{t.archive.free_limit}</Text>
@@ -404,7 +397,6 @@ export default function ArchiveScreen() {
         <Text style={styles.limitHint}>{t.archive.premium_hint}</Text>
       </View>
 
-      {/* PRODUCT LIST */}
       {loading
         ? <ActivityIndicator color={T.accent} style={{ marginTop: 40 }} />
         : filteredProducts.length === 0
@@ -449,25 +441,18 @@ export default function ArchiveScreen() {
             })
       }
 
-      {/* ADD BUTTON */}
       <TouchableOpacity style={styles.addDashed} onPress={() => { resetForm(); setShowAddModal(true); }}>
         <Text style={styles.addDashedText}>{t.archive.add_product}</Text>
       </TouchableOpacity>
 
       <View style={{ height: 32 }} />
 
-      {/* ADD MODAL */}
       <Modal visible={showAddModal} animationType="slide" transparent>
-        <View style={ms.overlay}>
-          <ProductForm isEdit={false} />
-        </View>
+        <View style={ms.overlay}><ProductForm isEdit={false} /></View>
       </Modal>
 
-      {/* EDIT MODAL */}
       <Modal visible={showEditModal} animationType="slide" transparent>
-        <View style={ms.overlay}>
-          <ProductForm isEdit={true} />
-        </View>
+        <View style={ms.overlay}><ProductForm isEdit={true} /></View>
       </Modal>
     </ScrollView>
   );

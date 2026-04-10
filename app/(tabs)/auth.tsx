@@ -1,8 +1,8 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Image, PanResponder, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -42,6 +42,13 @@ export default function AuthScreen() {
 
   const SKIN_LABELS = lang === 'tr' ? SKIN_TYPES_TR : lang === 'fr' ? SKIN_TYPES_FR : SKIN_TYPES_EN;
   const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
+
+  const panResponder = useRef(PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx > 60) router.push('/(tabs)/scanner' as any);
+    },
+  })).current;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -194,7 +201,7 @@ export default function AuthScreen() {
 
   // ── DELETE ACCOUNT ──
   if (loggedIn && mode === 'deleteAccount') return (
-    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={s.container} showsVerticalScrollIndicator={false}>
       <View style={s.page}>
         <Text style={s.logoSmall}>Rituel</Text>
         <View style={s.card}>
@@ -217,7 +224,7 @@ export default function AuthScreen() {
 
   // ── EDIT PROFILE ──
   if (loggedIn && mode === 'editProfile') return (
-    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={s.container} showsVerticalScrollIndicator={false}>
       <View style={s.page}>
         <Text style={s.logoSmall}>Rituel</Text>
         <View style={s.card}>
@@ -255,7 +262,7 @@ export default function AuthScreen() {
 
   // ── PROFILE ──
   if (loggedIn && mode === 'profile') return (
-    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={s.container} showsVerticalScrollIndicator={false}>
       <View style={s.page}>
         <View style={s.profileHeader}>
           <Text style={s.logoSmall}>Rituel</Text>
@@ -337,7 +344,7 @@ export default function AuthScreen() {
 
   // ── RESET ──
   if (mode === 'reset') return (
-    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={s.container} showsVerticalScrollIndicator={false}>
       <View style={s.page}>
         <Text style={s.logoSmall}>Rituel</Text>
         {resetSent
@@ -366,7 +373,7 @@ export default function AuthScreen() {
 
   // ── LOGIN / REGISTER ──
   return (
-    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+    <ScrollView {...panResponder.panHandlers} style={s.container} showsVerticalScrollIndicator={false}>
       <View style={s.page}>
         <View style={s.logoBlock}>
           <Text style={s.logoLarge}>Rituel</Text>
