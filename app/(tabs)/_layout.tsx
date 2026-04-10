@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Svg, { Circle, Line, Path, Polyline, Rect } from 'react-native-svg';
 
 function HomeIcon({ color }: { color: string }) {
@@ -40,66 +41,67 @@ function ProfileIcon({ color }: { color: string }) {
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E8D5C8',
-          borderTopWidth: 1,
-          height: 72,
-          paddingBottom: 12,
-          paddingTop: 8,
-        },
-        tabBarActiveTintColor: '#B8856A',
-        tabBarInactiveTintColor: '#E8D5C8',
-        tabBarLabelStyle: {
-          fontSize: 8,
-          fontWeight: '500',
-          textTransform: 'uppercase',
-          letterSpacing: 0.8,
-          marginTop: 2,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Accueil',
-          tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: '#FFFFFF',
+            borderTopColor: '#E8D5C8',
+            borderTopWidth: 1,
+            height: 72,
+            paddingBottom: 12,
+            paddingTop: 8,
+          },
+          tabBarActiveTintColor: '#B8856A',
+          tabBarInactiveTintColor: '#E8D5C8',
+          tabBarLabelStyle: {
+            fontSize: 8,
+            fontWeight: '500',
+            textTransform: 'uppercase',
+            letterSpacing: 0.8,
+            marginTop: 2,
+          },
         }}
-      />
-      <Tabs.Screen
-        name="archive"
-        options={{
-          title: 'Archive',
-          tabBarIcon: ({ color }) => <ArchiveIcon color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="scanner"
-        options={{
-          title: 'Scanner',
-          tabBarIcon: ({ color }) => <ScannerIcon color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="auth"
-        options={{
-          title: 'Profil',
-          tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
-        }}
-      />
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Accueil',
+            tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="archive"
+          options={{
+            title: 'Archive',
+            tabBarIcon: ({ color }) => <ArchiveIcon color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="scanner"
+          options={{
+            title: 'Scanner',
+            tabBarIcon: ({ color }) => <ScannerIcon color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="auth"
+          options={{
+            title: 'Profil',
+            tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
+          }}
+        />
 
-      {/* Gizli ekranlar */}
-      <Tabs.Screen name="discover" options={{ href: null }} />
-      <Tabs.Screen name="community" options={{ href: null }} />
-      <Tabs.Screen name="routine" options={{ href: null }} />
-      <Tabs.Screen name="journal" options={{ href: null }} />
-      <Tabs.Screen name="compatibility" options={{ href: null }} />
-      <Tabs.Screen name="onboarding" options={{ href: null }} />
-      <Tabs.Screen name="explore" options={{ href: null }} />
-      <Tabs.Screen name="skin-analysis" options={{ href: null }} />
-    </Tabs>
+        <Tabs.Screen name="discover" options={{ href: null }} />
+        <Tabs.Screen name="community" options={{ href: null }} />
+        <Tabs.Screen name="routine" options={{ href: null }} />
+        <Tabs.Screen name="journal" options={{ href: null }} />
+        <Tabs.Screen name="compatibility" options={{ href: null }} />
+        <Tabs.Screen name="onboarding" options={{ href: null }} />
+        <Tabs.Screen name="explore" options={{ href: null }} />
+        <Tabs.Screen name="skin-analysis" options={{ href: null }} />
+      </Tabs>
+    </GestureHandlerRootView>
   );
 }

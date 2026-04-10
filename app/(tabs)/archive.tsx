@@ -1,7 +1,8 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Linking, Modal, PanResponder, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Image, Linking, Modal, PanResponder, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 import { getAwinLink } from '../../utils/awin';
@@ -256,10 +257,14 @@ export default function ArchiveScreen() {
       lang === 'fr' ? 'Cette action est irréversible.' : lang === 'tr' ? 'Bu işlem geri alınamaz.' : 'This cannot be undone.',
       [
         { text: lang === 'fr' ? 'Annuler' : lang === 'tr' ? 'İptal' : 'Cancel', style: 'cancel' },
-        { text: lang === 'fr' ? 'Supprimer' : lang === 'tr' ? 'Sil' : 'Delete', style: 'destructive', onPress: async () => {
-          await supabase.from('products').delete().eq('id', id);
-          if (user) loadProducts(user.id);
-        }},
+        {
+          text: lang === 'fr' ? 'Supprimer' : lang === 'tr' ? 'Sil' : 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await supabase.from('products').delete().eq('id', id);
+            if (user) loadProducts(user.id);
+          }
+        },
       ]
     );
   };
@@ -272,6 +277,7 @@ export default function ArchiveScreen() {
   const getStatusColor = (s: string) => STATUSES.find(x => x.id === s)?.color || T.mid;
   const getStatusLabel = (s: string) => STATUSES.find(x => x.id === s)?.label || s;
   const expiringCount = products.filter(p => { const pao = getPAOStatus(p); return pao && pao.daysLeft <= 30; }).length;
+
   const paoMonthsLabel = (cat: string) => {
     const m = PAO_MONTHS[cat] || 12;
     return lang === 'fr' ? `PAO: ${m} mois` : lang === 'tr' ? `PAO: ${m} ay` : `PAO: ${m} months`;
@@ -407,36 +413,60 @@ export default function ArchiveScreen() {
           : filteredProducts.map(p => {
               const pao = getPAOStatus(p);
               const awinLink = getAwinLink(p.brand);
-              return (
-                <TouchableOpacity key={p.id} onPress={() => openEdit(p)} style={styles.card}>
-                  {p.image_url
-                    ? <Image source={{ uri: p.image_url }} style={styles.cardImage} />
-                    : <View style={styles.cardThumb}><Text style={styles.cardThumbText}>{(p.name || '?')[0].toUpperCase()}</Text></View>
-                  }
-                  <View style={styles.cardInfo}>
-                    <Text style={styles.cardBrand}>{p.brand}</Text>
-                    <Text style={styles.cardName}>{p.name}</Text>
-                    <View style={styles.cardMeta}>
-                      <View style={[styles.statusDot, { backgroundColor: getStatusColor(p.status) }]} />
-                      <Text style={[styles.cardStatus, { color: getStatusColor(p.status) }]}>{getStatusLabel(p.status)}</Text>
-                      {pao && <Text style={[styles.paoLabel, { color: pao.color }]}>{pao.label}</Text>}
-                    </View>
-                  </View>
-                  <View style={styles.cardRight}>
-                    <Text style={styles.cardPrice}>€{p.price}</Text>
-                    {p.status === 'finished' && awinLink && (
-                      <TouchableOpacity
-                        onPress={(e: any) => { e.stopPropagation?.(); Linking.openURL(awinLink); }}
-                        style={styles.rebuyBtn}
-                      >
-                        <Text style={styles.rebuyText}>↺</Text>
-                      </TouchableOpacity>
-                    )}
-                    <TouchableOpacity onPress={(e: any) => { e.stopPropagation?.(); deleteProduct(p.id); }}>
-                      <Text style={styles.deleteText}>✕</Text>
+
+              const renderRightActions = (progress: Animated.AnimatedInterpolation<number>) => {
+                const trans = progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [80, 0],
+                });
+                return (
+                  <Animated.View style={[styles.deleteAction, { transform: [{ translateX: trans }] }]}>
+                    <TouchableOpacity
+                      style={styles.deleteActionBtn}
+                      onPress={() => deleteProduct(p.id)}
+                    >
+                      <Text style={styles.deleteActionText}>
+                        {lang === 'fr' ? 'Supprimer' : lang === 'tr' ? 'Sil' : 'Delete'}
+                      </Text>
                     </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
+                  </Animated.View>
+                );
+              };
+
+              return (
+                <Swipeable
+                  key={p.id}
+                  renderRightActions={renderRightActions}
+                  rightThreshold={40}
+                  overshootRight={false}
+                >
+                  <TouchableOpacity onPress={() => openEdit(p)} style={styles.card}>
+                    {p.image_url
+                      ? <Image source={{ uri: p.image_url }} style={styles.cardImage} />
+                      : <View style={styles.cardThumb}><Text style={styles.cardThumbText}>{(p.name || '?')[0].toUpperCase()}</Text></View>
+                    }
+                    <View style={styles.cardInfo}>
+                      <Text style={styles.cardBrand}>{p.brand}</Text>
+                      <Text style={styles.cardName}>{p.name}</Text>
+                      <View style={styles.cardMeta}>
+                        <View style={[styles.statusDot, { backgroundColor: getStatusColor(p.status) }]} />
+                        <Text style={[styles.cardStatus, { color: getStatusColor(p.status) }]}>{getStatusLabel(p.status)}</Text>
+                        {pao && <Text style={[styles.paoLabel, { color: pao.color }]}>{pao.label}</Text>}
+                      </View>
+                    </View>
+                    <View style={styles.cardRight}>
+                      <Text style={styles.cardPrice}>€{p.price}</Text>
+                      {p.status === 'finished' && awinLink && (
+                        <TouchableOpacity
+                          onPress={(e: any) => { e.stopPropagation?.(); Linking.openURL(awinLink); }}
+                          style={styles.rebuyBtn}
+                        >
+                          <Text style={styles.rebuyText}>↺</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </Swipeable>
               );
             })
       }
@@ -482,7 +512,7 @@ const styles = StyleSheet.create({
   barBg: { height: 3, backgroundColor: T.bg2, borderRadius: 2, marginBottom: 6 },
   barFill: { height: 3, backgroundColor: T.accent, borderRadius: 2 },
   limitHint: { fontSize: 9, color: T.light },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: T.white, borderRadius: 16, marginHorizontal: 22, marginBottom: 9, padding: 13, gap: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: T.white, marginHorizontal: 22, marginBottom: 9, padding: 13, gap: 12, borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 },
   cardImage: { width: 48, height: 48, borderRadius: 12 },
   cardThumb: { width: 48, height: 48, borderRadius: 12, backgroundColor: T.bg2, alignItems: 'center', justifyContent: 'center' },
   cardThumbText: { fontSize: 18, color: T.accent, fontWeight: '300' },
@@ -497,7 +527,9 @@ const styles = StyleSheet.create({
   cardPrice: { fontSize: 13, color: T.accent, fontWeight: '500' },
   rebuyBtn: { width: 28, height: 28, borderRadius: 8, backgroundColor: T.bg2, borderWidth: 1, borderColor: T.light, alignItems: 'center', justifyContent: 'center' },
   rebuyText: { fontSize: 14, color: T.accent },
-  deleteText: { fontSize: 12, color: T.light },
+  deleteAction: { justifyContent: 'center', marginBottom: 9 },
+  deleteActionBtn: { backgroundColor: T.red, justifyContent: 'center', alignItems: 'center', width: 80, height: '100%' as any, borderTopRightRadius: 16, borderBottomRightRadius: 16 },
+  deleteActionText: { color: T.white, fontSize: 11, fontWeight: '600', letterSpacing: 0.3 },
   addDashed: { borderWidth: 1.5, borderColor: T.light, borderStyle: 'dashed', borderRadius: 16, marginHorizontal: 22, padding: 16, alignItems: 'center', marginTop: 4 },
   addDashedText: { fontSize: 13, color: T.mid },
   empty: { alignItems: 'center', paddingTop: 60, paddingBottom: 40 },
