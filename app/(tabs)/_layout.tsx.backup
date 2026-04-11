@@ -1,8 +1,6 @@
 import { Tabs } from 'expo-router';
-import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Svg, { Circle, Ellipse, Line, Path, Polyline, Rect } from 'react-native-svg';
-import { initializePurchases } from '../../utils/purchases';
+import Svg, { Circle, Line, Path, Polyline, Rect } from 'react-native-svg';
 
 function HomeIcon({ color }: { color: string }) {
   return (
@@ -25,19 +23,9 @@ function ArchiveIcon({ color }: { color: string }) {
 
 function ScannerIcon({ color }: { color: string }) {
   return (
-    <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round">
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round">
       <Path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
       <Circle cx={12} cy={13} r={4} />
-    </Svg>
-  );
-}
-
-function JournalIcon({ color }: { color: string }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Rect x={3} y={3} width={18} height={18} rx={3} />
-      <Circle cx={8.5} cy={8.5} r={1.5} />
-      <Path d="M21 15l-5-5L5 21" />
     </Svg>
   );
 }
@@ -52,33 +40,27 @@ function ProfileIcon({ color }: { color: string }) {
 }
 
 export default function TabLayout() {
-  useEffect(() => {
-    initializePurchases();
-  }, []);
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#FDF8F5',
+            backgroundColor: '#FFFFFF',
             borderTopColor: '#E8D5C8',
-            borderTopWidth: 0.5,
-            height: 80,
-            paddingBottom: 16,
-            paddingTop: 10,
-            elevation: 0,
-            shadowOpacity: 0,
+            borderTopWidth: 1,
+            height: 72,
+            paddingBottom: 12,
+            paddingTop: 8,
           },
           tabBarActiveTintColor: '#B8856A',
-          tabBarInactiveTintColor: '#C9B5A8',
+          tabBarInactiveTintColor: '#E8D5C8',
           tabBarLabelStyle: {
-            fontSize: 9,
+            fontSize: 8,
             fontWeight: '500',
             textTransform: 'uppercase',
-            letterSpacing: 0.6,
-            marginTop: 3,
+            letterSpacing: 0.8,
+            marginTop: 2,
           },
         }}
       >
@@ -100,19 +82,7 @@ export default function TabLayout() {
           name="scanner"
           options={{
             title: 'Scanner',
-            tabBarIcon: ({ color, focused }) => (
-              <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke={focused ? '#B8856A' : '#C9B5A8'} strokeWidth={1.8} strokeLinecap="round">
-                <Path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                <Circle cx={12} cy={13} r={4} />
-              </Svg>
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="journal"
-          options={{
-            title: 'Journal',
-            tabBarIcon: ({ color }) => <JournalIcon color={color} />,
+            tabBarIcon: ({ color }) => <ScannerIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -122,9 +92,11 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
           }}
         />
+
         <Tabs.Screen name="discover" options={{ href: null }} />
         <Tabs.Screen name="community" options={{ href: null }} />
         <Tabs.Screen name="routine" options={{ href: null }} />
+        <Tabs.Screen name="journal" options={{ href: null }} />
         <Tabs.Screen name="compatibility" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
         <Tabs.Screen name="explore" options={{ href: null }} />
