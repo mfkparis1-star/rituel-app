@@ -4,9 +4,9 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
 const T = {
-  bg: '#08080E', surface: '#11111A', border: '#1C1C2E',
-  accent: '#C9A96E', rose: '#E87FAC', text: '#F5F0F8',
-  textMid: '#B8B0C4', textSoft: '#6B6278',
+  bg: '#FDF8F5', bg2: '#F5EDE6', accent: '#B8856A',
+  dark: '#1A1310', mid: '#6B5245', light: '#E8D5C8', white: '#FFFFFF',
+  green: '#5B9B6B',
 };
 
 type RoutineStep = {
@@ -25,6 +25,8 @@ export default function RoutineScreen() {
   const [brand, setBrand] = useState('');
   const [duration, setDuration] = useState('60s');
   const [saving, setSaving] = useState(false);
+
+  const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -48,13 +50,13 @@ export default function RoutineScreen() {
   const loadSteps = async (userId: string, type: string) => {
     setLoading(true);
     const { data, error } = await supabase.from('routine_steps').select('*').eq('user_id', userId).eq('routine_type', type).order('step_order', { ascending: true });
-    if (error) { console.warn('loadSteps error:', error.message); }
+    if (error) console.warn('loadSteps error:', error.message);
     else if (data) setSteps(data);
     setLoading(false);
   };
 
   const addStep = async () => {
-    if (!productName.trim()) { Alert.alert('', lang === 'fr' ? 'Nom du produit obligatoire' : 'Product name required'); return; }
+    if (!productName.trim()) { Alert.alert('', lbl('Nom du produit obligatoire', 'Ürün adı zorunlu', 'Product name required')); return; }
     if (!user) return;
     setSaving(true);
     const { error } = await supabase.from('routine_steps').insert({
@@ -62,7 +64,7 @@ export default function RoutineScreen() {
       brand: brand.trim(), step_order: steps.length + 1,
       duration, routine_type: tab, icon: '✨',
     });
-    if (error) { Alert.alert('Erreur', error.message); }
+    if (error) Alert.alert('Erreur', error.message);
     else { setShowModal(false); setProductName(''); setBrand(''); setDuration('60s'); loadSteps(user.id, tab); }
     setSaving(false);
   };
@@ -74,98 +76,105 @@ export default function RoutineScreen() {
   };
 
   if (!user) return (
-    <View style={styles.center}>
-      <Text style={styles.centerIcon}>🔐</Text>
-      <Text style={styles.centerTitle}>{t.archive.login_required}</Text>
-      <Text style={styles.centerSub}>{t.archive.login_sub}</Text>
+    <View style={s.center}>
+      <Text style={s.centerTitle}>{t.archive.login_required}</Text>
+      <Text style={s.centerSub}>{t.archive.login_sub}</Text>
     </View>
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t.routine.title}</Text>
+    <ScrollView style={s.container} showsVerticalScrollIndicator={false}>
+
+      <View style={s.header}>
+        <Text style={s.title}>{t.routine.title}</Text>
       </View>
 
-      <View style={styles.tabs}>
+      <View style={s.tabs}>
         {[
-          { id: 'matin', label: t.routine.morning },
-          { id: 'soir', label: t.routine.evening },
-        ].map(t2 => (
-          <TouchableOpacity key={t2.id} onPress={() => setTab(t2.id)} style={[styles.tab, tab === t2.id && styles.tabActive]}>
-            <Text style={[styles.tabText, tab === t2.id && styles.tabTextActive]}>{t2.label}</Text>
+          { id: 'matin', label: t.routine.morning, emoji: '☀️' },
+          { id: 'soir', label: t.routine.evening, emoji: '🌙' },
+        ].map(tab2 => (
+          <TouchableOpacity key={tab2.id} onPress={() => setTab(tab2.id)} style={[s.tab, tab === tab2.id && s.tabActive]}>
+            <Text style={[s.tabText, tab === tab2.id && s.tabTextActive]}>{tab2.emoji} {tab2.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {loading ? (
-        <Text style={styles.loading}>...</Text>
+        <Text style={s.loading}>...</Text>
       ) : steps.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>{tab === 'matin' ? '☀️' : '🌙'}</Text>
-          <Text style={styles.emptyTitle}>{t.routine.empty_title}</Text>
-          <Text style={styles.emptySub}>{t.routine.empty_sub}</Text>
+        <View style={s.empty}>
+          <Text style={s.emptyIcon}>{tab === 'matin' ? '☀️' : '🌙'}</Text>
+          <Text style={s.emptyTitle}>{t.routine.empty_title}</Text>
+          <Text style={s.emptySub}>{t.routine.empty_sub}</Text>
         </View>
       ) : (
-        steps.map((s, i) => (
-          <View key={s.id} style={styles.stepRow}>
-            <View style={styles.timeline}>
-              <View style={styles.stepIcon}>
-                <Text style={styles.stepEmoji}>{s.icon}</Text>
+        steps.map((step2, i) => (
+          <View key={step2.id} style={s.stepRow}>
+            <View style={s.timeline}>
+              <View style={s.stepIconBox}>
+                <Text style={s.stepEmoji}>{step2.icon}</Text>
               </View>
-              {i < steps.length - 1 && <View style={styles.line} />}
+              {i < steps.length - 1 && <View style={s.line} />}
             </View>
-            <View style={styles.stepCard}>
-              <View style={styles.stepHeader}>
-                <Text style={styles.stepName}>{s.product_name}</Text>
-                <Text style={styles.stepNum}>{lang === 'fr' ? `Étape ${s.step_order}` : `Step ${s.step_order}`}</Text>
+            <View style={s.stepCard}>
+              <View style={s.stepHeader}>
+                <Text style={s.stepName}>{step2.product_name}</Text>
+                <View style={s.stepNumBadge}>
+                  <Text style={s.stepNum}>
+                    {lbl(`Étape ${step2.step_order}`, `Adım ${step2.step_order}`, `Step ${step2.step_order}`)}
+                  </Text>
+                </View>
               </View>
-              <Text style={styles.stepBrand}>{s.brand} · {s.duration}</Text>
+              <Text style={s.stepBrand}>{step2.brand} · {step2.duration}</Text>
             </View>
-            <TouchableOpacity onPress={() => deleteStep(s.id)} style={styles.deleteBtn}>
-              <Text style={styles.deleteBtnText}>✕</Text>
+            <TouchableOpacity onPress={() => deleteStep(step2.id)} style={s.deleteBtn}>
+              <Text style={s.deleteBtnText}>✕</Text>
             </TouchableOpacity>
           </View>
         ))
       )}
 
-      <TouchableOpacity style={styles.addBtn} onPress={() => setShowModal(true)}>
-        <Text style={styles.addText}>{t.routine.add_step}</Text>
+      <TouchableOpacity style={s.addBtn} onPress={() => setShowModal(true)}>
+        <Text style={s.addText}>+ {t.routine.add_step}</Text>
       </TouchableOpacity>
 
       {steps.length > 0 && (
-        <View style={styles.shareBox}>
-          <Text style={styles.shareTitle}>{t.routine.share_title}</Text>
-          <Text style={styles.shareSub}>{t.routine.share_sub}</Text>
-          <TouchableOpacity style={styles.shareBtn}>
-            <Text style={styles.shareBtnText}>{t.routine.share_btn}</Text>
+        <View style={s.shareBox}>
+          <Text style={s.shareTitle}>{t.routine.share_title}</Text>
+          <Text style={s.shareSub}>{t.routine.share_sub}</Text>
+          <TouchableOpacity style={s.shareBtn}>
+            <Text style={s.shareBtnText}>{t.routine.share_btn}</Text>
           </TouchableOpacity>
         </View>
       )}
 
+      <View style={{ height: 40 }} />
+
       <Modal visible={showModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <ScrollView style={styles.modalScroll} keyboardShouldPersistTaps="handled">
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t.routine.new_step}</Text>
-              <Text style={styles.fieldLabel}>{t.routine.product_name}</Text>
-              <TextInput style={styles.input} placeholder={lang === 'fr' ? 'ex: Toleriane Double Repair' : 'ex: CeraVe Moisturizing Cream'} placeholderTextColor={T.textSoft} value={productName} onChangeText={setProductName} autoCorrect={false} blurOnSubmit={false} />
-              <Text style={styles.fieldLabel}>{t.routine.brand}</Text>
-              <TextInput style={styles.input} placeholder={lang === 'fr' ? 'ex: La Roche-Posay' : 'ex: CeraVe'} placeholderTextColor={T.textSoft} value={brand} onChangeText={setBrand} autoCorrect={false} blurOnSubmit={false} />
-              <Text style={styles.fieldLabel}>{t.routine.duration}</Text>
-              <View style={styles.durationRow}>
+        <View style={s.modalOverlay}>
+          <ScrollView style={s.modalScroll} keyboardShouldPersistTaps="handled">
+            <View style={s.modalContent}>
+              <View style={s.modalHandle} />
+              <Text style={s.modalTitle}>{t.routine.new_step}</Text>
+              <Text style={s.fieldLabel}>{t.routine.product_name}</Text>
+              <TextInput style={s.input} placeholder={lbl('ex: Toleriane Double Repair', 'örn: CeraVe', 'ex: CeraVe Moisturizing')} placeholderTextColor={T.light} value={productName} onChangeText={setProductName} autoCorrect={false} />
+              <Text style={s.fieldLabel}>{t.routine.brand}</Text>
+              <TextInput style={s.input} placeholder={lbl('ex: La Roche-Posay', 'örn: La Roche-Posay', 'ex: CeraVe')} placeholderTextColor={T.light} value={brand} onChangeText={setBrand} autoCorrect={false} />
+              <Text style={s.fieldLabel}>{t.routine.duration}</Text>
+              <View style={s.durationRow}>
                 {['30s', '60s', '90s', '2min'].map(d => (
-                  <TouchableOpacity key={d} onPress={() => setDuration(d)} style={[styles.durationChip, duration === d && styles.durationChipActive]}>
-                    <Text style={[styles.durationChipText, duration === d && styles.durationChipTextActive]}>{d}</Text>
+                  <TouchableOpacity key={d} onPress={() => setDuration(d)} style={[s.durationChip, duration === d && s.durationChipActive]}>
+                    <Text style={[s.durationChipText, duration === d && s.durationChipTextActive]}>{d}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
-              <View style={styles.modalBtns}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
-                  <Text style={styles.cancelBtnText}>{lang === 'fr' ? 'Annuler' : 'Cancel'}</Text>
+              <View style={s.modalBtns}>
+                <TouchableOpacity style={s.cancelBtn} onPress={() => setShowModal(false)}>
+                  <Text style={s.cancelBtnText}>{lbl('Annuler', 'İptal', 'Cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.saveBtn} onPress={addStep} disabled={saving}>
-                  <Text style={styles.saveBtnText}>{saving ? '...' : lang === 'fr' ? 'Ajouter ✓' : 'Add ✓'}</Text>
+                <TouchableOpacity style={s.saveBtn} onPress={addStep} disabled={saving}>
+                  <Text style={s.saveBtnText}>{saving ? '...' : lbl('Ajouter ✓', 'Ekle ✓', 'Add ✓')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -176,57 +185,58 @@ export default function RoutineScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: T.bg, padding: 20 },
-  header: { paddingTop: 60, paddingBottom: 20 },
-  title: { fontSize: 26, fontWeight: '700', color: T.text },
-  tabs: { flexDirection: 'row', gap: 10, marginBottom: 24 },
-  tab: { flex: 1, padding: 12, borderRadius: 14, backgroundColor: T.surface, alignItems: 'center', borderWidth: 1, borderColor: T.border },
-  tabActive: { backgroundColor: T.accent, borderColor: T.accent },
-  tabText: { fontSize: 13, fontWeight: '600', color: T.textSoft },
-  tabTextActive: { color: '#1A1208' },
-  loading: { textAlign: 'center', color: T.textSoft, marginTop: 40 },
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: T.bg },
+  header: { paddingHorizontal: 22, paddingTop: 60, paddingBottom: 16 },
+  title: { fontSize: 24, fontWeight: '300', color: T.dark, letterSpacing: 0.5 },
+  tabs: { flexDirection: 'row', gap: 10, marginHorizontal: 22, marginBottom: 20 },
+  tab: { flex: 1, padding: 12, borderRadius: 100, backgroundColor: T.white, alignItems: 'center', borderWidth: 1, borderColor: T.light },
+  tabActive: { backgroundColor: T.dark, borderColor: T.dark },
+  tabText: { fontSize: 12, color: T.mid },
+  tabTextActive: { color: 'rgba(184,133,106,0.9)' },
+  loading: { textAlign: 'center', color: T.light, marginTop: 40 },
   empty: { alignItems: 'center', paddingTop: 40, paddingBottom: 20 },
-  emptyIcon: { fontSize: 44, marginBottom: 10 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: T.text, marginBottom: 6 },
-  emptySub: { fontSize: 13, color: T.textSoft },
-  stepRow: { flexDirection: 'row', gap: 14, marginBottom: 4, alignItems: 'flex-start' },
+  emptyIcon: { fontSize: 40, marginBottom: 10 },
+  emptyTitle: { fontSize: 17, fontWeight: '300', color: T.dark, marginBottom: 6 },
+  emptySub: { fontSize: 12, color: T.mid },
+  stepRow: { flexDirection: 'row', gap: 12, marginHorizontal: 22, marginBottom: 4, alignItems: 'flex-start' },
   timeline: { alignItems: 'center', width: 44 },
-  stepIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: T.surface, borderWidth: 1, borderColor: T.border, alignItems: 'center', justifyContent: 'center' },
-  stepEmoji: { fontSize: 22 },
-  line: { width: 2, flex: 1, backgroundColor: T.border, marginVertical: 4, minHeight: 20 },
-  stepCard: { flex: 1, backgroundColor: T.surface, borderRadius: 14, padding: 12, marginBottom: 4, borderWidth: 1, borderColor: T.border },
+  stepIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: T.white, borderWidth: 1, borderColor: T.light, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1 },
+  stepEmoji: { fontSize: 20 },
+  line: { width: 1.5, flex: 1, backgroundColor: T.light, marginVertical: 4, minHeight: 20 },
+  stepCard: { flex: 1, backgroundColor: T.white, borderRadius: 14, padding: 12, marginBottom: 4, borderWidth: 1, borderColor: T.light, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
   stepHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  stepName: { fontSize: 13, fontWeight: '700', color: T.text, flex: 1 },
-  stepNum: { fontSize: 10, color: T.accent, fontWeight: '600', backgroundColor: 'rgba(201,169,110,0.12)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
-  stepBrand: { fontSize: 11, color: T.textSoft },
+  stepName: { fontSize: 13, fontWeight: '500', color: T.dark, flex: 1 },
+  stepNumBadge: { backgroundColor: 'rgba(184,133,106,0.1)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
+  stepNum: { fontSize: 9, color: T.accent, letterSpacing: 0.3 },
+  stepBrand: { fontSize: 10, color: T.mid },
   deleteBtn: { padding: 8, justifyContent: 'center' },
-  deleteBtnText: { fontSize: 14, color: T.textSoft },
-  addBtn: { borderWidth: 1.5, borderColor: T.border, borderStyle: 'dashed', borderRadius: 14, padding: 16, alignItems: 'center', marginTop: 8, marginBottom: 16 },
-  addText: { fontSize: 14, color: T.textSoft },
-  shareBox: { backgroundColor: 'rgba(232,127,172,0.08)', borderRadius: 18, padding: 18, marginBottom: 40, borderWidth: 1, borderColor: 'rgba(232,127,172,0.2)' },
-  shareTitle: { fontSize: 14, fontWeight: '600', color: T.text, marginBottom: 4 },
-  shareSub: { fontSize: 12, color: T.textSoft, marginBottom: 14 },
-  shareBtn: { backgroundColor: T.rose, borderRadius: 12, padding: 12, alignItems: 'center' },
-  shareBtnText: { fontSize: 13, fontWeight: '700', color: '#fff' },
+  deleteBtnText: { fontSize: 12, color: T.light },
+  addBtn: { borderWidth: 1.5, borderColor: T.light, borderStyle: 'dashed', borderRadius: 14, padding: 16, alignItems: 'center', marginHorizontal: 22, marginTop: 8, marginBottom: 16 },
+  addText: { fontSize: 13, color: T.mid },
+  shareBox: { backgroundColor: T.bg2, borderRadius: 18, padding: 18, marginHorizontal: 22, marginBottom: 16, borderWidth: 1, borderColor: T.light },
+  shareTitle: { fontSize: 13, fontWeight: '500', color: T.dark, marginBottom: 4 },
+  shareSub: { fontSize: 11, color: T.mid, marginBottom: 14 },
+  shareBtn: { backgroundColor: T.accent, borderRadius: 100, padding: 12, alignItems: 'center' },
+  shareBtnText: { fontSize: 12, fontWeight: '500', color: T.white },
   center: { flex: 1, backgroundColor: T.bg, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  centerIcon: { fontSize: 48, marginBottom: 12 },
-  centerTitle: { fontSize: 20, fontWeight: '700', color: T.text, marginBottom: 8 },
-  centerSub: { fontSize: 13, color: T.textSoft, textAlign: 'center' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-  modalScroll: { maxHeight: '90%' as any },
-  modalContent: { backgroundColor: T.surface, borderRadius: 24, padding: 24, paddingBottom: 40, borderWidth: 1, borderColor: T.border },
-  modalTitle: { fontSize: 20, fontWeight: '700', color: T.text, marginBottom: 20 },
-  fieldLabel: { fontSize: 12, color: T.textSoft, marginBottom: 6, fontWeight: '500' },
-  input: { backgroundColor: T.bg, borderRadius: 12, padding: 14, color: T.text, fontSize: 14, borderWidth: 1, borderColor: T.border, marginBottom: 14 },
+  centerTitle: { fontSize: 18, fontWeight: '300', color: T.dark, marginBottom: 8 },
+  centerSub: { fontSize: 13, color: T.mid, textAlign: 'center' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(26,19,16,0.6)', justifyContent: 'flex-end' },
+  modalScroll: { maxHeight: '85%' as any },
+  modalContent: { backgroundColor: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 48 },
+  modalHandle: { width: 36, height: 4, backgroundColor: T.light, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontWeight: '300', color: T.dark, marginBottom: 20, letterSpacing: 0.3 },
+  fieldLabel: { fontSize: 9, color: T.mid, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 6 },
+  input: { backgroundColor: T.white, borderRadius: 12, padding: 13, color: T.dark, fontSize: 13, borderWidth: 1, borderColor: T.light, marginBottom: 14 },
   durationRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
-  durationChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: T.bg, borderWidth: 1, borderColor: T.border },
-  durationChipActive: { backgroundColor: T.accent, borderColor: T.accent },
-  durationChipText: { fontSize: 12, color: T.textSoft },
-  durationChipTextActive: { color: '#1A1208', fontWeight: '700' },
+  durationChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 100, backgroundColor: T.white, borderWidth: 1, borderColor: T.light },
+  durationChipActive: { backgroundColor: T.dark, borderColor: T.dark },
+  durationChipText: { fontSize: 12, color: T.mid },
+  durationChipTextActive: { color: 'rgba(184,133,106,0.9)' },
   modalBtns: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.border, alignItems: 'center' },
-  cancelBtnText: { fontSize: 14, color: T.textSoft },
+  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.light, alignItems: 'center' },
+  cancelBtnText: { fontSize: 13, color: T.mid },
   saveBtn: { flex: 2, padding: 14, borderRadius: 12, backgroundColor: T.accent, alignItems: 'center' },
-  saveBtnText: { fontSize: 14, fontWeight: '700', color: '#1A1208' },
+  saveBtnText: { fontSize: 13, fontWeight: '600', color: T.white },
 });
