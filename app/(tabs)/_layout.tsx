@@ -92,7 +92,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="archive"
           options={{
-            title: 'Archive',
+            title: 'Produits',
             tabBarIcon: ({ color }) => <ArchiveIcon color={color} />,
           }}
         />
