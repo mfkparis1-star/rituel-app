@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
+import { compareSkinPhotos } from '../../utils/skinAnalysis';
 import { supabase } from '../../lib/supabase';
 
 const T = {
@@ -27,6 +28,8 @@ export default function JournalScreen() {
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -102,6 +105,43 @@ export default function JournalScreen() {
         }},
       ]
     );
+  };
+
+
+  const urlToBase64 = async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const handleAICompare = async () => {
+    if (entries.length < 2) return;
+    setAnalyzing(true);
+    setAiAnalysis(null);
+    try {
+      const beforeEntry = entries[entries.length - 1];
+      const afterEntry = entries[0];
+      const [base64Before, base64After] = await Promise.all([
+        urlToBase64(beforeEntry.photo_url),
+        urlToBase64(afterEntry.photo_url),
+      ]);
+      const result = await compareSkinPhotos(
+        base64Before, base64After,
+        lang as 'fr' | 'en' | 'tr',
+        beforeEntry.week_number,
+        afterEntry.week_number
+      );
+      setAiAnalysis(result);
+    } catch (e: any) {
+      setAiAnalysis(lang === 'fr' ? 'Analyse impossible. Réessayez.' : 'Analysis failed. Please try again.');
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -248,7 +288,16 @@ export default function JournalScreen() {
             <Text style={styles.compareMessage}>
               {entries.length} {lang === 'fr' ? 'semaines de suivi' : 'weeks of tracking'} ✨
             </Text>
-            <TouchableOpacity style={styles.saveBtn} onPress={() => setShowCompare(false)}>
+            <TouchableOpacity style={styles.compareBtn} onPress={handleAICompare} disabled={analyzing}>
+              <Text style={styles.compareBtnText}>{analyzing ? '🤖 ...' : lang === 'fr' ? '🤖 Analyser l'évolution par IA' : lang === 'tr' ? '🤖 AI ile evrim analizi' : '🤖 Analyze evolution with AI'}</Text>
+            </TouchableOpacity>
+            {aiAnalysis && (
+              <View style={{ backgroundColor: 'rgba(201,169,110,0.08)', borderRadius: 14, padding: 16, marginTop: 12, borderWidth: 1, borderColor: 'rgba(201,169,110,0.2)' }}>
+                <Text style={{ fontSize: 10, color: '#C9A96E', letterSpacing: 2, marginBottom: 8 }}>✦ RITUEL AI</Text>
+                <Text style={{ fontSize: 13, color: '#B8B0C4', lineHeight: 20 }}>{aiAnalysis}</Text>
+              </View>
+            )}
+            <TouchableOpacity style={[styles.saveBtn, { marginTop: 12 }]} onPress={() => { setShowCompare(false); setAiAnalysis(null); }}>
               <Text style={styles.saveBtnText}>{lang === 'fr' ? 'Fermer' : 'Close'}</Text>
             </TouchableOpacity>
           </View>

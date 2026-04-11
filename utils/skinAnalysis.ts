@@ -97,3 +97,43 @@ export function getSkinTypeLabel(skinType: string, lang: 'fr' | 'en' | 'tr'): st
   };
   return labels[skinType]?.[lang] || skinType;
 }
+export async function compareSkinPhotos(
+  base64Before: string,
+  base64After: string,
+  lang: 'fr' | 'en' | 'tr',
+  weeksBefore: number,
+  weeksAfter: number
+): Promise<string> {
+  const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY || '';
+  const langInstruction = lang === 'fr'
+    ? 'Réponds en français.'
+    : lang === 'tr'
+    ? 'Türkçe yanıt ver.'
+    : 'Reply in English.';
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'x-api-key': ANTHROPIC_API_KEY,
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64Before.replace(/^data:image\/\w+;base64,/, '') } },
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64After.replace(/^data:image\/\w+;base64,/, '') } },
+          { type: 'text', text: `Compare these two skin photos taken ${weeksAfter - weeksBefore} weeks apart. The first is week ${weeksBefore}, the second is week ${weeksAfter}. Describe visible changes in skin condition, texture, tone, or any improvements or concerns. Be specific, encouraging and concise (3-4 sentences max). ${langInstruction}` },
+        ],
+      }],
+    }),
+  });
+
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
+  const data = await response.json();
+  return data.content?.[0]?.text || '';
+}
