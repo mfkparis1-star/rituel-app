@@ -5,9 +5,9 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
 const T = {
-  bg: '#08080E', surface: '#11111A', border: '#1C1C2E',
-  accent: '#C9A96E', rose: '#E87FAC', text: '#F5F0F8',
-  textMid: '#B8B0C4', textSoft: '#6B6278',
+  bg: '#FDF8F5', surface: '#FFFFFF', border: '#E8D5C8',
+  accent: '#B8856A', rose: '#D4547E', text: '#1A1310',
+  textMid: '#6B5245', textSoft: '#A89080',
 };
 
 type Post = {

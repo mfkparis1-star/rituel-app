@@ -42,6 +42,18 @@ function JournalIcon({ color }: { color: string }) {
   );
 }
 
+
+function CommunityIcon({ color }: { color: string }) {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+      <Circle cx={9} cy={7} r={4} />
+      <Path d="M23 21v-2a4 4 0 00-3-3.87" />
+      <Path d="M16 3.13a4 4 0 010 7.75" />
+    </Svg>
+  );
+}
+
 function ProfileIcon({ color }: { color: string }) {
   return (
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round">
@@ -96,16 +108,12 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <ArchiveIcon color={color} />,
           }}
         />
+        <Tabs.Screen name="scanner" options={{ href: null }} />
         <Tabs.Screen
-          name="scanner"
+          name="community"
           options={{
-            title: 'Scanner',
-            tabBarIcon: ({ color, focused }) => (
-              <Svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke={focused ? '#B8856A' : '#C9B5A8'} strokeWidth={1.8} strokeLinecap="round">
-                <Path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                <Circle cx={12} cy={13} r={4} />
-              </Svg>
-            ),
+            title: 'Communauté',
+            tabBarIcon: ({ color }) => <CommunityIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -123,7 +131,6 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen name="discover" options={{ href: null }} />
-        <Tabs.Screen name="community" options={{ href: null }} />
         <Tabs.Screen name="routine" options={{ href: null }} />
         <Tabs.Screen name="compatibility" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
