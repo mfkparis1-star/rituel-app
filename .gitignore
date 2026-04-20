@@ -43,3 +43,10 @@ app-example
 /android
 .env
 .env
+
+# Backups & temp files
+*.backup
+*.backup_*
+.env.save
+*.zip
+fix-critical-bugs.sh

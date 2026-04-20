@@ -1,5 +1,6 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActionSheetIOS, Alert, Modal, Platform, ScrollView, Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../hooks/useTranslation';
 import { supabase } from '../../lib/supabase';
 
@@ -21,10 +22,12 @@ export default function RoutineScreen() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [productName, setProductName] = useState('');
   const [brand, setBrand] = useState('');
   const [duration, setDuration] = useState('60s');
   const [saving, setSaving] = useState(false);
+  const [postingToCommunity, setPostingToCommunity] = useState(false);
 
   const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
 
@@ -73,6 +76,109 @@ export default function RoutineScreen() {
     const { error } = await supabase.from('routine_steps').delete().eq('id', id);
     if (error) { Alert.alert('Erreur', error.message); return; }
     if (user) loadSteps(user.id, tab);
+  };
+
+
+  const buildShareText = () => {
+    const header = lbl(
+      `✨ Ma routine ${tab === 'matin' ? 'matin' : 'soir'} sur Rituel`,
+      `✨ Rituel'deki ${tab === 'matin' ? 'sabah' : 'akşam'} rutinim`,
+      `✨ My ${tab === 'matin' ? 'morning' : 'evening'} routine on Rituel`
+    );
+    const stepLines = steps
+      .map((st, i) => `${i + 1}. ${st.icon} ${st.product_name}${st.brand ? ' — ' + st.brand : ''} (${st.duration})`)
+      .join('\n');
+    const footer = lbl(
+      '\n\n📲 Télécharge Rituel : https://apps.apple.com/tr/app/rituel/id6761560472',
+      '\n\n📲 Rituel\u2019i indir: https://apps.apple.com/tr/app/rituel/id6761560472',
+      '\n\n📲 Download Rituel: https://apps.apple.com/tr/app/rituel/id6761560472'
+    );
+    return `${header}\n\n${stepLines}${footer}`;
+  };
+
+  const shareExternal = async () => {
+    if (steps.length === 0) return;
+    try {
+      await Share.share({
+        message: buildShareText(),
+        title: lbl('Ma routine Rituel', 'Rituel rutinim', 'My Rituel routine'),
+      });
+    } catch (e: any) {
+      console.warn('Share error:', e?.message);
+    }
+  };
+
+  const shareToCommunity = async () => {
+    if (steps.length === 0 || !user) return;
+    setPostingToCommunity(true);
+
+    const caption = lbl(
+      `Ma routine ${tab === 'matin' ? 'matin ☀️' : 'soir 🌙'}\n\n` +
+        steps.map((st, i) => `${i + 1}. ${st.product_name}${st.brand ? ' (' + st.brand + ')' : ''}`).join('\n'),
+      `${tab === 'matin' ? 'Sabah ☀️' : 'Akşam 🌙'} rutinim\n\n` +
+        steps.map((st, i) => `${i + 1}. ${st.product_name}${st.brand ? ' (' + st.brand + ')' : ''}`).join('\n'),
+      `My ${tab === 'matin' ? 'morning ☀️' : 'evening 🌙'} routine\n\n` +
+        steps.map((st, i) => `${i + 1}. ${st.product_name}${st.brand ? ' (' + st.brand + ')' : ''}`).join('\n')
+    );
+
+    const productList = steps.map(st => st.product_name).filter(Boolean);
+
+    // Profili çek (skin_type için)
+    const { data: profile } = await supabase.from('profiles').select('skin_type, full_name').eq('id', user.id).single();
+
+    const { error } = await supabase.from('posts').insert({
+      user_id: user.id,
+      user_email: user.email,
+      display_name: profile?.full_name || user.email?.split('@')[0] || 'Membre',
+      caption,
+      skin_type: profile?.skin_type || '',
+      product_names: productList,
+      likes_count: 0,
+      image_url: null,
+    });
+
+    setPostingToCommunity(false);
+    setShowShareModal(false);
+
+    if (error) {
+      Alert.alert('Erreur', error.message);
+    } else {
+      Alert.alert(
+        '✨',
+        lbl('Routine partagée !', 'Rutin paylaşıldı!', 'Routine shared!'),
+        [
+          {
+            text: lbl('Voir dans la communauté', 'Toplulukta gör', 'View in community'),
+            onPress: () => router.push('/(tabs)/community' as any),
+          },
+          { text: 'OK', style: 'cancel' },
+        ]
+      );
+    }
+  };
+
+  const openShareSheet = () => {
+    if (steps.length === 0) return;
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: [
+            lbl('Annuler', 'İptal', 'Cancel'),
+            lbl('Partager dans la communauté', 'Toplulukla paylaş', 'Share to community'),
+            lbl('Partager à l\u2019extérieur', 'Dışarı paylaş', 'Share externally'),
+          ],
+          cancelButtonIndex: 0,
+          title: lbl('Partager ma routine', 'Rutinimi paylaş', 'Share my routine'),
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) shareToCommunity();
+          else if (buttonIndex === 2) shareExternal();
+        }
+      );
+    } else {
+      // Android: özel modal aç
+      setShowShareModal(true);
+    }
   };
 
   if (!user) return (
@@ -143,7 +249,7 @@ export default function RoutineScreen() {
         <View style={s.shareBox}>
           <Text style={s.shareTitle}>{t.routine.share_title}</Text>
           <Text style={s.shareSub}>{t.routine.share_sub}</Text>
-          <TouchableOpacity style={s.shareBtn}>
+          <TouchableOpacity style={s.shareBtn} onPress={openShareSheet}>
             <Text style={s.shareBtnText}>{t.routine.share_btn}</Text>
           </TouchableOpacity>
         </View>
@@ -151,6 +257,7 @@ export default function RoutineScreen() {
 
       <View style={{ height: 40 }} />
 
+      {/* Add Step Modal */}
       <Modal visible={showModal} animationType="slide" transparent>
         <View style={s.modalOverlay}>
           <ScrollView style={s.modalScroll} keyboardShouldPersistTaps="handled">
@@ -179,6 +286,36 @@ export default function RoutineScreen() {
               </View>
             </View>
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Share Modal (Android fallback) */}
+      <Modal visible={showShareModal} animationType="slide" transparent>
+        <View style={s.modalOverlay}>
+          <View style={s.shareModalContent}>
+            <View style={s.modalHandle} />
+            <Text style={s.modalTitle}>{lbl('Partager ma routine', 'Rutinimi paylaş', 'Share my routine')}</Text>
+
+            <TouchableOpacity style={s.shareOption} onPress={shareToCommunity} disabled={postingToCommunity}>
+              <Text style={s.shareOptionIcon}>📱</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={s.shareOptionTitle}>{lbl('Partager dans la communauté', 'Toplulukla paylaş', 'Share to community')}</Text>
+                <Text style={s.shareOptionSub}>{lbl('Visible par les autres membres Rituel', 'Diğer Rituel üyeleri görebilir', 'Visible to other Rituel members')}</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={s.shareOption} onPress={() => { setShowShareModal(false); setTimeout(shareExternal, 300); }}>
+              <Text style={s.shareOptionIcon}>📤</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={s.shareOptionTitle}>{lbl('Partager à l\u2019extérieur', 'Dışarı paylaş', 'Share externally')}</Text>
+                <Text style={s.shareOptionSub}>{lbl('WhatsApp, Messages, Mail...', 'WhatsApp, Mesajlar, Mail...', 'WhatsApp, Messages, Mail...')}</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={s.cancelBtn} onPress={() => setShowShareModal(false)}>
+              <Text style={s.cancelBtnText}>{lbl('Annuler', 'İptal', 'Cancel')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -235,8 +372,13 @@ const s = StyleSheet.create({
   durationChipText: { fontSize: 12, color: T.mid },
   durationChipTextActive: { color: 'rgba(184,133,106,0.9)' },
   modalBtns: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.light, alignItems: 'center' },
+  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: T.light, alignItems: 'center', marginTop: 8 },
   cancelBtnText: { fontSize: 13, color: T.mid },
   saveBtn: { flex: 2, padding: 14, borderRadius: 12, backgroundColor: T.accent, alignItems: 'center' },
   saveBtnText: { fontSize: 13, fontWeight: '600', color: T.white },
+  shareModalContent: { backgroundColor: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 48 },
+  shareOption: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, backgroundColor: T.white, borderRadius: 14, borderWidth: 1, borderColor: T.light, marginBottom: 12 },
+  shareOptionIcon: { fontSize: 32 },
+  shareOptionTitle: { fontSize: 14, fontWeight: '600', color: T.dark, marginBottom: 2 },
+  shareOptionSub: { fontSize: 11, color: T.mid },
 });

@@ -44,9 +44,10 @@ export default function AuthScreen() {
   const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
 
   const panResponder = useRef(PanResponder.create({
-    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onMoveShouldSetPanResponder: (_, g) =>
+      Math.abs(g.dx) > 50 && Math.abs(g.dx) > Math.abs(g.dy) * 3 && Math.abs(g.vx) > 0.3,
     onPanResponderRelease: (_, g) => {
-      if (g.dx > 60) router.push('/(tabs)/scanner' as any);
+      if (g.dx > 120 && Math.abs(g.vx) > 0.3) router.push('/(tabs)/journal' as any);
     },
   })).current;
 
@@ -295,28 +296,38 @@ export default function AuthScreen() {
           <View style={s.statBox}><Text style={s.statNum}>—</Text><Text style={s.statLbl}>{lbl('Actifs', 'Aktif', 'Active')}</Text></View>
         </View>
 
-        <TouchableOpacity style={s.aiCard} onPress={() => router.push('/skin-analysis' as any)}>
+        <TouchableOpacity style={s.aiCard} onPress={() => router.push('/(tabs)/skin-analysis' as any)}>
           <Text style={s.aiCardTitle}>{lbl('Analyse IA de ma peau', 'AI Cilt Analizim', 'AI Skin Analysis')}</Text>
           <Text style={s.aiCardSub}>{lbl('Découvrez votre type de peau en 1 photo', '1 fotoğrafla cilt tipinizi öğrenin', 'Discover your skin type in 1 photo')}</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={s.premiumCard} onPress={() => router.push('/paywall' as any)}>
+          <View style={s.premiumLeft}>
+            <Text style={s.premiumIcon}>✨</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.premiumTitle}>{lbl('Passer Premium', 'Premium\'a geç', 'Go Premium')}</Text>
+              <Text style={s.premiumSub}>{lbl('Débloquez toutes les fonctionnalités', 'Tüm özelliklerin kilidini aç', 'Unlock all features')}</Text>
+            </View>
+          </View>
+          <Text style={s.premiumArrow}>›</Text>
+        </TouchableOpacity>
         <View style={s.settingsCard}>
           <TouchableOpacity style={s.settingRow} onPress={() => setMode('editProfile')}>
             <View style={s.settingIcon}><Text style={s.settingIconText}>◎</Text></View>
             <Text style={s.settingLabel}>{t.auth.edit_profile}</Text>
             <Text style={s.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={s.settingRow} onPress={() => router.push('/skin-analysis' as any)}>
+          <TouchableOpacity style={s.settingRow} onPress={() => router.push('/(tabs)/skin-analysis' as any)}>
             <View style={s.settingIcon}><Text style={s.settingIconText}>◈</Text></View>
             <Text style={s.settingLabel}>{lbl('Analyse peau', 'Cilt analizi', 'Skin analysis')}</Text>
             <Text style={s.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={s.settingRow} onPress={() => router.push('/routine' as any)}>
+          <TouchableOpacity style={s.settingRow} onPress={() => router.push('/(tabs)/routine' as any)}>
             <View style={s.settingIcon}><Text style={s.settingIconText}>◇</Text></View>
             <Text style={s.settingLabel}>{t.routine.title}</Text>
             <Text style={s.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[s.settingRow, { borderBottomWidth: 0 }]} onPress={() => router.push('/compatibility' as any)}>
+          <TouchableOpacity style={[s.settingRow, { borderBottomWidth: 0 }]} onPress={() => router.push('/(tabs)/compatibility' as any)}>
             <View style={s.settingIcon}><Text style={s.settingIconText}>◉</Text></View>
             <Text style={s.settingLabel}>{t.compatibility.title}</Text>
             <Text style={s.settingArrow}>›</Text>
@@ -505,4 +516,10 @@ const s = StyleSheet.create({
   skinChipActive: { backgroundColor: T.dark, borderColor: T.dark },
   skinChipText: { fontSize: 11, color: T.mid },
   skinChipTextActive: { color: 'rgba(184,133,106,0.9)' },
+  premiumCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: T.dark, borderRadius: 18, padding: 18, marginHorizontal: 22, marginBottom: 12 },
+  premiumLeft: { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 },
+  premiumIcon: { fontSize: 28 },
+  premiumTitle: { fontSize: 15, fontWeight: '700', color: T.bg, marginBottom: 2 },
+  premiumSub: { fontSize: 11, color: '#C9B5A8' },
+  premiumArrow: { fontSize: 20, color: T.bg, opacity: 0.6 },
 });

@@ -37,10 +37,11 @@ export default function HomeScreen() {
   const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
 
   const panResponder = useRef(PanResponder.create({
-    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onMoveShouldSetPanResponder: (_, g) =>
+      Math.abs(g.dx) > 50 && Math.abs(g.dx) > Math.abs(g.dy) * 3 && Math.abs(g.vx) > 0.3,
     onPanResponderRelease: (_, g) => {
-      if (g.dx < -60) router.push('/(tabs)/archive' as any);
-      if (g.dx > 60) router.push('/(tabs)/auth' as any);
+      if (g.dx < -120 && Math.abs(g.vx) > 0.3) router.push('/(tabs)/archive' as any);
+      if (g.dx > 120 && Math.abs(g.vx) > 0.3) router.push('/(tabs)/auth' as any);
     },
   })).current;
 
@@ -173,12 +174,12 @@ export default function HomeScreen() {
         </Text>
         {skinLabel && (
           <View style={styles.skinTags}>
-            <View style={styles.skinTag}><Text style={styles.skinTagText}>Hydratation</Text></View>
-            <View style={styles.skinTag}><Text style={styles.skinTagText}>Anti-brillance</Text></View>
+            <View style={styles.skinTag}><Text style={styles.skinTagText}>{lbl('Hydratation', 'Nemlendirme', 'Hydration')}</Text></View>
+            <View style={styles.skinTag}><Text style={styles.skinTagText}>{lbl('Anti-brillance', 'Mat görünüm', 'Anti-shine')}</Text></View>
             <View style={styles.skinTag}><Text style={styles.skinTagText}>SPF</Text></View>
           </View>
         )}
-        <TouchableOpacity style={styles.analyseBtn} onPress={() => router.push('/(tabs)/scanner' as any)}>
+        <TouchableOpacity style={styles.analyseBtn} onPress={() => router.push('/(tabs)/skin-analysis' as any)}>
           <Text style={styles.analyseBtnText}>
             {lbl('Nouvelle analyse', 'Yeni analiz', 'New analysis')}
           </Text>

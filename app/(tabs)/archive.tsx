@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Image, Linking, Modal, PanResponder, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -146,10 +146,11 @@ export default function ArchiveScreen() {
   const [saving, setSaving] = useState(false);
 
   const panResponder = useRef(PanResponder.create({
-    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onMoveShouldSetPanResponder: (_, g) =>
+      Math.abs(g.dx) > 50 && Math.abs(g.dx) > Math.abs(g.dy) * 3 && Math.abs(g.vx) > 0.3,
     onPanResponderRelease: (_, g) => {
-      if (g.dx < -60) router.push('/(tabs)/scanner' as any);
-      if (g.dx > 60) router.push('/' as any);
+      if (g.dx < -120 && Math.abs(g.vx) > 0.3) router.push('/(tabs)/community' as any);
+      if (g.dx > 120 && Math.abs(g.vx) > 0.3) router.push('/' as any);
     },
   })).current;
 
@@ -168,6 +169,11 @@ export default function ArchiveScreen() {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+
+  // Refresh list every time we return to this screen
+  useFocusEffect(() => {
+    if (user) loadProducts(user.id);
+  });
 
   const loadProducts = async (userId: string) => {
     const { data, error } = await supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
@@ -359,7 +365,7 @@ export default function ArchiveScreen() {
             {products.length} {lang === 'fr' ? 'produits' : lang === 'tr' ? 'ürün' : 'products'} · €{total}
           </Text>
         </View>
-        <TouchableOpacity style={styles.addCircle} onPress={() => { resetForm(); setShowAddModal(true); }}>
+        <TouchableOpacity style={styles.addCircle} onPress={() => router.push('/add-product' as any)}>
           <Text style={styles.addCircleText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -471,7 +477,7 @@ export default function ArchiveScreen() {
             })
       }
 
-      <TouchableOpacity style={styles.addDashed} onPress={() => { resetForm(); setShowAddModal(true); }}>
+      <TouchableOpacity style={styles.addDashed} onPress={() => router.push('/add-product' as any)}>
         <Text style={styles.addDashedText}>{t.archive.add_product}</Text>
       </TouchableOpacity>
 
