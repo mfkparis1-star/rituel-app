@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rituel — Votre archive beauté personnelle</title>
+  <meta name="description" content="Archivez vos produits, analysez votre peau par IA et créez vos routines beauté sur mesure.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Georgia, serif; background: #08080E; color: #F5F0F8; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; border-bottom: 1px solid #1C1C2E; }
+    .logo { font-size: 24px; color: #C9A96E; letter-spacing: 4px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: #6B6278; font-size: 13px; text-decoration: none; letter-spacing: 1px; }
+    .nav-links a:hover { color: #C9A96E; }
+    .nav-cta { background: #C9A96E !important; color: #1A1208 !important; padding: 10px 20px; border-radius: 10px; font-weight: 600; }
+    .hero { text-align: center; padding: 100px 24px 80px; max-width: 720px; margin: 0 auto; }
+    .hero-badge { display: inline-block; border: 1px solid rgba(201,169,110,0.3); color: #C9A96E; font-size: 11px; letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 32px; }
+    .hero h1 { font-size: 52px; font-weight: 400; color: #F5F0F8; line-height: 1.2; margin-bottom: 20px; }
+    .hero h1 span { color: #C9A96E; }
+    .hero p { font-size: 17px; color: #B8B0C4; line-height: 1.8; margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: #C9A96E; color: #1A1208; padding: 16px 32px; border-radius: 14px; font-size: 14px; font-weight: 600; text-decoration: none; letter-spacing: 1px; }
+    .btn-secondary { border: 1px solid #1C1C2E; color: #B8B0C4; padding: 16px 32px; border-radius: 14px; font-size: 14px; text-decoration: none; letter-spacing: 1px; }
+    .founding { background: #11111A; border: 1px solid rgba(201,169,110,0.3); border-radius: 24px; padding: 60px 48px; max-width: 860px; margin: 60px auto; text-align: center; }
+    .founding-badge { display: inline-block; background: rgba(201,169,110,0.15); color: #C9A96E; font-size: 10px; letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 24px; }
+    .founding h2 { font-size: 36px; font-weight: 400; color: #F5F0F8; margin-bottom: 16px; }
+    .founding h2 span { color: #C9A96E; }
+    .founding p { font-size: 15px; color: #B8B0C4; line-height: 1.8; margin-bottom: 32px; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .founding-perks { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .perk { background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.2); border-radius: 12px; padding: 16px 20px; font-size: 13px; color: #C9A96E; }
+    .counter { font-size: 14px; color: #6B6278; margin-top: 16px; }
+    .counter span { color: #C9A96E; font-size: 18px; font-weight: 600; }
+    .waitlist-form { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .waitlist-form input { background: #1C1C2E; border: 1px solid #2A2A3E; border-radius: 12px; padding: 14px 20px; color: #F5F0F8; font-size: 14px; width: 280px; outline: none; font-family: Georgia, serif; }
+    .waitlist-form input:focus { border-color: #C9A96E; }
+    .waitlist-form input::placeholder { color: #6B6278; }
+    .waitlist-form button { background: #C9A96E; color: #1A1208; border: none; border-radius: 12px; padding: 14px 28px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: Georgia, serif; }
+    #form-success { display: none; color: #C9A96E; font-size: 14px; margin-top: 12px; }
+    .ai-section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .ai-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 24px; padding: 48px; display: flex; gap: 48px; align-items: center; flex-wrap: wrap; }
+    .ai-text { flex: 1; min-width: 280px; }
+    .ai-badge { display: inline-block; background: rgba(201,169,110,0.1); color: #C9A96E; font-size: 10px; letter-spacing: 3px; padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
+    .ai-text h2 { font-size: 32px; font-weight: 400; color: #F5F0F8; margin-bottom: 16px; line-height: 1.3; }
+    .ai-text p { font-size: 14px; color: #6B6278; line-height: 1.8; margin-bottom: 24px; }
+    .ai-points { list-style: none; }
+    .ai-points li { font-size: 14px; color: #B8B0C4; padding: 8px 0; border-bottom: 1px solid #1C1C2E; display: flex; gap: 12px; }
+    .ai-points li:last-child { border-bottom: none; }
+    .ai-visual { flex: 1; min-width: 240px; background: #08080E; border: 1px solid #1C1C2E; border-radius: 18px; padding: 32px; text-align: center; }
+    .ai-result { background: #11111A; border-radius: 12px; padding: 16px; margin-top: 16px; text-align: left; }
+    .ai-result-label { font-size: 10px; color: #6B6278; letter-spacing: 2px; margin-bottom: 8px; }
+    .ai-tag { display: inline-block; background: rgba(201,169,110,0.1); color: #C9A96E; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 3px; }
+    .stats { background: #11111A; border-top: 1px solid #1C1C2E; border-bottom: 1px solid #1C1C2E; padding: 60px 48px; }
+    .stats-inner { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 32px; text-align: center; }
+    .stat-val { font-size: 42px; color: #C9A96E; margin-bottom: 8px; }
+    .stat-label { font-size: 12px; color: #6B6278; letter-spacing: 2px; text-transform: uppercase; }
+    .features { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 10px; color: #6B6278; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 48px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .feature-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 18px; padding: 28px; }
+    .feature-icon { font-size: 28px; margin-bottom: 16px; }
+    .feature-title { font-size: 16px; color: #F5F0F8; margin-bottom: 10px; }
+    .feature-desc { font-size: 13px; color: #6B6278; line-height: 1.7; }
+    .partners { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .partners-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 48px; }
+    .partner-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 16px; padding: 24px; text-align: center; width: 180px; }
+    .partner-emoji { font-size: 32px; margin-bottom: 10px; }
+    .partner-name { font-size: 13px; color: #F5F0F8; font-weight: 600; margin-bottom: 6px; }
+    .partner-desc { font-size: 11px; color: #6B6278; line-height: 1.5; }
+    .download { text-align: center; padding: 80px 24px; }
+    .download h2 { font-size: 36px; color: #F5F0F8; margin-bottom: 16px; font-weight: 400; }
+    .download p { font-size: 15px; color: #B8B0C4; margin-bottom: 40px; }
+    .store-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .store-btn { background: #11111A; border: 1px solid #1C1C2E; border-radius: 14px; padding: 14px 28px; color: #F5F0F8; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .store-btn:hover { border-color: #C9A96E; }
+    footer { border-top: 1px solid #1C1C2E; padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-size: 18px; color: #C9A96E; letter-spacing: 4px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: #6B6278; font-size: 12px; text-decoration: none; }
+    .footer-copy { font-size: 12px; color: #6B6278; }
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .hero h1 { font-size: 36px; }
+      .founding { padding: 40px 24px; margin: 40px 16px; }
+      .ai-section, .features, .partners { padding: 40px 24px; }
+      footer { padding: 32px 24px; flex-direction: column; text-align: center; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">✦ rituel</div>
+    <div class="nav-links">
+      <a href="#founding">Founding Member</a>
+      <a href="#features">Fonctionnalités</a>
+      <a href="#partners">Partenaires</a>
+      <a href="privacy.html">Confidentialité</a>
+      <a href="https://apps.apple.com/app/rituel/id6761560472" class="nav-cta" target="_blank">📱 Télécharger</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">✦ VOTRE ARCHIVE BEAUTÉ INTELLIGENTE</div>
+    <h1>Prenez soin de vous<br>avec <span>rituel</span></h1>
+    <p>Archivez vos produits, analysez votre peau par intelligence artificielle et créez vos routines sur mesure.</p>
+    <div class="hero-btns">
+      <a href="https://apps.apple.com/app/rituel/id6761560472" class="btn-primary" target="_blank">🍎 Télécharger gratuitement</a>
+      <a href="#founding" class="btn-secondary">Devenir Founding Member</a>
+    </div>
+  </section>
+
+  <section class="founding" id="founding">
+    <div class="founding-badge">✦ OFFRE LIMITÉE — 100 PLACES</div>
+    <h2>Devenez <span>Founding Member</span></h2>
+    <p>Les 100 premières personnes à rejoindre Rituel obtiennent un accès Premium à vie, gratuitement. Partagez l'app avec vos amies et elles bénéficient de 6 mois offerts.</p>
+    <div class="founding-perks">
+      <div class="perk">✦ Premium à vie gratuit</div>
+      <div class="perk">✦ Badge exclusif Founding Member</div>
+      <div class="perk">✦ 6 mois offerts à vos invités</div>
+      <div class="perk">✦ Accès prioritaire aux nouvelles fonctionnalités</div>
+    </div>
+    <div class="waitlist-form">
+      <input type="email" id="email-input" placeholder="Votre adresse e-mail" />
+      <button onclick="handleSubmit()">Rejoindre la liste →</button>
+    </div>
+    <div id="form-success">✦ Merci ! Vous êtes sur la liste. Nous vous contactons dès l'ouverture.</div>
+    <div class="counter">Plus que <span id="spots">87</span> places disponibles sur 100</div>
+  </section>
+
+  <section class="ai-section">
+    <div class="ai-card">
+      <div class="ai-text">
+        <div class="ai-badge">✦ NOUVEAUTÉ — ANALYSE IA</div>
+        <h2>Votre peau analysée<br>par l'intelligence artificielle</h2>
+        <p>Prenez une photo de votre visage et notre IA analyse instantanément votre type de peau, détecte les problèmes et recommande les produits manquants dans votre routine.</p>
+        <ul class="ai-points">
+          <li><span style="color:#C9A96E">✦</span> Détection du type de peau (sèche, grasse, mixte, sensible)</li>
+          <li><span style="color:#C9A96E">✦</span> Identification des zones à traiter</li>
+          <li><span style="color:#C9A96E">✦</span> Recommandations de produits personnalisées</li>
+          <li><span style="color:#C9A96E">✦</span> Disponible en français, anglais et turc</li>
+        </ul>
+      </div>
+      <div class="ai-visual">
+        <div style="font-size:64px;margin-bottom:16px;">🤖</div>
+        <div style="font-size:13px;color:#6B6278;margin-bottom:16px;">Exemple d'analyse</div>
+        <div class="ai-result">
+          <div class="ai-result-label">TYPE DE PEAU DÉTECTÉ</div>
+          <div style="color:#C9A96E;font-size:14px;">Peau mixte</div>
+        </div>
+        <div class="ai-result" style="margin-top:8px;">
+          <div class="ai-result-label">PROBLÈMES DÉTECTÉS</div>
+          <span class="ai-tag">Zone T grasse</span>
+          <span class="ai-tag">Pores dilatés</span>
+        </div>
+        <div class="ai-result" style="margin-top:8px;">
+          <div class="ai-result-label">PRODUITS MANQUANTS</div>
+          <span class="ai-tag">Sérum hydratant</span>
+          <span class="ai-tag">SPF</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stats-inner">
+      <div><div class="stat-val">5</div><div class="stat-label">Marques partenaires</div></div>
+      <div><div class="stat-val">8</div><div class="stat-label">Fonctionnalités</div></div>
+      <div><div class="stat-val">3</div><div class="stat-label">Langues</div></div>
+      <div><div class="stat-val">100%</div><div class="stat-label">Gratuit pour commencer</div></div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <p class="section-label">Ce que vous pouvez faire</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">Analyse IA de la peau</div><div class="feature-desc">Analysez votre peau en une photo. Notre IA identifie votre type, vos problèmes et vos besoins.</div></div>
+      <div class="feature-card"><div class="feature-icon">🗂</div><div class="feature-title">Archive personnelle</div><div class="feature-desc">Archivez tous vos produits, suivez vos dépenses et gérez votre stock beauté.</div></div>
+      <div class="feature-card"><div class="feature-icon">✦</div><div class="feature-title">Routine sur mesure</div><div class="feature-desc">Créez votre routine matin et soir, étape par étape, adaptée à votre peau.</div></div>
+      <div class="feature-card"><div class="feature-icon">📸</div><div class="feature-title">Journal peau</div><div class="feature-desc">Photographiez votre peau chaque semaine et suivez son évolution dans le temps.</div></div>
+      <div class="feature-card"><div class="feature-icon">🧪</div><div class="feature-title">Test de compatibilité</div><div class="feature-desc">Vérifiez si vos ingrédients actifs sont compatibles avant de les mélanger.</div></div>
+      <div class="feature-card"><div class="feature-icon">📷</div><div class="feature-title">Scanner de produits</div><div class="feature-desc">Scannez le code-barre de n'importe quel produit pour l'ajouter instantanément.</div></div>
+    </div>
+  </section>
+
+  <section class="partners" id="partners">
+    <p class="section-label">Nos marques partenaires</p>
+    <div class="partners-grid">
+      <div class="partner-card"><div class="partner-emoji">💎</div><div class="partner-name">Diamond Smile</div><div class="partner-desc">Blanchiment dentaire professionnel</div></div>
+      <div class="partner-card"><div class="partner-emoji">🎁</div><div class="partner-name">Blissim</div><div class="partner-desc">Box beauté personnalisée mensuelle</div></div>
+      <div class="partner-card"><div class="partner-emoji">🌿</div><div class="partner-name">Laboratoires Uma</div><div class="partner-desc">Compléments naturels pour femmes</div></div>
+      <div class="partner-card"><div class="partner-emoji">🌸</div><div class="partner-name">Perfumeria Comas</div><div class="partner-desc">Parfums & cosmétiques premium</div></div>
+      <div class="partner-card"><div class="partner-emoji">✨</div><div class="partner-name">Dr Pierre Ricaud</div><div class="partner-desc">Soins anti-âge experts</div></div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <h2>Téléchargez Rituel</h2>
+    <p>Disponible sur iOS. Android bientôt disponible.</p>
+    <div class="store-btns">
+      <a href="https://apps.apple.com/app/rituel/id6761560472" class="store-btn" target="_blank">
+        <span style="font-size:22px">🍎</span>
+        <div><div style="font-size:10px;color:#6B6278;letter-spacing:1px">DISPONIBLE SUR</div><div style="font-weight:600">App Store</div></div>
+      </a>
+      <a href="#" class="store-btn" style="opacity:0.5;cursor:not-allowed">
+        <span style="font-size:22px">▶</span>
+        <div><div style="font-size:10px;color:#6B6278;letter-spacing:1px">BIENTÔT SUR</div><div style="font-weight:600">Google Play</div></div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">✦ rituel</div>
+    <div class="footer-links">
+      <a href="privacy.html">Politique de confidentialité</a>
+      <a href="mailto:contact@rituel.app">Contact</a>
+    </div>
+    <div class="footer-copy">© 2026 Rituel. Tous droits réservés.</div>
+  </footer>
+
+  <script>
+    function handleSubmit() {
+      const email = document.getElementById('email-input').value;
+      if (!email || !email.includes('@')) { alert('Veuillez entrer une adresse e-mail valide.'); return; }
+      document.querySelector('.waitlist-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+      const spots = parseInt(document.getElementById('spots').textContent);
+      if (spots > 0) document.getElementById('spots').textContent = spots - 1;
+    }
+  </script>
+</body>
+</html>

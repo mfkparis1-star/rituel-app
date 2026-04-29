@@ -1,232 +1,1014 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rituel — Votre archive beauté personnelle</title>
-  <meta name="description" content="Archivez vos produits, analysez votre peau par IA et créez vos routines beauté sur mesure.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F6F1EC" />
+
+  <title>Rituel — AI-powered skincare, personalized for every skin</title>
+  <meta name="description" content="Rituel helps users analyze their skin, build personalized routines, and discover skincare products that match their needs. A Parisian beauty-tech app for skincare-focused users and brand partners." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Rituel — AI-powered skincare, personalized for every skin" />
+  <meta property="og:description" content="A Parisian beauty-tech app helping users analyze their skin, build routines, and discover the right products." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Favicons (using app icon) -->
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
+  <link rel="apple-touch-icon" href="../assets/images/icon.png" />
+
+  <!-- Fonts: Playfair Display for headings, Inter for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
   <style>
+    /* ==========================================================
+       RITUEL — Brand tokens (matches docs/BRAND_BOOK.md & app theme)
+       ========================================================== */
+    :root {
+      --beige: #F6F1EC;
+      --beige-deep: #EFE6DC;
+      --cream: #F5E8DC;
+      --copper: #B8856A;
+      --copper-warm: #C08A6A;
+      --espresso: #2A1410;
+      --espresso-soft: #4A3528;
+      --ink: #1A0F0B;
+      --muted: #6B5848;
+      --line: rgba(42, 20, 16, 0.08);
+      --line-strong: rgba(42, 20, 16, 0.16);
+      --shadow-sm: 0 1px 2px rgba(42, 20, 16, 0.04);
+      --shadow-md: 0 8px 32px rgba(42, 20, 16, 0.06);
+      --shadow-lg: 0 24px 64px rgba(42, 20, 16, 0.10);
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --maxw: 1140px;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Georgia, serif; background: #08080E; color: #F5F0F8; }
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; border-bottom: 1px solid #1C1C2E; }
-    .logo { font-size: 24px; color: #C9A96E; letter-spacing: 4px; }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-    .nav-links a { color: #6B6278; font-size: 13px; text-decoration: none; letter-spacing: 1px; }
-    .nav-links a:hover { color: #C9A96E; }
-    .nav-cta { background: #C9A96E !important; color: #1A1208 !important; padding: 10px 20px; border-radius: 10px; font-weight: 600; }
-    .hero { text-align: center; padding: 100px 24px 80px; max-width: 720px; margin: 0 auto; }
-    .hero-badge { display: inline-block; border: 1px solid rgba(201,169,110,0.3); color: #C9A96E; font-size: 11px; letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 32px; }
-    .hero h1 { font-size: 52px; font-weight: 400; color: #F5F0F8; line-height: 1.2; margin-bottom: 20px; }
-    .hero h1 span { color: #C9A96E; }
-    .hero p { font-size: 17px; color: #B8B0C4; line-height: 1.8; margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
-    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary { background: #C9A96E; color: #1A1208; padding: 16px 32px; border-radius: 14px; font-size: 14px; font-weight: 600; text-decoration: none; letter-spacing: 1px; }
-    .btn-secondary { border: 1px solid #1C1C2E; color: #B8B0C4; padding: 16px 32px; border-radius: 14px; font-size: 14px; text-decoration: none; letter-spacing: 1px; }
-    .founding { background: #11111A; border: 1px solid rgba(201,169,110,0.3); border-radius: 24px; padding: 60px 48px; max-width: 860px; margin: 60px auto; text-align: center; }
-    .founding-badge { display: inline-block; background: rgba(201,169,110,0.15); color: #C9A96E; font-size: 10px; letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 24px; }
-    .founding h2 { font-size: 36px; font-weight: 400; color: #F5F0F8; margin-bottom: 16px; }
-    .founding h2 span { color: #C9A96E; }
-    .founding p { font-size: 15px; color: #B8B0C4; line-height: 1.8; margin-bottom: 32px; max-width: 560px; margin-left: auto; margin-right: auto; }
-    .founding-perks { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-    .perk { background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.2); border-radius: 12px; padding: 16px 20px; font-size: 13px; color: #C9A96E; }
-    .counter { font-size: 14px; color: #6B6278; margin-top: 16px; }
-    .counter span { color: #C9A96E; font-size: 18px; font-weight: 600; }
-    .waitlist-form { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
-    .waitlist-form input { background: #1C1C2E; border: 1px solid #2A2A3E; border-radius: 12px; padding: 14px 20px; color: #F5F0F8; font-size: 14px; width: 280px; outline: none; font-family: Georgia, serif; }
-    .waitlist-form input:focus { border-color: #C9A96E; }
-    .waitlist-form input::placeholder { color: #6B6278; }
-    .waitlist-form button { background: #C9A96E; color: #1A1208; border: none; border-radius: 12px; padding: 14px 28px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: Georgia, serif; }
-    #form-success { display: none; color: #C9A96E; font-size: 14px; margin-top: 12px; }
-    .ai-section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
-    .ai-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 24px; padding: 48px; display: flex; gap: 48px; align-items: center; flex-wrap: wrap; }
-    .ai-text { flex: 1; min-width: 280px; }
-    .ai-badge { display: inline-block; background: rgba(201,169,110,0.1); color: #C9A96E; font-size: 10px; letter-spacing: 3px; padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
-    .ai-text h2 { font-size: 32px; font-weight: 400; color: #F5F0F8; margin-bottom: 16px; line-height: 1.3; }
-    .ai-text p { font-size: 14px; color: #6B6278; line-height: 1.8; margin-bottom: 24px; }
-    .ai-points { list-style: none; }
-    .ai-points li { font-size: 14px; color: #B8B0C4; padding: 8px 0; border-bottom: 1px solid #1C1C2E; display: flex; gap: 12px; }
-    .ai-points li:last-child { border-bottom: none; }
-    .ai-visual { flex: 1; min-width: 240px; background: #08080E; border: 1px solid #1C1C2E; border-radius: 18px; padding: 32px; text-align: center; }
-    .ai-result { background: #11111A; border-radius: 12px; padding: 16px; margin-top: 16px; text-align: left; }
-    .ai-result-label { font-size: 10px; color: #6B6278; letter-spacing: 2px; margin-bottom: 8px; }
-    .ai-tag { display: inline-block; background: rgba(201,169,110,0.1); color: #C9A96E; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin: 3px; }
-    .stats { background: #11111A; border-top: 1px solid #1C1C2E; border-bottom: 1px solid #1C1C2E; padding: 60px 48px; }
-    .stats-inner { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 32px; text-align: center; }
-    .stat-val { font-size: 42px; color: #C9A96E; margin-bottom: 8px; }
-    .stat-label { font-size: 12px; color: #6B6278; letter-spacing: 2px; text-transform: uppercase; }
-    .features { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
-    .section-label { font-size: 10px; color: #6B6278; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 48px; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-    .feature-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 18px; padding: 28px; }
-    .feature-icon { font-size: 28px; margin-bottom: 16px; }
-    .feature-title { font-size: 16px; color: #F5F0F8; margin-bottom: 10px; }
-    .feature-desc { font-size: 13px; color: #6B6278; line-height: 1.7; }
-    .partners { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
-    .partners-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 48px; }
-    .partner-card { background: #11111A; border: 1px solid #1C1C2E; border-radius: 16px; padding: 24px; text-align: center; width: 180px; }
-    .partner-emoji { font-size: 32px; margin-bottom: 10px; }
-    .partner-name { font-size: 13px; color: #F5F0F8; font-weight: 600; margin-bottom: 6px; }
-    .partner-desc { font-size: 11px; color: #6B6278; line-height: 1.5; }
-    .download { text-align: center; padding: 80px 24px; }
-    .download h2 { font-size: 36px; color: #F5F0F8; margin-bottom: 16px; font-weight: 400; }
-    .download p { font-size: 15px; color: #B8B0C4; margin-bottom: 40px; }
-    .store-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .store-btn { background: #11111A; border: 1px solid #1C1C2E; border-radius: 14px; padding: 14px 28px; color: #F5F0F8; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-    .store-btn:hover { border-color: #C9A96E; }
-    footer { border-top: 1px solid #1C1C2E; padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .footer-logo { font-size: 18px; color: #C9A96E; letter-spacing: 4px; }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { color: #6B6278; font-size: 12px; text-decoration: none; }
-    .footer-copy { font-size: 12px; color: #6B6278; }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--beige);
+      color: var(--espresso);
+      line-height: 1.6;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .serif { font-family: 'Playfair Display', Georgia, serif; font-weight: 400; }
+
+    a { color: inherit; text-decoration: none; }
+
+    img, svg { display: block; max-width: 100%; }
+
+    .container {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--copper);
+    }
+
+    /* ==========================================================
+       NAVIGATION
+       ========================================================== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(246, 241, 236, 0.85);
+      backdrop-filter: saturate(180%) blur(16px);
+      -webkit-backdrop-filter: saturate(180%) blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      letter-spacing: 4px;
+      color: var(--espresso);
+      font-weight: 500;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--espresso); }
+    .nav-cta {
+      background: var(--espresso);
+      color: var(--beige) !important;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .nav-cta:hover {
+      background: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 720px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+    }
+
+    /* ==========================================================
+       HERO
+       ========================================================== */
+    .hero {
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(184, 133, 106, 0.10) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(184, 133, 106, 0.08);
+      border: 1px solid rgba(184, 133, 106, 0.20);
+      color: var(--copper);
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--copper);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 5.2vw, 58px);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      color: var(--espresso);
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--copper);
+      font-weight: 400;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 36px;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn-primary {
+      background: var(--espresso);
+      color: var(--beige) !important;
+      padding: 16px 28px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid var(--espresso);
+    }
+    .btn-primary:hover {
+      background: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--espresso) !important;
+      padding: 16px 28px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      border: 1px solid var(--line-strong);
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      border-color: var(--espresso);
+      background: rgba(42, 20, 16, 0.03);
+    }
+
+    /* Hero phone mockup */
+    .phone-mockup {
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+      aspect-ratio: 9 / 19.5;
+      border-radius: 44px;
+      background: var(--espresso);
+      padding: 12px;
+      box-shadow: var(--shadow-lg);
+      transform: rotate(-2deg);
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      background: linear-gradient(160deg, var(--cream) 0%, var(--beige) 100%);
+      overflow: hidden;
+      position: relative;
+      padding: 36px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .phone-screen::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 100px; height: 24px;
+      background: var(--espresso);
+      border-radius: 0 0 14px 14px;
+    }
+    .mock-eyebrow {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--copper);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .mock-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--espresso);
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+    .mock-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(42, 20, 16, 0.05);
+    }
+    .mock-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .mock-dot {
+      width: 8px; height: 8px;
+      background: var(--copper);
+      border-radius: 50%;
+    }
+    .mock-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--espresso);
+      letter-spacing: 0.3px;
+    }
+    .mock-line {
+      height: 6px;
+      background: var(--beige-deep);
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+    .mock-line.short { width: 60%; }
+    .mock-line.long { width: 90%; }
+    .mock-score {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--espresso);
+      color: var(--beige);
+      border-radius: 14px;
+    }
+    .mock-score-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: var(--copper-warm);
+    }
+    .mock-score-label {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(246, 241, 236, 0.6);
+    }
+
+    @media (max-width: 880px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 48px; text-align: center; }
+      .hero-sub { margin-left: auto; margin-right: auto; }
+      .hero-cta { justify-content: center; }
+      .phone-mockup { max-width: 260px; transform: rotate(0); }
+    }
+
+    /* ==========================================================
+       SECTIONS — generic
+       ========================================================== */
+    section {
+      padding: 96px 0;
+    }
+    section.tight { padding: 72px 0; }
+    .section-header {
+      max-width: 680px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+    .section-header .eyebrow { margin-bottom: 12px; display: inline-block; }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--espresso);
+      margin-bottom: 16px;
+    }
+    .section-header h2 em { font-style: italic; color: var(--copper); }
+    .section-header p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ==========================================================
+       WHAT RITUEL DOES (3 cards)
+       ========================================================== */
+    .features {
+      background: white;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--beige);
+      border-radius: var(--radius-md);
+      padding: 36px 28px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--espresso);
+      color: var(--copper-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--espresso);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .feature-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 880px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ==========================================================
+       WHY BRANDS — alternating layout
+       ========================================================== */
+    .brands-section {
+      background: var(--beige);
+    }
+    .brand-points {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .brand-point {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 32px;
+      border: 1px solid var(--line);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .brand-point-num {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 28px;
+      color: var(--copper);
+      line-height: 1;
+      min-width: 32px;
+    }
+    .brand-point h4 {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--espresso);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .brand-point p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 720px) {
+      .brand-points { grid-template-columns: 1fr; }
+    }
+
+    /* ==========================================================
+       PARTNERSHIP MODEL
+       ========================================================== */
+    .partnership {
+      background: var(--espresso);
+      color: var(--beige);
+    }
+    .partnership .section-header h2 { color: var(--beige); }
+    .partnership .section-header h2 em { color: var(--copper-warm); }
+    .partnership .section-header p { color: rgba(246, 241, 236, 0.7); }
+    .partnership .eyebrow { color: var(--copper-warm); }
+
+    .partnership-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .partnership-item {
+      padding: 28px 8px;
+      border-bottom: 1px solid rgba(246, 241, 236, 0.10);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+    .partnership-item:last-child { border-bottom: none; }
+    .partnership-item-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(192, 138, 106, 0.12);
+      color: var(--copper-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .partnership-item h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      color: var(--beige);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+    .partnership-item p {
+      font-size: 14px;
+      color: rgba(246, 241, 236, 0.65);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================
+       FOR USERS — minimal text section
+       ========================================================== */
+    .for-users {
+      background: white;
+      text-align: center;
+    }
+    .for-users-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      max-width: 880px;
+      margin: 48px auto 0;
+    }
+    .user-pillar h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--espresso);
+      margin-bottom: 10px;
+      font-weight: 400;
+      font-style: italic;
+    }
+    .user-pillar p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      .for-users-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    /* ==========================================================
+       TRUST / POSITIONING
+       ========================================================== */
+    .trust {
+      background: var(--beige);
+      text-align: center;
+    }
+    .trust-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 48px;
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      position: relative;
+    }
+    .trust-quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 72px;
+      color: var(--copper);
+      line-height: 0.5;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .trust-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 2.6vw, 26px);
+      font-style: italic;
+      color: var(--espresso);
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    .trust-attr {
+      margin-top: 28px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--copper);
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 720px) {
+      .trust-card { padding: 40px 28px; }
+    }
+
+    /* ==========================================================
+       CONTACT
+       ========================================================== */
+    .contact {
+      background: white;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+    .contact h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4.5vw, 48px);
+      font-weight: 400;
+      color: var(--espresso);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+    .contact h2 em { font-style: italic; color: var(--copper); }
+    .contact p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--espresso);
+      color: var(--beige) !important;
+      padding: 18px 32px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      transition: all 0.2s ease;
+    }
+    .contact-email:hover {
+      background: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ==========================================================
+       FOOTER
+       ========================================================== */
+    footer {
+      background: var(--beige);
+      padding: 48px 0 32px;
+      border-top: 1px solid var(--line);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: var(--espresso);
+    }
+    .footer-meta {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+    .footer-meta a { color: var(--muted); margin-left: 16px; }
+    .footer-meta a:hover { color: var(--espresso); }
+
     @media (max-width: 600px) {
-      nav { padding: 20px 24px; }
-      .hero h1 { font-size: 36px; }
-      .founding { padding: 40px 24px; margin: 40px 16px; }
-      .ai-section, .features, .partners { padding: 40px 24px; }
-      footer { padding: 32px 24px; flex-direction: column; text-align: center; }
-      .nav-links { display: none; }
+      .footer-inner { justify-content: center; text-align: center; }
+    }
+
+    /* ==========================================================
+       UTILITIES
+       ========================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- ===================== NAV ===================== -->
   <nav>
-    <div class="logo">✦ rituel</div>
-    <div class="nav-links">
-      <a href="#founding">Founding Member</a>
-      <a href="#features">Fonctionnalités</a>
-      <a href="#partners">Partenaires</a>
-      <a href="privacy.html">Confidentialité</a>
-      <a href="https://apps.apple.com/app/rituel/id6761560472" class="nav-cta" target="_blank">📱 Télécharger</a>
+    <div class="nav-inner">
+      <a href="#" class="brand">RITUEL</a>
+      <div class="nav-links">
+        <a href="#features">Product</a>
+        <a href="#brands">For Brands</a>
+        <a href="#partnership">Partnership</a>
+        <a href="#contact" class="nav-cta">Contact</a>
+      </div>
     </div>
   </nav>
 
+  <!-- ===================== HERO ===================== -->
   <section class="hero">
-    <div class="hero-badge">✦ VOTRE ARCHIVE BEAUTÉ INTELLIGENTE</div>
-    <h1>Prenez soin de vous<br>avec <span>rituel</span></h1>
-    <p>Archivez vos produits, analysez votre peau par intelligence artificielle et créez vos routines sur mesure.</p>
-    <div class="hero-btns">
-      <a href="https://apps.apple.com/app/rituel/id6761560472" class="btn-primary" target="_blank">🍎 Télécharger gratuitement</a>
-      <a href="#founding" class="btn-secondary">Devenir Founding Member</a>
-    </div>
-  </section>
-
-  <section class="founding" id="founding">
-    <div class="founding-badge">✦ OFFRE LIMITÉE — 100 PLACES</div>
-    <h2>Devenez <span>Founding Member</span></h2>
-    <p>Les 100 premières personnes à rejoindre Rituel obtiennent un accès Premium à vie, gratuitement. Partagez l'app avec vos amies et elles bénéficient de 6 mois offerts.</p>
-    <div class="founding-perks">
-      <div class="perk">✦ Premium à vie gratuit</div>
-      <div class="perk">✦ Badge exclusif Founding Member</div>
-      <div class="perk">✦ 6 mois offerts à vos invités</div>
-      <div class="perk">✦ Accès prioritaire aux nouvelles fonctionnalités</div>
-    </div>
-    <div class="waitlist-form">
-      <input type="email" id="email-input" placeholder="Votre adresse e-mail" />
-      <button onclick="handleSubmit()">Rejoindre la liste →</button>
-    </div>
-    <div id="form-success">✦ Merci ! Vous êtes sur la liste. Nous vous contactons dès l'ouverture.</div>
-    <div class="counter">Plus que <span id="spots">87</span> places disponibles sur 100</div>
-  </section>
-
-  <section class="ai-section">
-    <div class="ai-card">
-      <div class="ai-text">
-        <div class="ai-badge">✦ NOUVEAUTÉ — ANALYSE IA</div>
-        <h2>Votre peau analysée<br>par l'intelligence artificielle</h2>
-        <p>Prenez une photo de votre visage et notre IA analyse instantanément votre type de peau, détecte les problèmes et recommande les produits manquants dans votre routine.</p>
-        <ul class="ai-points">
-          <li><span style="color:#C9A96E">✦</span> Détection du type de peau (sèche, grasse, mixte, sensible)</li>
-          <li><span style="color:#C9A96E">✦</span> Identification des zones à traiter</li>
-          <li><span style="color:#C9A96E">✦</span> Recommandations de produits personnalisées</li>
-          <li><span style="color:#C9A96E">✦</span> Disponible en français, anglais et turc</li>
-        </ul>
-      </div>
-      <div class="ai-visual">
-        <div style="font-size:64px;margin-bottom:16px;">🤖</div>
-        <div style="font-size:13px;color:#6B6278;margin-bottom:16px;">Exemple d'analyse</div>
-        <div class="ai-result">
-          <div class="ai-result-label">TYPE DE PEAU DÉTECTÉ</div>
-          <div style="color:#C9A96E;font-size:14px;">Peau mixte</div>
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-badge">
+            <span class="dot"></span>
+            <span>Beauty &middot; AI &middot; Paris</span>
+          </div>
+          <h1>AI-powered skincare recommendations, <em>personalized</em> for every skin.</h1>
+          <p class="hero-sub">
+            Rituel helps users analyze their skin, build personalized routines, and discover products that truly match their needs. Built in Paris for skincare-focused users and beauty brands.
+          </p>
+          <div class="hero-cta">
+            <a href="#contact" class="btn-primary">
+              Partner with Rituel
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            <a href="#features" class="btn-secondary">Learn more</a>
+          </div>
         </div>
-        <div class="ai-result" style="margin-top:8px;">
-          <div class="ai-result-label">PROBLÈMES DÉTECTÉS</div>
-          <span class="ai-tag">Zone T grasse</span>
-          <span class="ai-tag">Pores dilatés</span>
-        </div>
-        <div class="ai-result" style="margin-top:8px;">
-          <div class="ai-result-label">PRODUITS MANQUANTS</div>
-          <span class="ai-tag">Sérum hydratant</span>
-          <span class="ai-tag">SPF</span>
+
+        <!-- Phone mockup placeholder -->
+        <div>
+          <div class="phone-mockup" aria-hidden="true">
+            <div class="phone-screen">
+              <div>
+                <div class="mock-eyebrow">Skin Analysis</div>
+                <div class="mock-title">Your skin, today</div>
+              </div>
+              <div class="mock-score">
+                <div>
+                  <div class="mock-score-label">Overall Score</div>
+                  <div class="mock-score-num">82</div>
+                </div>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C08A6A" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l3 3 5-6"></path></svg>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header">
+                  <div class="mock-dot"></div>
+                  <div class="mock-label">Hydration</div>
+                </div>
+                <div class="mock-line long"></div>
+                <div class="mock-line short"></div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header">
+                  <div class="mock-dot"></div>
+                  <div class="mock-label">Recommended routine</div>
+                </div>
+                <div class="mock-line long"></div>
+                <div class="mock-line long"></div>
+                <div class="mock-line short"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="stats">
-    <div class="stats-inner">
-      <div><div class="stat-val">5</div><div class="stat-label">Marques partenaires</div></div>
-      <div><div class="stat-val">8</div><div class="stat-label">Fonctionnalités</div></div>
-      <div><div class="stat-val">3</div><div class="stat-label">Langues</div></div>
-      <div><div class="stat-val">100%</div><div class="stat-label">Gratuit pour commencer</div></div>
-    </div>
-  </section>
-
+  <!-- ===================== WHAT RITUEL DOES ===================== -->
   <section class="features" id="features">
-    <p class="section-label">Ce que vous pouvez faire</p>
-    <div class="features-grid">
-      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">Analyse IA de la peau</div><div class="feature-desc">Analysez votre peau en une photo. Notre IA identifie votre type, vos problèmes et vos besoins.</div></div>
-      <div class="feature-card"><div class="feature-icon">🗂</div><div class="feature-title">Archive personnelle</div><div class="feature-desc">Archivez tous vos produits, suivez vos dépenses et gérez votre stock beauté.</div></div>
-      <div class="feature-card"><div class="feature-icon">✦</div><div class="feature-title">Routine sur mesure</div><div class="feature-desc">Créez votre routine matin et soir, étape par étape, adaptée à votre peau.</div></div>
-      <div class="feature-card"><div class="feature-icon">📸</div><div class="feature-title">Journal peau</div><div class="feature-desc">Photographiez votre peau chaque semaine et suivez son évolution dans le temps.</div></div>
-      <div class="feature-card"><div class="feature-icon">🧪</div><div class="feature-title">Test de compatibilité</div><div class="feature-desc">Vérifiez si vos ingrédients actifs sont compatibles avant de les mélanger.</div></div>
-      <div class="feature-card"><div class="feature-icon">📷</div><div class="feature-title">Scanner de produits</div><div class="feature-desc">Scannez le code-barre de n'importe quel produit pour l'ajouter instantanément.</div></div>
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">What Rituel does</span>
+        <h2>A complete skincare <em>intelligence layer</em></h2>
+        <p>From diagnosis to discovery — Rituel guides users through three core experiences.</p>
+      </div>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 3a9 9 0 0 1 0 18"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <h3>AI skin analysis</h3>
+          <p>Users capture a selfie and receive an evidence-based read of hydration, texture, sensitivity, and key concerns — powered by computer vision.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6h16"></path>
+              <path d="M4 12h16"></path>
+              <path d="M4 18h10"></path>
+              <circle cx="20" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <h3>Personalized routines</h3>
+          <p>Morning and evening rituals built around each user's skin profile, lifestyle, and goals — adaptive, not generic.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7l9-4 9 4-9 4-9-4z"></path>
+              <path d="M3 12l9 4 9-4"></path>
+              <path d="M3 17l9 4 9-4"></path>
+            </svg>
+          </div>
+          <h3>Product recommendations</h3>
+          <p>Suggestions matched to real user needs — not random catalog noise. Surfaced at the moment users are actively deciding what to buy.</p>
+        </div>
+
+      </div>
     </div>
   </section>
 
-  <section class="partners" id="partners">
-    <p class="section-label">Nos marques partenaires</p>
-    <div class="partners-grid">
-      <div class="partner-card"><div class="partner-emoji">💎</div><div class="partner-name">Diamond Smile</div><div class="partner-desc">Blanchiment dentaire professionnel</div></div>
-      <div class="partner-card"><div class="partner-emoji">🎁</div><div class="partner-name">Blissim</div><div class="partner-desc">Box beauté personnalisée mensuelle</div></div>
-      <div class="partner-card"><div class="partner-emoji">🌿</div><div class="partner-name">Laboratoires Uma</div><div class="partner-desc">Compléments naturels pour femmes</div></div>
-      <div class="partner-card"><div class="partner-emoji">🌸</div><div class="partner-name">Perfumeria Comas</div><div class="partner-desc">Parfums & cosmétiques premium</div></div>
-      <div class="partner-card"><div class="partner-emoji">✨</div><div class="partner-name">Dr Pierre Ricaud</div><div class="partner-desc">Soins anti-âge experts</div></div>
+  <!-- ===================== WHY BRANDS ===================== -->
+  <section class="brands-section" id="brands">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">For brands</span>
+        <h2>Reach skincare-focused users at the <em>moment of decision</em></h2>
+        <p>Rituel is built for relevance. Every recommendation is tied to a diagnosed need, not a banner placement.</p>
+      </div>
+
+      <div class="brand-points">
+        <div class="brand-point">
+          <div class="brand-point-num">01</div>
+          <div>
+            <h4>High-intent users after diagnosis</h4>
+            <p>Users see recommendations only after completing skin analysis — meaning intent and context are already established.</p>
+          </div>
+        </div>
+        <div class="brand-point">
+          <div class="brand-point-num">02</div>
+          <div>
+            <h4>Product discovery at decision moment</h4>
+            <p>Recommendations appear inside personalized routines, where users are already evaluating what to add or replace.</p>
+          </div>
+        </div>
+        <div class="brand-point">
+          <div class="brand-point-num">03</div>
+          <div>
+            <h4>Qualified traffic, not generic clicks</h4>
+            <p>Each click reflects a matched skin need — concern, type, or routine gap — rather than broad demographic targeting.</p>
+          </div>
+        </div>
+        <div class="brand-point">
+          <div class="brand-point-num">04</div>
+          <div>
+            <h4>Beauty &amp; skincare focused audience</h4>
+            <p>The user base self-selects for skincare engagement: they download Rituel specifically to improve their routines.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="download" id="download">
-    <h2>Téléchargez Rituel</h2>
-    <p>Disponible sur iOS. Android bientôt disponible.</p>
-    <div class="store-btns">
-      <a href="https://apps.apple.com/app/rituel/id6761560472" class="store-btn" target="_blank">
-        <span style="font-size:22px">🍎</span>
-        <div><div style="font-size:10px;color:#6B6278;letter-spacing:1px">DISPONIBLE SUR</div><div style="font-weight:600">App Store</div></div>
+  <!-- ===================== PARTNERSHIP MODEL ===================== -->
+  <section class="partnership" id="partnership">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Partnership model</span>
+        <h2>Multiple ways to <em>work together</em></h2>
+        <p>Flexible formats — from affiliate integrations to featured placements inside personalized routines.</p>
+      </div>
+
+      <div class="partnership-list">
+
+        <div class="partnership-item">
+          <div class="partnership-item-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div>
+            <h4>Affiliate partnerships</h4>
+            <p>Standard affiliate integrations through established networks — performance-based, transparent, easy to set up.</p>
+          </div>
+        </div>
+
+        <div class="partnership-item">
+          <div class="partnership-item-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>
+          </div>
+          <div>
+            <h4>Featured product recommendations</h4>
+            <p>Selected products surfaced in routines where they fit the user's diagnosed concern — context-aware, never intrusive.</p>
+          </div>
+        </div>
+
+        <div class="partnership-item">
+          <div class="partnership-item-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <h4>AI routine matching</h4>
+            <p>Brand catalogs integrated into the AI recommendation engine, so products surface dynamically based on user skin profiles.</p>
+          </div>
+        </div>
+
+        <div class="partnership-item">
+          <div class="partnership-item-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          </div>
+          <div>
+            <h4>Campaign &amp; product testing</h4>
+            <p>Targeted reach for new launches or limited campaigns — with feedback loops via routine adoption and engagement.</p>
+          </div>
+        </div>
+
+        <div class="partnership-item">
+          <div class="partnership-item-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <h4>Brand visibility in personalized routines</h4>
+            <p>Editorial-style placement inside routines and skin reports, where users actively engage with content.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOR USERS ===================== -->
+  <section class="for-users tight">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">For users</span>
+        <h2>Skincare, <em>made personal</em></h2>
+      </div>
+      <div class="for-users-grid">
+        <div class="user-pillar">
+          <h4>Understand your skin</h4>
+          <p>AI-driven analysis turns vague concerns into clear, trackable insights.</p>
+        </div>
+        <div class="user-pillar">
+          <h4>Build better routines</h4>
+          <p>Morning and evening rituals tailored to your skin, refined over time.</p>
+        </div>
+        <div class="user-pillar">
+          <h4>Discover better products</h4>
+          <p>Recommendations grounded in real needs — not trends or generic catalogs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TRUST / POSITIONING ===================== -->
+  <section class="trust">
+    <div class="container">
+      <div class="trust-card">
+        <div class="trust-quote-mark">&ldquo;</div>
+        <p class="trust-text">
+          Rituel is built for skincare-focused users and beauty brands looking for more relevant, personalized product discovery.
+        </p>
+        <div class="trust-attr">Made in Paris</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTACT ===================== -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <span class="eyebrow">Get in touch</span>
+      <h2 style="margin-top:12px;">Let's build something <em>relevant</em>.</h2>
+      <p>
+        We work with affiliate and brand partners across the beauty ecosystem. If you'd like to explore a partnership, integration, or campaign — get in touch.
+      </p>
+      <a href="mailto:info@mfatihkucuk.com?subject=Rituel%20%E2%80%94%20Partnership%20inquiry" class="contact-email">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        info@mfatihkucuk.com
       </a>
-      <a href="#" class="store-btn" style="opacity:0.5;cursor:not-allowed">
-        <span style="font-size:22px">▶</span>
-        <div><div style="font-size:10px;color:#6B6278;letter-spacing:1px">BIENTÔT SUR</div><div style="font-weight:600">Google Play</div></div>
-      </a>
     </div>
   </section>
 
+  <!-- ===================== FOOTER ===================== -->
   <footer>
-    <div class="footer-logo">✦ rituel</div>
-    <div class="footer-links">
-      <a href="privacy.html">Politique de confidentialité</a>
-      <a href="mailto:contact@rituel.app">Contact</a>
+    <div class="container footer-inner">
+      <div class="footer-brand">RITUEL</div>
+      <div class="footer-meta">
+        &copy; 2026 Rituel &middot; Paris
+        <a href="../privacy.html">Privacy</a>
+      </div>
     </div>
-    <div class="footer-copy">© 2026 Rituel. Tous droits réservés.</div>
   </footer>
 
   <script>
-    function handleSubmit() {
-      const email = document.getElementById('email-input').value;
-      if (!email || !email.includes('@')) { alert('Veuillez entrer une adresse e-mail valide.'); return; }
-      document.querySelector('.waitlist-form').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
-      const spots = parseInt(document.getElementById('spots').textContent);
-      if (spots > 0) document.getElementById('spots').textContent = spots - 1;
-    }
+    // Minimal smooth scroll for older browsers + offset for sticky nav
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const id = link.getAttribute('href');
+        if (id === '#' || id.length < 2) return;
+        const target = document.querySelector(id);
+        if (!target) return;
+        e.preventDefault();
+        const navH = document.querySelector('nav').offsetHeight;
+        const y = target.getBoundingClientRect().top + window.pageYOffset - navH - 8;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      });
+    });
   </script>
+
 </body>
 </html>
