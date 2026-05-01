@@ -22,9 +22,17 @@ export default function AffiliateProductCard({
   variant = 'vertical',
   onPress,
 }: Props) {
-  const handlePress = () => {
+  const handlePress = async () => {
     if (onPress) onPress();
-    if (product.affiliateUrl) Linking.openURL(product.affiliateUrl);
+    if (!product.affiliateUrl) return;
+    try {
+      const supported = await Linking.canOpenURL(product.affiliateUrl);
+      if (supported) {
+        await Linking.openURL(product.affiliateUrl);
+      }
+    } catch {
+      // silent — never crash UX from a bad URL
+    }
   };
 
   const isHorizontal = variant === 'horizontal';
@@ -47,18 +55,15 @@ export default function AffiliateProductCard({
         )}
       </View>
       <View style={s.content}>
-        <Text style={s.brand} numberOfLines={1}>
-          {product.brand}
-        </Text>
-        <Text style={s.name} numberOfLines={2}>
-          {product.name}
-        </Text>
+        <Text style={s.brand} numberOfLines={1}>{product.brand}</Text>
+        <Text style={s.name} numberOfLines={2}>{product.name}</Text>
         {product.reason && (
-          <Text style={s.reason} numberOfLines={2}>
-            {product.reason}
-          </Text>
+          <Text style={s.reason} numberOfLines={2}>{product.reason}</Text>
         )}
         {product.price && <Text style={s.price}>{product.price}</Text>}
+        {isHorizontal && (
+          <Text style={s.cta}>Voir le produit ›</Text>
+        )}
       </View>
     </Pressable>
   );
@@ -84,29 +89,20 @@ const s = StyleSheet.create({
     backgroundColor: C.cream,
     overflow: 'hidden',
   },
-  imageVertical: {
-    width: '100%',
-    height: 140,
-  },
+  imageVertical: { width: '100%', height: 140 },
   imageHorizontal: {
     width: 64,
     height: 64,
     borderRadius: R.sm,
     marginRight: Sp.md,
   },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
+  image: { width: '100%', height: '100%' },
   imagePlaceholder: {
     width: '100%',
     height: '100%',
     backgroundColor: C.cream,
   },
-  content: {
-    padding: Sp.sm,
-    flex: 1,
-  },
+  content: { padding: Sp.sm, flex: 1 },
   brand: {
     fontSize: 10,
     fontWeight: '600',
@@ -133,5 +129,11 @@ const s = StyleSheet.create({
     fontWeight: '600',
     color: C.espresso,
     marginTop: 2,
+  },
+  cta: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: C.copper,
+    marginTop: 6,
   },
 });
