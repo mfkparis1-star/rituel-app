@@ -40,3 +40,5 @@ yarn-error.*
 /ios
 /android
 app.json.bak
+.env
+.env.local
