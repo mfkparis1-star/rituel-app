@@ -1,51 +1,184 @@
+import { Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
+import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import { localizedAuthInfo, mapAuthError } from '../../utils/authErrors';
 
-type AuthMode = 'login' | 'register' | 'profile';
+type AuthMode = 'signin' | 'signup' | 'profile';
 
 export default function AuthScreen() {
-  const [mode, setMode] = useState<AuthMode>('profile');
+  const [mode, setMode] = useState<AuthMode>('signin');
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+
+  // form fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const profile = {
-    displayName: 'Demo',
-    email: 'demo@rituel.app',
-    lastAnalysisDays: 3,
-    productCount: 0,
-    analysisCount: 1,
-    routineActive: true,
-    creditBalance: 0,
-    isPremium: false,
+  // ----- Session bootstrap + listener -----
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session);
+      setMode(data.session ? 'profile' : 'signin');
+      setLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (!mounted) return;
+      setSession(newSession);
+      setMode(newSession ? 'profile' : 'signin');
+      setSubmitting(false);
+      setError(null);
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // ----- Validators -----
+  const isEmailValid = (v: string) => v.trim().includes('@') && v.trim().length >= 5;
+  const isPasswordValid = (v: string) => v.length >= 6;
+
+  const canSubmitSignin = isEmailValid(email) && isPasswordValid(password) && !submitting;
+  const canSubmitSignup = isEmailValid(email) && isPasswordValid(password) && name.trim().length > 0 && !submitting;
+
+  // ----- Actions -----
+  const clearMessages = () => {
+    setError(null);
+    setInfo(null);
   };
 
-  if (mode === 'login' || mode === 'register') {
+  const handleSignIn = async () => {
+    clearMessages();
+    if (!canSubmitSignin) {
+      setError(localizedAuthInfo('empty_field'));
+      return;
+    }
+    setSubmitting(true);
+    const { error: err } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    if (err) {
+      setError(mapAuthError(err));
+      setSubmitting(false);
+    }
+    // success path: onAuthStateChange will flip mode to 'profile' and clear submitting
+  };
+
+  const handleSignUp = async () => {
+    clearMessages();
+    if (!canSubmitSignup) {
+      setError(localizedAuthInfo('empty_field'));
+      return;
+    }
+    setSubmitting(true);
+    const { data, error: err } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: { display_name: name.trim() },
+      },
+    });
+    setSubmitting(false);
+    if (err) {
+      setError(mapAuthError(err));
+      return;
+    }
+    // If session is null → email confirmation required (Supabase default)
+    if (!data.session) {
+      setInfo(localizedAuthInfo('signup_check_email'));
+      setMode('signin');
+      setPassword('');
+    }
+    // If a session is returned (confirmation disabled in dashboard), listener handles it
+  };
+
+  const handleResetPassword = async () => {
+    clearMessages();
+    if (!isEmailValid(email)) {
+      setError(localizedAuthInfo('empty_field'));
+      return;
+    }
+    setSubmitting(true);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim());
+    setSubmitting(false);
+    if (err) {
+      setError(mapAuthError(err));
+      return;
+    }
+    setInfo(localizedAuthInfo('reset_sent'));
+  };
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Déconnexion',
+      'Vous voulez vraiment vous déconnecter ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Se déconnecter',
+          style: 'destructive',
+          onPress: async () => {
+            setSubmitting(true);
+            await supabase.auth.signOut();
+            // listener resets mode + submitting
+            setEmail('');
+            setPassword('');
+            setName('');
+          },
+        },
+      ]
+    );
+  };
+
+  // ----- Loading splash -----
+  if (loading) {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
-        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <View style={s.centerWrap}>
+          <ActivityIndicator color={C.copper} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ----- SIGNIN / SIGNUP MODE -----
+  if (mode === 'signin' || mode === 'signup') {
+    return (
+      <SafeAreaView style={s.root} edges={['top']}>
+        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={s.header}>
             <Text style={s.brand}>RITUEL</Text>
             <Text style={s.title}>
-              {mode === 'login' ? 'Connexion' : 'Inscription'}
+              {mode === 'signin' ? 'Connexion' : 'Inscription'}
             </Text>
             <Text style={s.subtitle}>
-              {mode === 'login'
+              {mode === 'signin'
                 ? 'Retrouve ton rituel beauté'
                 : 'Crée ton compte pour commencer'}
             </Text>
           </View>
 
           <View style={[s.formCard, Sh.soft]}>
-            {mode === 'register' && (
+            {mode === 'signup' && (
               <>
                 <Text style={s.fieldLabel}>NOM</Text>
                 <TextInput
@@ -53,8 +186,9 @@ export default function AuthScreen() {
                   placeholder="Votre nom"
                   placeholderTextColor={C.textSoft}
                   value={name}
-                  onChangeText={setName}
+                  onChangeText={(v) => { setName(v); clearMessages(); }}
                   autoCorrect={false}
+                  editable={!submitting}
                 />
               </>
             )}
@@ -65,10 +199,11 @@ export default function AuthScreen() {
               placeholder="vous@email.com"
               placeholderTextColor={C.textSoft}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(v) => { setEmail(v); clearMessages(); }}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              editable={!submitting}
             />
 
             <Text style={s.fieldLabel}>MOT DE PASSE</Text>
@@ -77,55 +212,92 @@ export default function AuthScreen() {
               placeholder="••••••••"
               placeholderTextColor={C.textSoft}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => { setPassword(v); clearMessages(); }}
               secureTextEntry
               autoCapitalize="none"
+              editable={!submitting}
             />
 
+            {error && (
+              <View style={s.errorBox}>
+                <Text style={s.errorTxt}>{error}</Text>
+              </View>
+            )}
+            {info && !error && (
+              <View style={s.infoBox}>
+                <Text style={s.infoTxt}>{info}</Text>
+              </View>
+            )}
+
             <PillButton
-              label={mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+              label={mode === 'signin' ? 'Se connecter' : 'Créer mon compte'}
               variant="primary"
               fullWidth
+              loading={submitting}
+              disabled={mode === 'signin' ? !canSubmitSignin : !canSubmitSignup}
+              onPress={mode === 'signin' ? handleSignIn : handleSignUp}
               style={{ marginTop: Sp.md }}
             />
+
+            {mode === 'signin' && (
+              <Pressable onPress={handleResetPassword} disabled={submitting} style={s.forgotBtn}>
+                <Text style={s.forgotTxt}>Mot de passe oublié ?</Text>
+              </Pressable>
+            )}
           </View>
 
           <View style={s.switchRow}>
             <Text style={s.switchTxt}>
-              {mode === 'login' ? 'Pas encore de compte ?' : 'Déjà inscrite ?'}
+              {mode === 'signin' ? 'Pas encore de compte ?' : 'Déjà inscrite ?'}
             </Text>
-            <Text
-              style={s.switchLink}
-              onPress={() => setMode(mode === 'login' ? 'register' : 'login')}
+            <Pressable
+              onPress={() => {
+                setMode(mode === 'signin' ? 'signup' : 'signin');
+                clearMessages();
+              }}
+              disabled={submitting}
             >
-              {mode === 'login' ? 'S\'inscrire' : 'Se connecter'}
-            </Text>
+              <Text style={s.switchLink}>
+                {mode === 'signin' ? 'S\'inscrire' : 'Se connecter'}
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
     );
   }
 
+  // ----- PROFILE MODE -----
+  const userEmail = session?.user?.email ?? '';
+  const displayName =
+    (session?.user?.user_metadata as any)?.display_name ||
+    userEmail.split('@')[0] ||
+    'Utilisateur';
+  const avatarLetter = (displayName[0] || 'U').toUpperCase();
+
+  const profileStats = {
+    productCount: 0,
+    analysisCount: 0,
+    routineActive: false,
+  };
+
   return (
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={[s.profileCard, Sh.soft]}>
           <View style={s.avatar}>
-            <Text style={s.avatarLetter}>{profile.displayName[0]}</Text>
+            <Text style={s.avatarLetter}>{avatarLetter}</Text>
           </View>
-          <Text style={s.profileName}>{profile.displayName}</Text>
-          <Text style={s.profileEmail}>{profile.email}</Text>
-          <Text style={s.profileMeta}>
-            Dernière analyse : il y a {profile.lastAnalysisDays}j
-          </Text>
+          <Text style={s.profileName}>{displayName}</Text>
+          <Text style={s.profileEmail}>{userEmail}</Text>
         </View>
 
         <View style={s.statsRow}>
-          <StatCard label="Produit" value={profile.productCount} />
+          <StatCard label="Produit" value={profileStats.productCount} />
           <View style={s.gap} />
-          <StatCard label="Analyse" value={profile.analysisCount} />
+          <StatCard label="Analyse" value={profileStats.analysisCount} />
           <View style={s.gap} />
-          <StatCard label="Routine" value={profile.routineActive ? 'Active' : '—'} />
+          <StatCard label="Routine" value={profileStats.routineActive ? 'Active' : '—'} />
         </View>
 
         <HeroCard
@@ -140,11 +312,7 @@ export default function AuthScreen() {
 
         <ListRow
           title="Crédits IA"
-          subtitle={
-            profile.isPremium
-              ? 'Inclus avec Rituel Pro'
-              : `${profile.creditBalance} crédit${profile.creditBalance !== 1 ? 's' : ''} disponible${profile.creditBalance !== 1 ? 's' : ''}`
-          }
+          subtitle="0 crédit disponible"
           onPress={() => router.push('/paywall' as any)}
         />
 
@@ -191,9 +359,9 @@ export default function AuthScreen() {
           onPress={() => router.push('/(tabs)/routine' as any)}
         />
         <ListRow
-          title="Compte"
-          subtitle="Paramètres et confidentialité"
-          onPress={() => setMode('login')}
+          title="Se déconnecter"
+          subtitle="Quitter cette session"
+          onPress={handleSignOut}
         />
 
         <View style={{ height: Sp.huge }} />
@@ -205,147 +373,113 @@ export default function AuthScreen() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.appBg },
   scroll: { paddingHorizontal: Sp.lg, paddingTop: Sp.sm, paddingBottom: Sp.xl },
+  centerWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+
   header: { marginBottom: Sp.xl, marginTop: Sp.sm, alignItems: 'center' },
   brand: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 2.4,
-    marginBottom: Sp.lg,
+    fontSize: 11, fontWeight: '700', color: C.copper,
+    letterSpacing: 2.4, marginBottom: Sp.lg,
   },
   title: { ...Type.h1, marginBottom: 4, textAlign: 'center' },
   subtitle: { ...Type.body, color: C.textMid, textAlign: 'center' },
+
   formCard: {
-    backgroundColor: C.white,
-    borderRadius: R.lg,
-    padding: Sp.lg,
-    marginBottom: Sp.md,
+    backgroundColor: C.white, borderRadius: R.lg,
+    padding: Sp.lg, marginBottom: Sp.md,
   },
   fieldLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    marginBottom: Sp.xs,
-    marginTop: Sp.sm,
+    fontSize: 10, fontWeight: '700', color: C.copper,
+    letterSpacing: 1.4, textTransform: 'uppercase',
+    marginBottom: Sp.xs, marginTop: Sp.sm,
   },
   input: {
-    backgroundColor: C.cream,
-    borderRadius: R.sm,
-    paddingHorizontal: Sp.md,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: C.text,
+    backgroundColor: C.cream, borderRadius: R.sm,
+    paddingHorizontal: Sp.md, paddingVertical: 12,
+    fontSize: 14, color: C.text,
   },
+  errorBox: {
+    backgroundColor: '#FCE8E6', borderRadius: R.sm,
+    padding: Sp.sm, marginTop: Sp.sm,
+  },
+  errorTxt: {
+    fontSize: 12, color: C.red, lineHeight: 17,
+  },
+  infoBox: {
+    backgroundColor: C.cream, borderRadius: R.sm,
+    padding: Sp.sm, marginTop: Sp.sm,
+  },
+  infoTxt: {
+    fontSize: 12, color: C.espresso, lineHeight: 17,
+  },
+  forgotBtn: {
+    alignSelf: 'center', marginTop: Sp.sm, padding: Sp.xs,
+  },
+  forgotTxt: {
+    fontSize: 12, color: C.copper, fontWeight: '500',
+  },
+
   switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: Sp.md,
+    flexDirection: 'row', justifyContent: 'center',
+    alignItems: 'center', marginTop: Sp.md,
   },
   switchTxt: {
-    fontSize: 13,
-    color: C.textMid,
-    marginRight: 6,
+    fontSize: 13, color: C.textMid, marginRight: 6,
   },
   switchLink: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: C.copper,
+    fontSize: 13, fontWeight: '600', color: C.copper,
   },
+
   profileCard: {
-    backgroundColor: C.white,
-    borderRadius: R.lg,
-    padding: Sp.xl,
-    alignItems: 'center',
-    marginBottom: Sp.lg,
-    marginTop: Sp.sm,
+    backgroundColor: C.white, borderRadius: R.lg,
+    padding: Sp.xl, alignItems: 'center',
+    marginBottom: Sp.lg, marginTop: Sp.sm,
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 64, height: 64, borderRadius: 32,
     backgroundColor: C.cream,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', justifyContent: 'center',
     marginBottom: Sp.sm,
   },
   avatarLetter: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: C.espresso,
+    fontSize: 24, fontWeight: '600', color: C.espresso,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: C.text,
-    marginBottom: 2,
+    fontSize: 20, fontWeight: '600', color: C.text, marginBottom: 2,
   },
   profileEmail: {
-    fontSize: 13,
-    color: C.textMid,
-    marginBottom: Sp.xs,
+    fontSize: 13, color: C.textMid,
   },
-  profileMeta: {
-    fontSize: 11,
-    color: C.textSoft,
-    letterSpacing: 0.4,
-  },
+
   statsRow: {
-    flexDirection: 'row',
-    marginBottom: Sp.lg,
+    flexDirection: 'row', marginBottom: Sp.lg,
   },
   gap: { width: Sp.xs },
-  premium: {
-    marginTop: Sp.md,
-    marginBottom: Sp.md,
-  },
+
+  premium: { marginTop: Sp.md, marginBottom: Sp.md },
   premiumLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    marginBottom: Sp.xs,
+    fontSize: 10, fontWeight: '700', color: C.copper,
+    letterSpacing: 1.6, textTransform: 'uppercase', marginBottom: Sp.xs,
   },
   premiumTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: C.white,
-    marginBottom: Sp.xs,
+    fontSize: 22, fontWeight: '600', color: C.white, marginBottom: Sp.xs,
   },
   premiumSub: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.78)',
-    lineHeight: 19,
+    fontSize: 13, color: 'rgba(255,255,255,0.78)', lineHeight: 19,
   },
+
   section: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    marginTop: Sp.lg,
-    marginBottom: Sp.sm,
+    fontSize: 11, fontWeight: '700', color: C.copper,
+    letterSpacing: 1.6, textTransform: 'uppercase',
+    marginTop: Sp.lg, marginBottom: Sp.sm,
   },
   recoLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    marginBottom: Sp.xs,
+    fontSize: 10, fontWeight: '700', color: C.copper,
+    letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: Sp.xs,
   },
   recoTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: C.text,
-    marginBottom: 4,
+    fontSize: 17, fontWeight: '600', color: C.text, marginBottom: 4,
   },
   recoSub: {
-    fontSize: 13,
-    color: C.textMid,
-    lineHeight: 19,
+    fontSize: 13, color: C.textMid, lineHeight: 19,
   },
 });
