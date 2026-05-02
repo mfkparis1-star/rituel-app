@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import EmptyState from '../../components/ui/EmptyState';
@@ -27,6 +27,14 @@ function BackArrow({ color }: { color: string }) {
 export default function JournalScreen() {
   const [entries] = useState<JournalEntry[]>([]);
 
+  const handleAddEntry = () => {
+    Alert.alert(
+      'Bientôt disponible',
+      "L'ajout d'entrée avec photo arrive très bientôt.",
+      [{ text: 'OK' }]
+    );
+  };
+
   return (
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -52,6 +60,7 @@ export default function JournalScreen() {
                 <PillButton
                   label="Ajouter une entrée"
                   variant="primary"
+                  onPress={handleAddEntry}
                 />
               }
             />
@@ -71,6 +80,7 @@ export default function JournalScreen() {
               label="+ Nouvelle entrée"
               variant="outline"
               fullWidth
+              onPress={handleAddEntry}
               style={{ marginTop: Sp.md }}
             />
           </View>
