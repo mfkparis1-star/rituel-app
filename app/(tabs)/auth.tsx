@@ -5,6 +5,8 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
+import CreditPackModal from '../../components/credits/CreditPackModal';
+import { useCredits } from '../../hooks/useCredits';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
@@ -16,6 +18,8 @@ type AuthMode = 'signin' | 'signup' | 'profile';
 
 export default function AuthScreen() {
   const [mode, setMode] = useState<AuthMode>('signin');
+  const [creditModalOpen, setCreditModalOpen] = useState(false);
+  const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -308,8 +312,12 @@ export default function AuthScreen() {
 
         <ListRow
           title="Crédits IA"
-          subtitle="0 crédit disponible"
-          onPress={() => router.push('/paywall' as any)}
+          subtitle={
+            creditsLoading
+              ? 'Chargement...'
+              : `${creditBalance} crédit${creditBalance !== 1 ? 's' : ''} disponible${creditBalance !== 1 ? 's' : ''}`
+          }
+          onPress={() => setCreditModalOpen(true)}
         />
 
         <PremiumCard variant="espresso" style={s.premium}>
@@ -359,6 +367,11 @@ export default function AuthScreen() {
           title="Se déconnecter"
           subtitle="Quitter cette session"
           onPress={handleSignOut}
+        />
+
+        <CreditPackModal
+          visible={creditModalOpen}
+          onClose={() => setCreditModalOpen(false)}
         />
 
         <View style={{ height: Sp.huge }} />
