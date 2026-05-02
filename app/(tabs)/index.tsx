@@ -5,35 +5,11 @@ import HeroCard from '../../components/ui/HeroCard';
 import StatCard from '../../components/ui/StatCard';
 import PremiumCard from '../../components/ui/PremiumCard';
 import PillButton from '../../components/ui/PillButton';
-import AffiliateProductCard, { AffiliateProductCardData } from '../../components/ui/AffiliateProductCard';
+import { useEffect, useState } from 'react';
+import AffiliateProductCard from '../../components/ui/AffiliateProductCard';
+import { getAffiliateRecommendations } from '../../utils/affiliateRecommendations';
+import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
 import { C, R, Sh, Sp, Type } from '../../theme';
-
-const PLACEHOLDER_PRODUCTS: AffiliateProductCardData[] = [
-  {
-    id: 'placeholder-1',
-    brand: 'Caudalie',
-    name: 'Vinoperfect Sérum éclat anti-taches',
-    price: '49 €',
-    affiliateUrl: '',
-    reason: 'Pour une peau lumineuse',
-  },
-  {
-    id: 'placeholder-2',
-    brand: 'La Roche-Posay',
-    name: 'Toleriane Double Repair',
-    price: '18 €',
-    affiliateUrl: '',
-    reason: 'Hydratation quotidienne',
-  },
-  {
-    id: 'placeholder-3',
-    brand: 'Avène',
-    name: 'Cleanance crème nettoyante',
-    price: '14 €',
-    affiliateUrl: '',
-    reason: 'Pour peau mixte',
-  },
-];
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -44,6 +20,23 @@ function getGreeting(): string {
 
 export default function IndexScreen() {
   const greeting = getGreeting();
+
+  const [recommendations, setRecommendations] = useState<AffiliateProduct[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const items = await getAffiliateRecommendations({}, 4);
+        if (mounted) setRecommendations(items);
+      } catch {
+        // silent fail — section hides
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const stats = {
     active: 0,
@@ -126,18 +119,22 @@ export default function IndexScreen() {
           />
         </PremiumCard>
 
-        <View style={s.affiliateHeader}>
-          <Text style={s.sectionLabel}>SÉLECTIONNÉ POUR TOI</Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.affiliateScroll}
-        >
-          {PLACEHOLDER_PRODUCTS.map((p) => (
-            <AffiliateProductCard key={p.id} product={p} variant="vertical" />
-          ))}
-        </ScrollView>
+        {recommendations.length > 0 && (
+          <>
+            <View style={s.affiliateHeader}>
+              <Text style={s.sectionLabel}>SÉLECTIONNÉ POUR TOI</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.affiliateScroll}
+            >
+              {recommendations.map((p) => (
+                <AffiliateProductCard key={p.id} product={p} variant="vertical" />
+              ))}
+            </ScrollView>
+          </>
+        )}
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>

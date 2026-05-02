@@ -42,3 +42,4 @@ yarn-error.*
 app.json.bak
 .env
 .env.local
+*.bak
