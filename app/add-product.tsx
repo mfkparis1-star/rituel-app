@@ -9,6 +9,7 @@ import PremiumCard from '../components/ui/PremiumCard';
 import { supabase } from '../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../theme';
 import { mapAuthError } from '../utils/authErrors';
+import { safeBack } from '../utils/safeBack';
 
 type Mode = 'menu' | 'manual';
 type ProductStatus = 'active' | 'finished' | 'stocked';
@@ -89,7 +90,7 @@ export default function AddProductScreen() {
             {
               text: 'Annuler',
               style: 'cancel',
-              onPress: () => router.back(),
+              onPress: () => safeBack('/(tabs)/archive'),
             },
             {
               text: 'Se connecter',
@@ -145,7 +146,7 @@ export default function AddProductScreen() {
       [
         {
           text: 'OK',
-          onPress: () => router.back(),
+          onPress: () => safeBack('/(tabs)/archive'),
         },
       ]
     );
@@ -170,7 +171,7 @@ export default function AddProductScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={s.topBar}>
-            <Pressable onPress={() => router.back()} style={s.backBtn} hitSlop={8}>
+            <Pressable onPress={() => safeBack('/(tabs)/archive')} style={s.backBtn} hitSlop={8}>
               <BackArrow color={C.espresso} />
             </Pressable>
           </View>

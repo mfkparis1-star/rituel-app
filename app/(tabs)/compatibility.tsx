@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import { safeBack } from '../../utils/safeBack';
 
 type Compat = 'compatible' | 'caution' | 'avoid' | null;
 
@@ -44,7 +45,7 @@ export default function CompatibilityScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.topBar}>
-          <Pressable onPress={() => router.back()} style={s.backBtn} hitSlop={8}>
+          <Pressable onPress={() => safeBack('/(tabs)/ai-studio')} style={s.backBtn} hitSlop={8}>
             <BackArrow color={C.espresso} />
           </Pressable>
         </View>
