@@ -1,30 +1,51 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
-import PillButton from '../../components/ui/PillButton';
+import { supabase } from '../../lib/supabase';
+import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 type SkinFilter = 'all' | 'dry' | 'oily' | 'combination' | 'normal';
 
-type ProductRef = {
-  id: string;
-  brand: string;
-  name: string;
-};
-
 type Post = {
   id: string;
-  username: string;
-  meta?: string;
-  skinType: SkinFilter;
-  skinLabel: string;
-  content: string;
-  products: ProductRef[];
+  user_id: string;
+  caption: string;
+  skin_type: string;
+  product_names: string[] | null;
+  likes_count: number;
+  created_at: string;
+  user_email?: string;
+  display_name?: string;
+  image_url?: string;
 };
 
-const POSTS: Post[] = [];
+function mapSkinType(raw: string): Exclude<SkinFilter, "all"> {
+  const v = (raw || '').toLowerCase();
+  if (v.includes('sech') || v.includes('sèch') || v.includes('dry') || v.includes('kuru')) return 'dry';
+  if (v.includes('grass') || v.includes('oily') || v.includes('yagl') || v.includes('yağl')) return 'oily';
+  if (v.includes('mixt') || v.includes('combin') || v.includes('karma')) return 'combination';
+  if (v.includes('normal')) return 'normal';
+  return 'normal';
+}
+
+function relativeTime(iso: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (sec < 60) return "à l'instant";
+  if (sec < 3600) return `il y a ${Math.floor(sec / 60)} min`;
+  if (sec < 86400) return `il y a ${Math.floor(sec / 3600)} h`;
+  if (sec < 604800) return `il y a ${Math.floor(sec / 86400)} j`;
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function displayName(post: Post): string {
+  return post.display_name || (post.user_email ? post.user_email.split('@')[0] : 'Membre');
+}
 
 const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
   dry: 'Peau sèche',
@@ -35,9 +56,68 @@ const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
 
 export default function CommunityScreen() {
   const [filter, setFilter] = useState<SkinFilter>('all');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [translated, setTranslated] = useState<Record<string, string>>({});
+  const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
 
-  const filtered = POSTS.filter((p) => filter === 'all' || p.skinType === filter);
-  const isEmpty = filtered.length === 0;
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!mounted) return;
+        if (error) {
+          console.warn('community loadPosts error:', error.message);
+          setPosts([]);
+        } else if (data) {
+          setPosts(data as Post[]);
+        }
+      } catch {
+        if (mounted) setPosts([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const handleTranslate = async (post: Post) => {
+    if (translated[post.id]) {
+      setTranslated((prev) => {
+        const next = { ...prev };
+        delete next[post.id];
+        return next;
+      });
+      return;
+    }
+    if (translatingIds.has(post.id)) return;
+    setTranslatingIds((prev) => {
+      const next = new Set(prev);
+      next.add(post.id);
+      return next;
+    });
+    try {
+      const result = await translate(post.caption, 'en', 'fr');
+      if (!result.failed && result.text) {
+        setTranslated((prev) => ({ ...prev, [post.id]: result.text }));
+      }
+    } catch {
+      // silent fallback
+    } finally {
+      setTranslatingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(post.id);
+        return next;
+      });
+    }
+  };
+
+  const filtered = posts.filter((p) => filter === 'all' || mapSkinType(p.skin_type) === filter);
+  const isEmpty = !loading && filtered.length === 0;
 
   return (
     <SafeAreaView style={s.root} edges={['top']}>
@@ -59,15 +139,25 @@ export default function CommunityScreen() {
           <Chip label="Normale" active={filter === 'normal'} onPress={() => setFilter('normal')} />
         </ScrollView>
 
-        {isEmpty ? (
+        {loading ? (
+          <View style={s.loadingBox}>
+            <ActivityIndicator color={C.copper} />
+          </View>
+        ) : isEmpty ? (
           <EmptyState
             title="Pas encore de routines"
-            subtitle="Sois la première à partager ton rituel avec la communauté."
+            subtitle="La communauté grandit chaque jour. Revenez bientôt."
           />
         ) : (
           <View style={s.list}>
             {filtered.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard
+                key={post.id}
+                post={post}
+                translatedCaption={translated[post.id]}
+                isTranslating={translatingIds.has(post.id)}
+                onTranslatePress={() => handleTranslate(post)}
+              />
             ))}
           </View>
         )}
@@ -78,52 +168,72 @@ export default function CommunityScreen() {
   );
 }
 
-function PostCard({ post }: { post: Post }) {
+type PostCardProps = {
+  post: Post;
+  translatedCaption?: string;
+  isTranslating: boolean;
+  onTranslatePress: () => void;
+};
+
+function PostCard({ post, translatedCaption, isTranslating, onTranslatePress }: PostCardProps) {
+  const skinType = mapSkinType(post.skin_type);
+  const skinLabel = SKIN_LABEL[skinType];
+  const username = displayName(post);
+  const meta = relativeTime(post.created_at);
+  const showTranslated = !!translatedCaption;
+  const captionToShow = showTranslated ? translatedCaption : post.caption;
+  const productNames = post.product_names || [];
+
+  let translateLabel = 'Traduire';
+  if (isTranslating) translateLabel = 'Traduction...';
+  else if (showTranslated) translateLabel = 'Original';
+
   return (
     <View style={[s.postCard, Sh.soft]}>
       <View style={s.postHeader}>
         <View style={s.avatar}>
           <Text style={s.avatarLetter}>
-            {(post.username[0] || '').toUpperCase()}
+            {(username[0] || 'M').toUpperCase()}
           </Text>
         </View>
         <View style={s.postUserBox}>
-          <Text style={s.postUsername}>{post.username}</Text>
-          {post.meta && <Text style={s.postMeta}>{post.meta}</Text>}
+          <Text style={s.postUsername}>{username}</Text>
+          {meta ? <Text style={s.postMeta}>{meta}</Text> : null}
         </View>
         <View style={s.skinBadge}>
-          <Text style={s.skinBadgeTxt}>{post.skinLabel}</Text>
+          <Text style={s.skinBadgeTxt}>{skinLabel}</Text>
         </View>
       </View>
 
-      <Text style={s.postContent} numberOfLines={3}>
-        {post.content}
-      </Text>
+      {captionToShow ? (
+        <Text style={s.postContent}>{captionToShow}</Text>
+      ) : null}
 
-      {post.products.length > 0 && (
+      {productNames.length > 0 && (
         <>
           <Text style={s.productsLabel}>PRODUITS UTILISÉS</Text>
-          <View style={s.productsBox}>
-            {post.products.map((p) => (
-              <View key={p.id} style={s.productCard}>
-                <View style={s.productImg} />
-                <View style={s.productMeta}>
-                  <Text style={s.productBrand}>{p.brand}</Text>
-                  <Text style={s.productName} numberOfLines={2}>
-                    {p.name}
-                  </Text>
-                </View>
-                <Text style={s.productCta}>Voir le produit ›</Text>
+          <View style={s.productChipsBox}>
+            {productNames.map((name, i) => (
+              <View key={`${post.id}-p-${i}`} style={s.productChip}>
+                <Text style={s.productChipTxt} numberOfLines={1}>{name}</Text>
               </View>
             ))}
           </View>
         </>
       )}
 
-      <View style={s.actionsRow}>
-        <PillButton label="Essayer" variant="outline" size="sm" />
-        <View style={{ width: Sp.xs }} />
-        <PillButton label="Acheter" variant="primary" size="sm" />
+      <View style={s.footerRow}>
+        <Text style={s.likesTxt}>
+          {post.likes_count || 0} {(post.likes_count || 0) === 1 ? "j'aime" : "j'aime"}
+        </Text>
+        <Pressable
+          onPress={onTranslatePress}
+          disabled={isTranslating}
+          style={s.translateBtn}
+          hitSlop={6}
+        >
+          <Text style={s.translateTxt}>{translateLabel}</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -244,5 +354,51 @@ const s = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     marginTop: Sp.xs,
+  },
+  loadingBox: {
+    paddingVertical: Sp.huge,
+    alignItems: 'center',
+  },
+  productChipsBox: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: Sp.md,
+  },
+  productChip: {
+    backgroundColor: C.cream,
+    borderRadius: R.full,
+    paddingHorizontal: Sp.sm,
+    paddingVertical: 6,
+    marginRight: 6,
+    marginBottom: 6,
+    maxWidth: '100%',
+  },
+  productChipTxt: {
+    fontSize: 12,
+    color: C.text,
+    fontWeight: '500',
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Sp.xs,
+    paddingTop: Sp.sm,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+  },
+  likesTxt: {
+    fontSize: 12,
+    color: C.textMid,
+    fontWeight: '500',
+  },
+  translateBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  translateTxt: {
+    fontSize: 12,
+    color: C.copper,
+    fontWeight: '600',
   },
 });
