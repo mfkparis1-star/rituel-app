@@ -3,8 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import HeroCard from '../../components/ui/HeroCard';
-import PremiumCard from '../../components/ui/PremiumCard';
 import PillButton from '../../components/ui/PillButton';
+import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 function MakeupIcon({ color }: { color: string }) {
@@ -144,6 +144,7 @@ export default function AIStudioScreen() {
             variant="primary"
             size="md"
             onPress={() => router.push('/paywall' as any)}
+            textColor={C.espresso}
             style={{ marginTop: Sp.md, backgroundColor: C.white }}
           />
         </PremiumCard>

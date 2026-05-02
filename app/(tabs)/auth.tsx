@@ -1,4 +1,4 @@
-import { Session } from '@supabase/supabase-js';
+import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -80,7 +80,6 @@ export default function AuthScreen() {
       setError(mapAuthError(err));
       setSubmitting(false);
     }
-    // success path: onAuthStateChange will flip mode to 'profile' and clear submitting
   };
 
   const handleSignUp = async () => {
@@ -102,13 +101,11 @@ export default function AuthScreen() {
       setError(mapAuthError(err));
       return;
     }
-    // If session is null → email confirmation required (Supabase default)
     if (!data.session) {
       setInfo(localizedAuthInfo('signup_check_email'));
       setMode('signin');
       setPassword('');
     }
-    // If a session is returned (confirmation disabled in dashboard), listener handles it
   };
 
   const handleResetPassword = async () => {
@@ -139,7 +136,6 @@ export default function AuthScreen() {
           onPress: async () => {
             setSubmitting(true);
             await supabase.auth.signOut();
-            // listener resets mode + submitting
             setEmail('');
             setPassword('');
             setName('');
@@ -327,6 +323,7 @@ export default function AuthScreen() {
             variant="primary"
             size="md"
             onPress={() => router.push('/paywall' as any)}
+            textColor={C.espresso}
             style={{ marginTop: Sp.md, backgroundColor: C.white }}
           />
         </PremiumCard>

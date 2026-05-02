@@ -15,6 +15,7 @@ type Props = {
   leftIcon?: ReactNode;
   style?: ViewStyle;
   fullWidth?: boolean;
+  textColor?: string;
 };
 
 export default function PillButton({
@@ -27,6 +28,7 @@ export default function PillButton({
   leftIcon,
   style,
   fullWidth = false,
+  textColor: textColorOverride,
 }: Props) {
   const isDisabled = disabled || loading;
 
@@ -50,6 +52,8 @@ export default function PillButton({
     borderColor = C.espresso;
   }
 
+  const finalTextColor = textColorOverride ?? textColor;
+
   return (
     <Pressable
       onPress={onPress}
@@ -69,11 +73,11 @@ export default function PillButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} size="small" />
+        <ActivityIndicator color={finalTextColor} size="small" />
       ) : (
         <View style={s.row}>
           {leftIcon && <View style={s.icon}>{leftIcon}</View>}
-          <Text style={[s.label, { color: textColor, fontSize }]}>{label}</Text>
+          <Text style={[s.label, { color: finalTextColor, fontSize }]}>{label}</Text>
         </View>
       )}
     </Pressable>
