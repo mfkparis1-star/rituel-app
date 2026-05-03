@@ -7,6 +7,7 @@ import Svg, { Path } from 'react-native-svg';
 import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
+import { optimizeRoutine, RoutineOptimizeResult } from '../../utils/routineAI';
 import { supabase } from '../../lib/supabase';
 import { safeBack } from '../../utils/safeBack';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -54,6 +55,12 @@ export default function RoutineScreen() {
   const [brand, setBrand] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // optimize flow
+  const [optimizeModalOpen, setOptimizeModalOpen] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimizeResult, setOptimizeResult] = useState<RoutineOptimizeResult | null>(null);
+  const [optimizeError, setOptimizeError] = useState('');
 
   // ----- Session bootstrap -----
   useEffect(() => {
@@ -158,6 +165,47 @@ export default function RoutineScreen() {
     );
   };
 
+  // ----- AI Optimize -----
+  const handleOptimize = async () => {
+    if (steps.length === 0 || !session) return;
+    setOptimizeModalOpen(true);
+    setOptimizing(true);
+    setOptimizeError('');
+    setOptimizeResult(null);
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('skin_type')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      const skinType = profile?.skin_type || 'normal';
+
+      const { data: allSteps } = await supabase
+        .from('routine_steps')
+        .select('product_name, routine_type')
+        .eq('user_id', session.user.id);
+
+      const stepsForAI = (allSteps || []).map((st: any) => ({
+        name: st.product_name as string,
+        time: (st.routine_type === 'matin' ? 'morning' : 'evening') as 'morning' | 'evening',
+      }));
+
+      const r = await optimizeRoutine(stepsForAI, skinType, 'fr');
+      setOptimizeResult(r);
+    } catch (e: any) {
+      setOptimizeError(e?.message || 'Une erreur est survenue. Réessayez.');
+    } finally {
+      setOptimizing(false);
+    }
+  };
+
+  const closeOptimize = () => {
+    setOptimizeModalOpen(false);
+    setOptimizeResult(null);
+    setOptimizeError('');
+  };
+
   if (!authChecked) {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
@@ -217,17 +265,116 @@ export default function RoutineScreen() {
               </View>
             ))}
             <PillButton
+              label="Optimiser avec l'IA"
+              variant="primary"
+              fullWidth
+              onPress={handleOptimize}
+              style={{ marginTop: Sp.md }}
+            />
+            <PillButton
               label="+ Ajouter une étape"
               variant="outline"
               fullWidth
               onPress={openAddModal}
-              style={{ marginTop: Sp.md }}
+              style={{ marginTop: Sp.xs }}
             />
           </View>
         )}
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>
+
+      <Modal visible={optimizeModalOpen} animationType="slide" presentationStyle="pageSheet" onRequestClose={closeOptimize}>
+        <SafeAreaView style={s.modalRoot} edges={['top']}>
+          <ScrollView contentContainerStyle={s.modalScroll} showsVerticalScrollIndicator={false}>
+            <View style={s.modalTopBar}>
+              <Pressable onPress={closeOptimize} style={s.backBtn} hitSlop={8}>
+                <CloseIcon color={C.espresso} />
+              </Pressable>
+            </View>
+
+            <View style={s.header}>
+              <Text style={s.label}>OPTIMISATION IA</Text>
+              <Text style={s.title}>Ta routine, mieux pensée</Text>
+              <Text style={s.subtitle}>
+                Suggestions personnalisées selon ton type de peau et tes étapes actuelles.
+              </Text>
+            </View>
+
+            {optimizing && (
+              <View style={s.optimizeLoadingBox}>
+                <ActivityIndicator color={C.copper} size="large" />
+                <Text style={s.optimizeLoadingTxt}>Analyse en cours...</Text>
+              </View>
+            )}
+
+            {!optimizing && optimizeError && (
+              <View style={s.optimizeErrorBox}>
+                <Text style={s.optimizeErrorTitle}>Oups</Text>
+                <Text style={s.optimizeErrorTxt}>{optimizeError}</Text>
+                <PillButton
+                  label="Réessayer"
+                  variant="primary"
+                  fullWidth
+                  onPress={handleOptimize}
+                  style={{ marginTop: Sp.md }}
+                />
+              </View>
+            )}
+
+            {!optimizing && !optimizeError && optimizeResult && (
+              <View>
+                {optimizeResult.improvements.length > 0 && (
+                  <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
+                    <Text style={s.optimizeSectionLabel}>AMÉLIORATIONS</Text>
+                    {optimizeResult.improvements.map((imp, i) => (
+                      <View key={`imp-${i}`} style={s.optimizeBulletRow}>
+                        <Text style={s.optimizeBulletNum}>{i + 1}</Text>
+                        <Text style={s.optimizeBulletTxt}>{imp}</Text>
+                      </View>
+                    ))}
+                  </PremiumCard>
+                )}
+
+                {optimizeResult.missingCategories.length > 0 && (
+                  <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
+                    <Text style={s.optimizeSectionLabel}>CATÉGORIES MANQUANTES</Text>
+                    <View style={s.optimizeChipsRow}>
+                      {optimizeResult.missingCategories.map((cat, i) => (
+                        <View key={`miss-${i}`} style={s.optimizeMissingChip}>
+                          <Text style={s.optimizeMissingChipTxt}>{cat}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </PremiumCard>
+                )}
+
+                {optimizeResult.recommendations.length > 0 && (
+                  <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
+                    <Text style={s.optimizeSectionLabel}>RECOMMANDATIONS</Text>
+                    {optimizeResult.recommendations.map((rec, i) => (
+                      <View key={`rec-${i}`} style={s.optimizeBulletRow}>
+                        <Text style={s.optimizeBulletNum}>{i + 1}</Text>
+                        <Text style={s.optimizeBulletTxt}>{rec}</Text>
+                      </View>
+                    ))}
+                  </PremiumCard>
+                )}
+
+                <PillButton
+                  label="Fermer"
+                  variant="outline"
+                  fullWidth
+                  onPress={closeOptimize}
+                  style={{ marginTop: Sp.md }}
+                />
+              </View>
+            )}
+
+            <View style={{ height: Sp.huge }} />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
 
       <Modal visible={modalOpen} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setModalOpen(false)}>
         <SafeAreaView style={s.modalRoot} edges={['top']}>
@@ -365,4 +512,72 @@ const s = StyleSheet.create({
     padding: Sp.sm, marginTop: Sp.sm,
   },
   errorTxt: { fontSize: 12, color: C.red, lineHeight: 17 },
+
+  optimizeLoadingBox: {
+    paddingVertical: Sp.huge,
+    alignItems: 'center',
+  },
+  optimizeLoadingTxt: {
+    fontSize: 14,
+    color: C.textMid,
+    marginTop: Sp.md,
+  },
+  optimizeErrorBox: {
+    backgroundColor: C.white,
+    borderRadius: R.lg,
+    padding: Sp.lg,
+    alignItems: 'center',
+  },
+  optimizeErrorTitle: {
+    ...Type.h2,
+    marginBottom: Sp.xs,
+  },
+  optimizeErrorTxt: {
+    fontSize: 13,
+    color: C.textMid,
+    textAlign: 'center',
+    lineHeight: 19,
+  },
+  optimizeSectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: C.copper,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    marginBottom: Sp.sm,
+  },
+  optimizeBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: Sp.xs,
+  },
+  optimizeBulletNum: {
+    width: 22,
+    fontSize: 12,
+    fontWeight: '700',
+    color: C.espresso,
+  },
+  optimizeBulletTxt: {
+    flex: 1,
+    fontSize: 13,
+    color: C.text,
+    lineHeight: 19,
+  },
+  optimizeChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  optimizeMissingChip: {
+    backgroundColor: '#FCE8E6',
+    borderRadius: R.full,
+    paddingHorizontal: Sp.sm,
+    paddingVertical: 6,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  optimizeMissingChipTxt: {
+    fontSize: 12,
+    color: C.red,
+    fontWeight: '600',
+  },
 });
