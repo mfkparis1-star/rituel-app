@@ -9,7 +9,6 @@ import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { optimizeRoutine, RoutineOptimizeResult } from '../../utils/routineAI';
 import { supabase } from '../../lib/supabase';
-import { safeBack } from '../../utils/safeBack';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 type Slot = 'matin' | 'soir';
@@ -74,7 +73,7 @@ export default function RoutineScreen() {
           'Connexion requise',
           'Connectez-vous pour gérer votre routine.',
           [
-            { text: 'Annuler', style: 'cancel', onPress: () => safeBack('/(tabs)/ai-studio') },
+            { text: 'Annuler', style: 'cancel', onPress: () => router.replace('/(tabs)/ai-studio' as any) },
             { text: 'Se connecter', onPress: () => router.replace('/(tabs)/auth' as any) },
           ]
         );
@@ -218,7 +217,7 @@ export default function RoutineScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.topBar}>
-          <Pressable onPress={() => safeBack('/(tabs)/ai-studio')} style={s.backBtn} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/(tabs)/ai-studio' as any)} style={s.backBtn} hitSlop={8}>
             <BackArrow color={C.espresso} />
           </Pressable>
         </View>

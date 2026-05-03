@@ -6,7 +6,6 @@ import Svg, { Path } from 'react-native-svg';
 import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import { C, R, Sh, Sp, Type } from '../../theme';
-import { safeBack } from '../../utils/safeBack';
 
 type JournalEntry = {
   id: string;
@@ -39,7 +38,7 @@ export default function JournalScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.topBar}>
-          <Pressable onPress={() => safeBack('/(tabs)/ai-studio')} style={s.backBtn} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/(tabs)/ai-studio' as any)} style={s.backBtn} hitSlop={8}>
             <BackArrow color={C.espresso} />
           </Pressable>
         </View>
