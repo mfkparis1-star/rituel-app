@@ -310,7 +310,7 @@ export default function MakeupScreen() {
           label="STUDIO MAQUILLAGE"
           title="Découvre ton maquillage parfait"
           subtitle="Une routine adaptée à ton événement, ton style et ta peau."
-          ctaLabel="Continuer"
+          ctaLabel={occasion ? 'Continuer' : "Choisis un événement"}
           variant="espresso"
           onPress={handleHeroCta}
           style={{ marginBottom: Sp.xl }}
