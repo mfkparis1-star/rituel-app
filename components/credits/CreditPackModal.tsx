@@ -22,17 +22,11 @@ function CloseIcon({ color }: { color: string }) {
 export default function CreditPackModal({ visible, onClose, onSuccess }: Props) {
   const { add, balance } = useCredits();
 
-  const handleBuy = async (amount: number, label: string) => {
-    // Phase 14: real RevenueCat purchase wiring goes here.
-    // For now: simulate a successful credit grant via local helper.
-    const r = await add(amount, `pack_${amount}`);
-    if (r.ok) {
-      Alert.alert('✨', `${amount} crédit${amount > 1 ? 's' : ''} ajouté${amount > 1 ? 's' : ''}.`);
-      onSuccess?.(amount);
-      onClose();
-    } else {
-      Alert.alert('Erreur', 'Impossible d\'ajouter les crédits pour le moment.');
-    }
+  const handleBuy = (_amount: number, _label: string) => {
+    Alert.alert(
+      'Bientôt disponible',
+      'Les achats de crédits seront activés très bientôt.'
+    );
   };
 
   return (

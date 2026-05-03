@@ -15,9 +15,9 @@ import { supabase } from '../lib/supabase';
 const CACHE_KEY = 'rituel_credit_balance_v1';
 
 export const CREDIT_PACKS = [
-  { id: 'credits_1', amount: 1, priceLabel: '1,99 €' },
-  { id: 'credits_5', amount: 5, priceLabel: '7,99 €', popular: true },
-  { id: 'credits_15', amount: 15, priceLabel: '19,99 €', best: true },
+  { id: 'credits.1', amount: 1, priceLabel: '2,99 €' },
+  { id: 'credits.5', amount: 5, priceLabel: '9,99 €', popular: true },
+  { id: 'credits.15', amount: 15, priceLabel: '19,99 €', best: true },
 ];
 
 async function readCache(): Promise<number> {
