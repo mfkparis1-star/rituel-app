@@ -1,5 +1,6 @@
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { C, R, Sh, Sp } from '../../theme';
+import { formatPriceFR } from '../../utils/format';
 
 export type AffiliateProductCardData = {
   id: string;
@@ -60,7 +61,9 @@ export default function AffiliateProductCard({
         {product.reason && (
           <Text style={s.reason} numberOfLines={2}>{product.reason}</Text>
         )}
-        {product.price && <Text style={s.price}>{product.price}</Text>}
+        {formatPriceFR(product.price) ? (
+          <Text style={s.price}>{formatPriceFR(product.price)}</Text>
+        ) : null}
         {isHorizontal && (
           <Text style={s.cta}>Voir le produit ›</Text>
         )}
