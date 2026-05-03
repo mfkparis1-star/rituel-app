@@ -8,6 +8,7 @@ import PillButton from '../../components/ui/PillButton';
 import { useEffect, useState } from 'react';
 import AffiliateProductCard from '../../components/ui/AffiliateProductCard';
 import { getAffiliateRecommendations } from '../../utils/affiliateRecommendations';
+import { useRoutineCount } from '../../hooks/useRoutineCount';
 import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -20,6 +21,7 @@ function getGreeting(): string {
 
 export default function IndexScreen() {
   const greeting = getGreeting();
+  const { count: routineCount } = useRoutineCount();
 
   const [recommendations, setRecommendations] = useState<AffiliateProduct[]>([]);
 
@@ -76,12 +78,16 @@ export default function IndexScreen() {
 
         <PremiumCard variant="cream" style={s.recoCard}>
           <Text style={s.recoLabel}>ROUTINE</Text>
-          <Text style={s.recoTitle}>Routine du soir prête</Text>
+          <Text style={s.recoTitle}>
+            {routineCount > 0 ? 'Ta routine est prête' : 'Aucune routine encore'}
+          </Text>
           <Text style={s.recoSub}>
-            Trois étapes adaptées à ta peau pour un rituel apaisant.
+            {routineCount > 0
+              ? `${routineCount} étape${routineCount > 1 ? 's' : ''} dans ton rituel quotidien.`
+              : 'Ajoute tes premiers soins pour construire ton rituel.'}
           </Text>
           <PillButton
-            label="Voir la routine"
+            label={routineCount > 0 ? 'Voir la routine' : 'Créer ma routine'}
             variant="ghost"
             size="sm"
             onPress={() => router.push('/(tabs)/routine' as any)}

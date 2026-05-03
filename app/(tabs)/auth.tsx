@@ -7,6 +7,7 @@ import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { useCredits } from '../../hooks/useCredits';
+import { useRoutineCount } from '../../hooks/useRoutineCount';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
@@ -20,6 +21,7 @@ export default function AuthScreen() {
   const [mode, setMode] = useState<AuthMode>('signin');
   const [creditModalOpen, setCreditModalOpen] = useState(false);
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
+  const { count: routineCount } = useRoutineCount();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -297,7 +299,7 @@ export default function AuthScreen() {
           <View style={s.gap} />
           <StatCard label="Analyse" value={profileStats.analysisCount} />
           <View style={s.gap} />
-          <StatCard label="Routine" value={profileStats.routineActive ? 'Active' : '—'} />
+          <StatCard label="Routine" value={routineCount} />
         </View>
 
         <HeroCard
