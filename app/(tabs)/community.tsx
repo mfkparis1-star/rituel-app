@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
+import PillButton from '../../components/ui/PillButton';
 import EmptyState from '../../components/ui/EmptyState';
 import { supabase } from '../../lib/supabase';
 import { translate } from '../../utils/translate';
@@ -147,6 +148,18 @@ export default function CommunityScreen() {
           <EmptyState
             title="Pas encore de routines"
             subtitle="La communauté grandit chaque jour. Revenez bientôt."
+            action={
+              <PillButton
+                label="Partager ma routine"
+                variant="primary"
+                onPress={() =>
+                  Alert.alert(
+                    'Bientôt disponible',
+                    'Le partage arrive bientôt.'
+                  )
+                }
+              />
+            }
           />
         ) : (
           <View style={s.list}>
