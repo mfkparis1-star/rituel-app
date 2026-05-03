@@ -112,9 +112,9 @@ export default function IndexScreen() {
 
         <PremiumCard variant="white" style={s.recoCard}>
           <Text style={s.recoLabel}>ARCHIVE</Text>
-          <Text style={s.recoTitle}>Ton archive est vide</Text>
+          <Text style={s.recoTitle}>Ton archive beauté</Text>
           <Text style={s.recoSub}>
-            Ajoute tes soins pour suivre leur utilisation.
+            Ajoute ou retrouve tes soins favoris.
           </Text>
           <PillButton
             label="Ajouter un produit"
