@@ -187,32 +187,6 @@ export default function AddProductScreen() {
           {mode === 'menu' && (
             <View style={s.methods}>
               <Pressable
-                onPress={() => {
-                  Alert.alert(
-                    'Bientôt disponible',
-                    'L\'identification par IA arrive très bientôt.',
-                    [{ text: 'OK' }]
-                  );
-                }}
-                style={({ pressed }) => [
-                  s.methodCard,
-                  Sh.soft,
-                  pressed && { opacity: 0.85 },
-                ]}
-              >
-                <View style={s.methodIcon}>
-                  <SparkleIcon color={C.espresso} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.methodTitle}>Identifier avec l'IA</Text>
-                  <Text style={s.methodDesc}>
-                    Prenez une photo, l'IA reconnaît la marque et la catégorie.
-                  </Text>
-                  <Text style={s.methodSoon}>Bientôt disponible</Text>
-                </View>
-              </Pressable>
-
-              <Pressable
                 onPress={() => setMode('manual')}
                 style={({ pressed }) => [
                   s.methodCard,
@@ -228,6 +202,33 @@ export default function AddProductScreen() {
                   <Text style={s.methodDesc}>
                     Renseignez les informations vous-même.
                   </Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  Alert.alert(
+                    'Bientôt disponible',
+                    'L\'identification par IA arrive très bientôt.',
+                    [{ text: 'OK' }]
+                  );
+                }}
+                style={({ pressed }) => [
+                  s.methodCard,
+                  s.methodCardSoon,
+                  Sh.soft,
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <View style={s.methodIcon}>
+                  <SparkleIcon color={C.espresso} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.methodTitle}>Identifier avec l'IA</Text>
+                  <Text style={s.methodDesc}>
+                    Prenez une photo, l'IA reconnaît la marque et la catégorie.
+                  </Text>
+                  <Text style={s.methodSoon}>Bientôt disponible</Text>
                 </View>
               </Pressable>
             </View>
@@ -400,6 +401,9 @@ const s = StyleSheet.create({
   },
   methodDesc: {
     fontSize: 13, color: C.textMid, lineHeight: 18,
+  },
+  methodCardSoon: {
+    opacity: 0.6,
   },
   methodSoon: {
     fontSize: 10, color: C.copper, fontWeight: '600',
