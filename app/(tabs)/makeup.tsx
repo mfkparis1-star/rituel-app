@@ -58,7 +58,27 @@ export default function MakeupScreen() {
   const [result, setResult] = useState<MakeupResult | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const pickSelfie = async () => {
+  const openCamera = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(
+        'Autorisation requise',
+        'Veuillez autoriser l\'accès à la caméra.'
+      );
+      return;
+    }
+    const r = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!r.canceled && r.assets?.[0]?.base64) {
+      setSelfieBase64(r.assets[0].base64);
+    }
+  };
+
+  const openGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
@@ -77,6 +97,18 @@ export default function MakeupScreen() {
     if (!r.canceled && r.assets?.[0]?.base64) {
       setSelfieBase64(r.assets[0].base64);
     }
+  };
+
+  const pickSelfie = () => {
+    Alert.alert(
+      'Ajouter un selfie',
+      'Choisis comment tu veux ajouter ta photo.',
+      [
+        { text: 'Prendre un selfie', onPress: openCamera },
+        { text: 'Choisir depuis la galerie', onPress: openGallery },
+        { text: 'Annuler', style: 'cancel' },
+      ]
+    );
   };
 
   const runGeneration = async (skipSelfie: boolean) => {
