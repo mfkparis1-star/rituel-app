@@ -342,9 +342,9 @@ export default function AuthScreen() {
 
         <PremiumCard variant="cream" style={{ marginBottom: Sp.sm }}>
           <Text style={s.recoLabel}>RECOMMANDATION</Text>
-          <Text style={s.recoTitle}>Hydrate ta peau ce soir</Text>
+          <Text style={s.recoTitle}>Commence ton rituel ce soir</Text>
           <Text style={s.recoSub}>
-            Une routine apaisante adaptée à ton rituel du soir.
+            Une routine apaisante pour prendre soin de toi.
           </Text>
         </PremiumCard>
 
