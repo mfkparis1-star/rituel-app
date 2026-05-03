@@ -1,11 +1,13 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { type Session } from '@supabase/supabase-js';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import StatCard from '../../components/ui/StatCard';
+import { supabase } from '../../lib/supabase';
 import { C, R, Sp, Type } from '../../theme';
 
 const FREE_LIMIT = 30;
@@ -17,12 +19,65 @@ type Product = {
   brand: string;
   name: string;
   status: 'active' | 'finished' | 'stocked';
+  category?: string;
 };
 
 export default function ArchiveScreen() {
-  const [products] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState<FilterId>('all');
   const [search, setSearch] = useState('');
+  const [session, setSession] = useState<Session | null>(null);
+
+  const loadProducts = useCallback(async (uid: string) => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, brand, name, status, category')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false });
+    if (error) {
+      setProducts([]);
+      return;
+    }
+    setProducts((data as Product[]) ?? []);
+  }, []);
+
+  // Initial session + auth listener
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session);
+      if (data.session) {
+        loadProducts(data.session.user.id);
+      } else {
+        setProducts([]);
+      }
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_e, s) => {
+      if (!mounted) return;
+      setSession(s);
+      if (s) {
+        loadProducts(s.user.id);
+      } else {
+        setProducts([]);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [loadProducts]);
+
+  // Refresh on tab focus (e.g. after returning from add-product)
+  useFocusEffect(
+    useCallback(() => {
+      if (session) {
+        loadProducts(session.user.id);
+      }
+    }, [session, loadProducts])
+  );
 
   const stats = {
     total: products.length,
