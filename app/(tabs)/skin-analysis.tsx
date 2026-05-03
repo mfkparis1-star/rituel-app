@@ -8,6 +8,7 @@ import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { safeBack } from '../../utils/safeBack';
+import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
 
 type Step = 'intro' | 'analyzing' | 'result' | 'error';
 
@@ -111,16 +112,21 @@ export default function SkinAnalysisScreen() {
   const runAnalysis = async (base64: string) => {
     setStep('analyzing');
     setPreviewImage(`data:image/jpeg;base64,${base64}`);
-    // Placeholder: real Claude/Edge Function call to be wired in Phase 14
-    setTimeout(() => {
+    setErrorMsg('');
+    try {
+      const parsed = await analyzeSkin(base64, 'fr');
       setResult({
-        skinType: 'Mixte',
-        issues: ['Zone T grasse', 'Joues sèches'],
-        recommendations: ['Sérum hydratant', 'Crème équilibrante'],
-        missingCategories: ['SPF', 'Toner'],
+        skinType: getSkinTypeLabel(parsed.skinType, 'fr'),
+        issues: parsed.issues,
+        recommendations: parsed.recommendations,
+        missingCategories: parsed.missingCategories,
       });
       setStep('result');
-    }, 1800);
+    } catch (e: any) {
+      const msg = e?.message || 'Une erreur est survenue. Réessayez.';
+      setErrorMsg(msg);
+      setStep('error');
+    }
   };
 
   const reset = () => {
