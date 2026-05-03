@@ -11,8 +11,6 @@ import StatCard from '../../components/ui/StatCard';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sp, Type } from '../../theme';
 
-const FREE_LIMIT = 30;
-
 type FilterId = 'all' | 'active' | 'finished' | 'stocked';
 
 type Product = {
@@ -169,7 +167,11 @@ export default function ArchiveScreen() {
           <Chip label="En stock" active={filter === 'stocked'} onPress={() => setFilter('stocked')} />
         </View>
 
-        <Text style={s.limit}>{stats.total}/{FREE_LIMIT} produits gratuits</Text>
+        <Text style={s.limit}>
+          {stats.total === 1
+            ? '1 produit dans ton archive'
+            : `${stats.total} produits dans ton archive`}
+        </Text>
 
         {isEmpty ? (
           <EmptyState
@@ -209,6 +211,13 @@ export default function ArchiveScreen() {
                 </Pressable>
               </View>
             ))}
+            <PillButton
+              label="+ Ajouter un produit"
+              variant="outline"
+              fullWidth
+              onPress={() => router.push('/add-product' as any)}
+              style={{ marginTop: Sp.md }}
+            />
           </View>
         )}
 
