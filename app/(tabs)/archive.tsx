@@ -1,7 +1,8 @@
 import { type Session } from '@supabase/supabase-js';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
@@ -21,6 +22,15 @@ type Product = {
   status: 'active' | 'finished' | 'stocked';
   category?: string;
 };
+
+function CloseIcon({ color }: { color: string }) {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M18 6L6 18" />
+      <Path d="M6 6l12 12" />
+    </Svg>
+  );
+}
 
 export default function ArchiveScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -78,6 +88,33 @@ export default function ArchiveScreen() {
       }
     }, [session, loadProducts])
   );
+
+  const handleDelete = (id: string, name: string) => {
+    Alert.alert(
+      'Supprimer le produit',
+      `Voulez-vous supprimer "${name}" de votre archive ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            if (!session) return;
+            const { error: err } = await supabase
+              .from('products')
+              .delete()
+              .eq('id', id)
+              .eq('user_id', session.user.id);
+            if (err) {
+              Alert.alert('Erreur', 'Suppression impossible.');
+              return;
+            }
+            loadProducts(session.user.id);
+          },
+        },
+      ]
+    );
+  };
 
   const stats = {
     total: products.length,
@@ -167,6 +204,9 @@ export default function ArchiveScreen() {
                   </Text>
                 </View>
                 <View style={[s.statusDot, p.status === 'active' && s.statusActive, p.status === 'finished' && s.statusFinished]} />
+                <Pressable onPress={() => handleDelete(p.id, p.name)} style={s.deleteBtn} hitSlop={8}>
+                  <CloseIcon color={C.textSoft} />
+                </Pressable>
               </View>
             ))}
           </View>
@@ -234,4 +274,11 @@ const s = StyleSheet.create({
   },
   statusActive: { backgroundColor: C.green },
   statusFinished: { backgroundColor: C.textSoft },
+  deleteBtn: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: Sp.sm,
+  },
 });
