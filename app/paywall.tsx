@@ -94,7 +94,7 @@ export default function PaywallScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
           <View style={s.topBar}>
-            <Pressable onPress={() => safeBack('/(tabs)/index')} style={s.closeBtn} hitSlop={8}>
+            <Pressable onPress={() => safeBack('/(tabs)/auth')} style={s.closeBtn} hitSlop={8}>
               <CloseIcon color={C.espresso} />
             </Pressable>
           </View>
