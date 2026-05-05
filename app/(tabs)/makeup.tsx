@@ -5,6 +5,8 @@ import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Tex
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import HeroCard from '../../components/ui/HeroCard';
+import LockedAICard from '../../components/credits/LockedAICard';
+import { useAIUnlock } from '../../hooks/useAIUnlock';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -55,6 +57,9 @@ export default function MakeupScreen() {
   const [occasion, setOccasion] = useState<OccasionId | null>(null);
   const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
   const [result, setResult] = useState<MakeupResult | null>(null);
+  const [resultId, setResultId] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('makeup_full');
   const [errorMsg, setErrorMsg] = useState('');
 
   const openCamera = async () => {
@@ -122,6 +127,9 @@ export default function MakeupScreen() {
         'fr'
       );
       setResult(r);
+      const newResultId = `makeup_${Date.now()}`;
+      setResultId(newResultId);
+      setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
       const msg = e?.message || 'Une erreur est survenue. Réessayez.';
@@ -136,6 +144,8 @@ export default function MakeupScreen() {
     setSelfieBase64(null);
     setResult(null);
     setErrorMsg('');
+     setUnlocked(false);
+    setResultId(null);
   };
 
   const handleHeroCta = () => {
@@ -246,7 +256,11 @@ export default function MakeupScreen() {
           <Text style={s.label}>{occLabel.toUpperCase()}</Text>
           <Text style={s.title}>Tes 3 looks</Text>
 
-          {result.styles.map((look, i) => (
+          {result.styles.map((look, i) => {
+            if (i > 0 && !unlocked && !isPremium) {
+              return null;
+            }
+            return (
             <View key={i} style={[s.lookCard, Sh.soft]}>
               <Text style={s.lookNumber}>LOOK {i + 1}</Text>
               <Text style={s.lookName}>{look.name}</Text>
@@ -286,7 +300,15 @@ export default function MakeupScreen() {
                 </>
               )}
             </View>
-          ))}
+            );
+          })}
+          {!unlocked && !isPremium && resultId && result.styles.length > 1 && (
+            <LockedAICard
+              scope="makeup_full"
+              resultId={resultId}
+              onUnlocked={() => setUnlocked(true)}
+            />
+          )}
 
           <PillButton
             label="Recommencer"
