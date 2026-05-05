@@ -1,6 +1,6 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +8,7 @@ import PillButton from '../components/ui/PillButton';
 import { C, G, R, Sh, Sp, Type } from '../theme';
 import { trackEvent } from '../utils/analytics';
 import { safeBack } from '../utils/safeBack';
+import { purchaseProduct, restorePurchases, hasActivePremium } from '../utils/purchases';
 
 type Plan = 'monthly' | 'yearly';
 
@@ -18,6 +19,11 @@ type PlanInfo = {
   period: string;
   hint?: string;
   badge?: string;
+};
+
+const PRODUCT_IDS: Record<Plan, string> = {
+  monthly: 'com.mfkparis.rituel.premium.monthly',
+  yearly: 'com.mfkparis.rituel.premium.yearly',
 };
 
 const PLANS: PlanInfo[] = [
@@ -72,20 +78,74 @@ export default function PaywallScreen() {
     if (purchasing) return;
     setPurchasing(true);
     trackEvent('paywall_cta_clicked', { plan: selected });
-    // Phase 12: real RevenueCat purchase wiring goes here
-    setTimeout(() => {
+    try {
+      const productId = PRODUCT_IDS[selected];
+      const result = await purchaseProduct(productId);
+      if (result.ok) {
+        const premium = hasActivePremium(result.customerInfo);
+        if (premium) {
+          trackEvent('purchase_success', { plan: selected });
+          Alert.alert(
+            'Bienvenue dans Rituel Premium',
+            'Tu as maintenant accès à toutes les fonctionnalités premium.'
+          );
+          safeBack('/(tabs)/auth');
+        } else {
+          Alert.alert(
+            'Achat reçu',
+            'Ton abonnement sera activé sous peu.'
+          );
+        }
+      } else if ('userCancelled' in result && result.userCancelled) {
+        // silent
+      } else {
+        trackEvent('purchase_failed', { plan: selected });
+        Alert.alert(
+          'Achat impossible',
+          'Une erreur est survenue. Réessaye dans un instant.'
+        );
+      }
+    } catch {
+      trackEvent('purchase_failed', { plan: selected });
+      Alert.alert(
+        'Achat impossible',
+        'Une erreur est survenue. Réessaye dans un instant.'
+      );
+    } finally {
       setPurchasing(false);
-    }, 800);
+    }
   };
 
   const handleRestore = async () => {
     if (restoring) return;
     setRestoring(true);
     trackEvent('restore_clicked');
-    // Phase 12: real RevenueCat restore wiring goes here
-    setTimeout(() => {
+    try {
+      const customerInfo = await restorePurchases();
+      const premium = hasActivePremium(customerInfo);
+      if (premium) {
+        trackEvent('restore_success');
+        Alert.alert(
+          'Achats restaurés',
+          'Ton abonnement Rituel Premium est actif.'
+        );
+        safeBack('/(tabs)/auth');
+      } else {
+        trackEvent('restore_failed');
+        Alert.alert(
+          'Aucun achat trouvé',
+          "Nous n'avons pas trouvé d'achat actif lié à ton compte."
+        );
+      }
+    } catch {
+      trackEvent('restore_failed');
+      Alert.alert(
+        'Restauration impossible',
+        'Une erreur est survenue. Réessaye dans un instant.'
+      );
+    } finally {
       setRestoring(false);
-    }, 800);
+    }
   };
 
   return (
