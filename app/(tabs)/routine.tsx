@@ -8,6 +8,8 @@ import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { optimizeRoutine, RoutineOptimizeResult } from '../../utils/routineAI';
+import { useAIUnlock } from '../../hooks/useAIUnlock';
+import CreditPackModal from '../../components/credits/CreditPackModal';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -57,6 +59,8 @@ export default function RoutineScreen() {
 
   // optimize flow
   const [optimizeModalOpen, setOptimizeModalOpen] = useState(false);
+  const [creditPacksVisible, setCreditPacksVisible] = useState(false);
+  const { unlock, isPremium } = useAIUnlock('routine_optimize');
   const [optimizing, setOptimizing] = useState(false);
   const [optimizeResult, setOptimizeResult] = useState<RoutineOptimizeResult | null>(null);
   const [optimizeError, setOptimizeError] = useState('');
@@ -167,6 +171,21 @@ export default function RoutineScreen() {
   // ----- AI Optimize -----
   const handleOptimize = async () => {
     if (steps.length === 0 || !session) return;
+    if (!isPremium) {
+      const resultId = `routine_${Date.now()}`;
+      const r = await unlock(resultId);
+      if (!r.ok) {
+        if (r.reason === 'insufficient') {
+          setCreditPacksVisible(true);
+        } else {
+          Alert.alert(
+            'Erreur',
+            "Impossible de débloquer l'optimisation. Réessaye dans un instant."
+          );
+        }
+        return;
+      }
+    }
     setOptimizeModalOpen(true);
     setOptimizing(true);
     setOptimizeError('');
@@ -431,6 +450,11 @@ export default function RoutineScreen() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+      <CreditPackModal
+        visible={creditPacksVisible}
+        onClose={() => setCreditPacksVisible(false)}
+        onSuccess={() => setCreditPacksVisible(false)}
+      />
     </SafeAreaView>
   );
 }
