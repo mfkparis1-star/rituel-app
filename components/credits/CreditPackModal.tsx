@@ -1,8 +1,10 @@
-import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import PillButton from '../ui/PillButton';
 import { CREDIT_PACKS } from '../../utils/credits';
 import { useCredits } from '../../hooks/useCredits';
+import { purchaseProduct, addPendingGrant } from '../../utils/purchases';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 type Props = {
@@ -22,11 +24,46 @@ function CloseIcon({ color }: { color: string }) {
 export default function CreditPackModal({ visible, onClose, onSuccess }: Props) {
   const { add, balance } = useCredits();
 
-  const handleBuy = (_amount: number, _label: string) => {
-    Alert.alert(
-      'Bientôt disponible',
-      'Les achats de crédits seront activés très bientôt.'
-    );
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+
+  const handleBuy = async (productId: string, amount: number) => {
+    if (purchasingId) return;
+    setPurchasingId(productId);
+    try {
+      const result = await purchaseProduct(productId);
+      if (result.ok) {
+        const grantResult = await add(amount, productId);
+        if (grantResult.ok) {
+          Alert.alert(
+            'Crédits ajoutés',
+            `${amount} crédit${amount > 1 ? 's' : ''} ajouté${amount > 1 ? 's' : ''} à ton compte.`
+          );
+          onSuccess?.(amount);
+          onClose();
+        } else {
+          await addPendingGrant({ productId, amount, timestamp: Date.now() });
+          Alert.alert(
+            'Achat reçu',
+            'Tes crédits seront ajoutés dès que la connexion sera rétablie.'
+          );
+          onClose();
+        }
+      } else if ('userCancelled' in result && result.userCancelled) {
+        // silent
+      } else {
+        Alert.alert(
+          'Achat impossible',
+          'Une erreur est survenue. Réessaye dans un instant.'
+        );
+      }
+    } catch {
+      Alert.alert(
+        'Achat impossible',
+        'Une erreur est survenue. Réessaye dans un instant.'
+      );
+    } finally {
+      setPurchasingId(null);
+    }
   };
 
   return (
@@ -76,10 +113,11 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
               </View>
 
               <PillButton
-                label="Acheter"
+                label={purchasingId === p.id ? 'En cours...' : 'Acheter'}
                 variant="primary"
                 size="sm"
-                onPress={() => handleBuy(p.amount, p.priceLabel)}
+                disabled={purchasingId !== null}
+                onPress={() => handleBuy(p.id, p.amount)}
               />
             </View>
           ))}
