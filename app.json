@@ -45,12 +45,11 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Rituel utilise vos photos pour votre archive beaut\u00e9 et votre journal peau.",
-          "cameraPermission": "Rituel utilise la cam\u00e9ra pour scanner vos produits."
+          "photosPermission": "Rituel utilise vos photos pour votre archive beauté et votre journal peau.",
+          "cameraPermission": "Rituel utilise la caméra pour scanner vos produits."
         }
       ],
-      "expo-localization",
-      "react-native-purchases"
+      "expo-localization"
     ]
   }
 }
