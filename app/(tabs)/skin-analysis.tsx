@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
+import LockedAICard from '../../components/credits/LockedAICard';
+import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
 
@@ -41,6 +43,9 @@ function Sparkle({ color }: { color: string }) {
 export default function SkinAnalysisScreen() {
   const [step, setStep] = useState<Step>('intro');
   const [result, setResult] = useState<SkinResult | null>(null);
+  const [resultId, setResultId] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('skin_analysis');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -120,6 +125,9 @@ export default function SkinAnalysisScreen() {
         recommendations: parsed.recommendations,
         missingCategories: parsed.missingCategories,
       });
+      const newResultId = `skin_${Date.now()}`;
+      setResultId(newResultId);
+      setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
       const msg = e?.message || 'Une erreur est survenue. Réessayez.';
@@ -133,6 +141,8 @@ export default function SkinAnalysisScreen() {
     setResult(null);
     setPreviewImage(null);
     setErrorMsg('');
+    setUnlocked(false);
+    setResultId(null);
   };
 
   const spin = spinAnim.interpolate({
@@ -250,23 +260,33 @@ export default function SkinAnalysisScreen() {
                 <Text style={s.issueText}>{issue}</Text>
               </View>
             ))}
-
-            <Text style={s.sectionTitle}>Recommandations</Text>
-            {result.recommendations.map((rec, i) => (
-              <PremiumCard key={i} variant="white" style={s.recoCard}>
-                <Text style={s.recoText}>{rec}</Text>
-              </PremiumCard>
-            ))}
-
-            {result.missingCategories && result.missingCategories.length > 0 && (
+            {(unlocked || isPremium) ? (
               <>
-                <Text style={s.sectionTitle}>Produits manquants</Text>
-                {result.missingCategories.map((cat, i) => (
-                  <View key={i} style={s.missingRow}>
-                    <Text style={s.missingCat}>{cat}</Text>
-                  </View>
+                <Text style={s.sectionTitle}>Recommandations</Text>
+                {result.recommendations.map((rec, i) => (
+                  <PremiumCard key={i} variant="white" style={s.recoCard}>
+                    <Text style={s.recoText}>{rec}</Text>
+                  </PremiumCard>
                 ))}
+                {result.missingCategories && result.missingCategories.length > 0 && (
+                  <>
+                    <Text style={s.sectionTitle}>Produits manquants</Text>
+                    {result.missingCategories.map((cat, i) => (
+                      <View key={i} style={s.missingRow}>
+                        <Text style={s.missingCat}>{cat}</Text>
+                      </View>
+                    ))}
+                  </>
+                )}
               </>
+            ) : (
+              resultId && (
+                <LockedAICard
+                  scope="skin_analysis"
+                  resultId={resultId}
+                  onUnlocked={() => setUnlocked(true)}
+                />
+              )
             )}
 
             <PillButton
