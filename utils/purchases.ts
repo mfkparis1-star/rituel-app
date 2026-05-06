@@ -62,23 +62,44 @@ export async function findPackageByProductId(
   productId: string
 ): Promise<PurchasesPackage | null> {
   const offering = await getCurrentOffering();
-  if (!offering) return null;
+  if (!offering) {
+    console.warn('[purchases][debug] getCurrentOffering returned null');
+    return null;
+  }
+  const availableIds = offering.availablePackages.map((p) => p.product.identifier);
+  console.log('[purchases][debug] looking for:', productId);
+  console.log('[purchases][debug] available product identifiers:', availableIds);
   const pkg = offering.availablePackages.find(
     (p) => p.product.identifier === productId
   );
+  if (!pkg) {
+    console.warn('[purchases][debug] no match for', productId);
+  } else {
+    console.log('[purchases][debug] matched package:', pkg.identifier);
+  }
   return pkg ?? null;
 }
 
 export async function purchaseProduct(productId: string): Promise<PurchaseResult> {
   try {
+    console.log('[purchases][debug] purchaseProduct called with:', productId);
     const pkg = await findPackageByProductId(productId);
     if (!pkg) {
       return { ok: false, error: 'product_not_found' };
     }
+    console.log('[purchases][debug] calling Purchases.purchasePackage with:', pkg.identifier);
     const { customerInfo, productIdentifier } = await Purchases.purchasePackage(pkg);
+    console.log('[purchases][debug] purchase OK:', productIdentifier);
     return { ok: true, customerInfo, productIdentifier };
   } catch (e: any) {
     const err = e as PurchasesError;
+    console.warn('[purchases][debug] purchase failed full error:', JSON.stringify({
+      code: err?.code,
+      message: err?.message,
+      userCancelled: err?.userCancelled,
+      underlyingErrorMessage: (err as any)?.underlyingErrorMessage,
+      readableErrorCode: (err as any)?.readableErrorCode,
+    }, null, 2));
     if (err?.userCancelled) {
       return { ok: false, userCancelled: true };
     }
@@ -86,8 +107,7 @@ export async function purchaseProduct(productId: string): Promise<PurchaseResult
     if (code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
       return { ok: false, userCancelled: true };
     }
-    console.warn('[purchases] purchase failed', err);
-    return { ok: false, error: String(code) };
+    return { ok: false, error: `${code}: ${err?.message || 'unknown'}` };
   }
 }
 

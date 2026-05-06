@@ -100,16 +100,17 @@ export default function PaywallScreen() {
         // silent
       } else {
         trackEvent('purchase_failed', { plan: selected });
+        const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
-          'Achat impossible',
-          'Une erreur est survenue. Réessaye dans un instant.'
+          'Achat impossible (debug)',
+          `Product: ${productId}\nError: ${errMsg}`
         );
       }
-    } catch {
+    } catch (e: any) {
       trackEvent('purchase_failed', { plan: selected });
       Alert.alert(
-        'Achat impossible',
-        'Une erreur est survenue. Réessaye dans un instant.'
+        'Achat impossible (catch)',
+        `Plan: ${selected}\nException: ${e?.message || String(e)}`
       );
     } finally {
       setPurchasing(false);

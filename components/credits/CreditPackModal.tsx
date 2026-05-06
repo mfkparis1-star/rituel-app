@@ -51,15 +51,16 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
       } else if ('userCancelled' in result && result.userCancelled) {
         // silent
       } else {
+        const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
-          'Achat impossible',
-          'Une erreur est survenue. Réessaye dans un instant.'
+          'Achat impossible (debug)',
+          `Product: ${productId}\nError: ${errMsg}`
         );
       }
-    } catch {
+    } catch (e: any) {
       Alert.alert(
-        'Achat impossible',
-        'Une erreur est survenue. Réessaye dans un instant.'
+        'Achat impossible (catch)',
+        `Product: ${productId}\nException: ${e?.message || String(e)}`
       );
     } finally {
       setPurchasingId(null);
