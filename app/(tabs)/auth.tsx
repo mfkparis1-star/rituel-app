@@ -356,11 +356,6 @@ export default function AuthScreen() {
           onPress={() => router.push('/(tabs)/archive' as any)}
         />
         <ListRow
-          title="Journal de peau"
-          subtitle="Évolution semaine après semaine"
-          onPress={() => router.push('/(tabs)/journal' as any)}
-        />
-        <ListRow
           title="Mon rituel"
           subtitle="Routine matin et soir"
           onPress={() => router.push('/(tabs)/routine' as any)}

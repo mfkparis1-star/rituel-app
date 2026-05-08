@@ -82,7 +82,6 @@ export default function TabLayout() {
 
       <Tabs.Screen name="skin-analysis" options={{ href: null }} />
       <Tabs.Screen name="makeup" options={{ href: null }} />
-      <Tabs.Screen name="journal" options={{ href: null }} />
       <Tabs.Screen name="routine" options={{ href: null }} />
       <Tabs.Screen name="compatibility" options={{ href: null }} />
     </Tabs>

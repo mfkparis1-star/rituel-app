@@ -16,15 +16,6 @@ function MakeupIcon({ color }: { color: string }) {
   );
 }
 
-function JournalIcon({ color }: { color: string }) {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M4 4h12a4 4 0 014 4v12a0 0 0 010 0H8a4 4 0 01-4-4V4z" />
-      <Path d="M8 8h8M8 12h8M8 16h5" />
-    </Svg>
-  );
-}
-
 function RoutineIcon({ color }: { color: string }) {
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -60,14 +51,6 @@ const TOOLS: ToolCard[] = [
     description: 'Looks personnalisés selon ton événement.',
     route: '/(tabs)/makeup',
     Icon: MakeupIcon,
-  },
-  {
-    id: 'journal',
-    label: 'JOURNAL',
-    title: 'Journal de peau',
-    description: 'Suis l\'évolution de ta peau au fil du temps.',
-    route: '/(tabs)/journal',
-    Icon: JournalIcon,
   },
   {
     id: 'routine',
