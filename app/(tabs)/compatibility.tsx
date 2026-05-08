@@ -13,6 +13,7 @@ import {
   INGREDIENT_KEYS,
   INGREDIENT_LABELS,
 } from '../../utils/compatibility';
+import { COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Compat = 'compatible' | 'caution' | 'avoid' | null;
 
@@ -179,10 +180,7 @@ export default function CompatibilityScreen() {
           </View>
         )}
 
-        <Text style={s.disclaimer}>
-          Conseils cosmétiques généraux. Pour une recommandation adaptée,
-          consultez un professionnel.
-        </Text>
+        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>

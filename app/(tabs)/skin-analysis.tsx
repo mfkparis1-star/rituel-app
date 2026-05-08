@@ -10,6 +10,7 @@ import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
+import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Step = 'intro' | 'analyzing' | 'result' | 'error';
 
@@ -197,9 +198,9 @@ export default function SkinAnalysisScreen() {
             />
           </View>
 
-          <Text style={s.disclaimer}>
-            Cette analyse est à titre informatif uniquement, non médicale.
-          </Text>
+          <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+          <View style={{ height: Sp.xs }} />
+          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
         </ScrollView>
       </SafeAreaView>
     );
@@ -296,6 +297,10 @@ export default function SkinAnalysisScreen() {
               onPress={reset}
               style={{ marginTop: Sp.lg }}
             />
+
+            <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+            <View style={{ height: Sp.xs }} />
+            <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
           </Animated.View>
         </ScrollView>
       </SafeAreaView>

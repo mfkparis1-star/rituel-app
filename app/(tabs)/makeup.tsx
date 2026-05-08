@@ -16,6 +16,7 @@ import {
   MakeupResult,
   OccasionId,
 } from '../../utils/makeupAI';
+import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Step = 'pick_occasion' | 'selfie' | 'generating' | 'result' | 'error';
 
@@ -318,6 +319,10 @@ export default function MakeupScreen() {
             style={{ marginTop: Sp.md }}
           />
 
+          <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+          <View style={{ height: Sp.xs }} />
+          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+
           <View style={{ height: Sp.huge }} />
         </ScrollView>
       </SafeAreaView>
@@ -417,6 +422,10 @@ export default function MakeupScreen() {
             </View>
           </View>
         ))}
+
+        <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+        <View style={{ height: Sp.xs }} />
+        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>
@@ -679,6 +688,14 @@ const s = StyleSheet.create({
     fontWeight: '600',
   },
 
+  disclaimer: {
+    fontSize: 11,
+    color: C.textSoft,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginTop: Sp.md,
+    paddingHorizontal: Sp.md,
+  },
   errorWrap: {
     paddingHorizontal: Sp.lg,
     paddingTop: Sp.huge,

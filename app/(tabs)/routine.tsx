@@ -8,6 +8,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { optimizeRoutine, RoutineOptimizeResult } from '../../utils/routineAI';
+import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { supabase } from '../../lib/supabase';
@@ -379,6 +380,10 @@ export default function RoutineScreen() {
                   </PremiumCard>
                 )}
 
+                <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+                <View style={{ height: Sp.xs }} />
+                <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+
                 <PillButton
                   label="Fermer"
                   variant="outline"
@@ -602,5 +607,13 @@ const s = StyleSheet.create({
     fontSize: 12,
     color: C.red,
     fontWeight: '600',
+  },
+  disclaimer: {
+    fontSize: 11,
+    color: C.textSoft,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginTop: Sp.md,
+    paddingHorizontal: Sp.md,
   },
 });
