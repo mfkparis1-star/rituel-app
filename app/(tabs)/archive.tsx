@@ -185,13 +185,6 @@ export default function ArchiveScreen() {
                   onPress={() => router.push('/add-product' as any)}
                   fullWidth
                 />
-                <View style={{ height: Sp.sm }} />
-                <PillButton
-                  label="Identifier avec l'IA"
-                  variant="ghost"
-                  size="sm"
-                  onPress={() => router.push('/(tabs)/scanner' as any)}
-                />
               </View>
             }
           />

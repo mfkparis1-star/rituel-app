@@ -85,7 +85,6 @@ export default function TabLayout() {
       <Tabs.Screen name="journal" options={{ href: null }} />
       <Tabs.Screen name="routine" options={{ href: null }} />
       <Tabs.Screen name="compatibility" options={{ href: null }} />
-      <Tabs.Screen name="scanner" options={{ href: null }} />
     </Tabs>
   );
 }
