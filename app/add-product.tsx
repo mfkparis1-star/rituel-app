@@ -42,15 +42,6 @@ function BackArrow({ color }: { color: string }) {
   );
 }
 
-function SparkleIcon({ color }: { color: string }) {
-  return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M12 2v6M12 16v6M2 12h6M16 12h6" />
-      <Path d="M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3" />
-    </Svg>
-  );
-}
-
 function PencilIcon({ color }: { color: string }) {
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -205,32 +196,6 @@ export default function AddProductScreen() {
                 </View>
               </Pressable>
 
-              <Pressable
-                onPress={() => {
-                  Alert.alert(
-                    'Bientôt disponible',
-                    'L\'identification par IA arrive très bientôt.',
-                    [{ text: 'OK' }]
-                  );
-                }}
-                style={({ pressed }) => [
-                  s.methodCard,
-                  s.methodCardSoon,
-                  Sh.soft,
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
-                <View style={s.methodIcon}>
-                  <SparkleIcon color={C.espresso} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.methodTitle}>Identifier avec l'IA</Text>
-                  <Text style={s.methodDesc}>
-                    Prenez une photo, l'IA reconnaît la marque et la catégorie.
-                  </Text>
-                  <Text style={s.methodSoon}>Bientôt disponible</Text>
-                </View>
-              </Pressable>
             </View>
           )}
 
@@ -402,14 +367,6 @@ const s = StyleSheet.create({
   methodDesc: {
     fontSize: 13, color: C.textMid, lineHeight: 18,
   },
-  methodCardSoon: {
-    opacity: 0.6,
-  },
-  methodSoon: {
-    fontSize: 10, color: C.copper, fontWeight: '600',
-    letterSpacing: 1.2, textTransform: 'uppercase', marginTop: 6,
-  },
-
   formCard: { marginBottom: Sp.md },
   fieldLabel: {
     fontSize: 10, fontWeight: '700', color: C.copper,
