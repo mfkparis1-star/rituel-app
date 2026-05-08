@@ -54,13 +54,13 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
         const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
           'Achat impossible (debug)',
-          `Product: ${productId}\nError: ${errMsg}`
+          'Une erreur est survenue. Réessaie dans un instant.'
         );
       }
     } catch (e: any) {
       Alert.alert(
         'Achat impossible (catch)',
-        `Product: ${productId}\nException: ${e?.message || String(e)}`
+        'Une erreur est survenue. Réessaie dans un instant.'
       );
     } finally {
       setPurchasingId(null);
