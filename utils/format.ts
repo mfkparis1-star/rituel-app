@@ -34,3 +34,28 @@ export function formatPriceFR(price: string | number | null | undefined): string
   const fr = fixed.replace('.', ',');
   return `${fr} €`;
 }
+
+/**
+ * formatDateFR — format ISO 8601 date string to French long date.
+ *
+ * Examples:
+ *   "2027-05-08T13:30:00Z" -> "8 mai 2027"
+ *   "2027-05-08"           -> "8 mai 2027"
+ *   null / "" / undefined  -> ""
+ *
+ * On parse failure, returns empty string.
+ */
+export function formatDateFR(iso: string | null | undefined): string {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return '';
+  }
+}

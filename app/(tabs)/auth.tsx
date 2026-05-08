@@ -1,13 +1,15 @@
 import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { useCredits } from '../../hooks/useCredits';
 import { useRoutineCount } from '../../hooks/useRoutineCount';
+import { usePremium } from '../../hooks/usePremium';
+import { formatDateFR } from '../../utils/format';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
@@ -22,6 +24,13 @@ export default function AuthScreen() {
   const [creditModalOpen, setCreditModalOpen] = useState(false);
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const { count: routineCount } = useRoutineCount();
+  const { isPremium, customerInfo } = usePremium();
+
+  const premiumExpiryISO = customerInfo?.entitlements?.active?.['Rituel Pro']?.expirationDate ?? null;
+  const premiumExpiryFR = formatDateFR(premiumExpiryISO);
+  const premiumSubtitle = premiumExpiryFR
+    ? `Actif jusqu’au ${premiumExpiryFR}`
+    : 'Abonnement actif';
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -322,21 +331,36 @@ export default function AuthScreen() {
           onPress={() => setCreditModalOpen(true)}
         />
 
-        <PremiumCard variant="espresso" style={s.premium}>
-          <Text style={s.premiumLabel}>PREMIUM</Text>
-          <Text style={s.premiumTitle}>Active toute la puissance IA</Text>
-          <Text style={s.premiumSub}>
-            Analyses complètes, routines IA, crédits et recommandations premium.
-          </Text>
-          <PillButton
-            label="Découvrir Premium"
-            variant="primary"
-            size="md"
-            onPress={() => router.push('/paywall' as any)}
-            textColor={C.espresso}
-            style={{ marginTop: Sp.md, backgroundColor: C.white }}
-          />
-        </PremiumCard>
+        {!isPremium && (
+          <PremiumCard variant="espresso" style={s.premium}>
+            <Text style={s.premiumLabel}>PREMIUM</Text>
+            <Text style={s.premiumTitle}>Active toute la puissance IA</Text>
+            <Text style={s.premiumSub}>
+              Analyses complètes, routines IA, crédits et recommandations premium.
+            </Text>
+            <PillButton
+              label="Découvrir Premium"
+              variant="primary"
+              size="md"
+              onPress={() => router.push('/paywall' as any)}
+              textColor={C.espresso}
+              style={{ marginTop: Sp.md, backgroundColor: C.white }}
+            />
+          </PremiumCard>
+        )}
+
+        {isPremium && (
+          <>
+            <Text style={s.section}>ABONNEMENT</Text>
+            <ListRow
+              title="Rituel Pro"
+              subtitle={premiumSubtitle}
+              onPress={() =>
+                Linking.openURL('https://apps.apple.com/account/subscriptions').catch(() => {})
+              }
+            />
+          </>
+        )}
 
         <Text style={s.section}>POUR TOI</Text>
 
