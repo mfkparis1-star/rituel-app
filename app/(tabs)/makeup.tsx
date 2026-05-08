@@ -403,27 +403,6 @@ export default function MakeupScreen() {
           />
         )}
 
-        <PremiumCard variant="cream" style={s.suggestionCard}>
-          <Text style={s.suggestionLabel}>SUGGESTION DU JOUR</Text>
-          <Text style={s.suggestionTitle}>Soft glow pour la soirée</Text>
-          <Text style={s.suggestionSub}>
-            Un look lumineux et naturel pensé pour mettre ton teint en valeur,
-            avec ce que tu as déjà dans ta routine.
-          </Text>
-          <PillButton
-            label="Voir le look"
-            variant="ghost"
-            size="sm"
-            onPress={() =>
-              Alert.alert(
-                'Bientôt disponible',
-                'La suggestion du jour personnalisée arrive très bientôt.'
-              )
-            }
-            style={{ marginTop: Sp.sm }}
-          />
-        </PremiumCard>
-
         <Text style={s.sectionTitle}>Comment ça marche</Text>
 
         {FEATURES.map((f, i) => (
@@ -489,28 +468,6 @@ const s = StyleSheet.create({
   },
   occasionLabelActive: {
     color: C.white,
-  },
-  suggestionCard: {
-    marginBottom: Sp.xl,
-  },
-  suggestionLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: C.copper,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    marginBottom: Sp.xs,
-  },
-  suggestionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: C.text,
-    marginBottom: 4,
-  },
-  suggestionSub: {
-    fontSize: 13,
-    color: C.textMid,
-    lineHeight: 19,
   },
   featureRow: {
     flexDirection: 'row',
