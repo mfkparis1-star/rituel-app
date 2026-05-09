@@ -131,16 +131,7 @@ export default function AddProductScreen() {
       return;
     }
 
-    Alert.alert(
-      'Produit ajouté',
-      `${brand.trim()} — ${name.trim()} a été ajouté à votre archive.`,
-      [
-        {
-          text: 'OK',
-          onPress: () => safeBack('/(tabs)/archive'),
-        },
-      ]
-    );
+    safeBack('/(tabs)/archive');
   };
 
   // Don't render until auth is checked (avoids flash)
