@@ -43,3 +43,7 @@ app.json.bak
 .env
 .env.local
 *.bak
+
+# supabase local artifacts (CLI cache, generated types, link state)
+supabase/.temp/
+supabase/.branches/
