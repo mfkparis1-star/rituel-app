@@ -145,6 +145,10 @@ The following are deferred to Phase 16+ and are NOT blockers for this submit. Do
 - Privacy contact email rituel.app vs rituel.beauty consistency
 - Privacy article 9 "16+" age check vs App Store rating consistency
 - Product edit UI in Archive (currently Create / Read / Delete only; Update deferred — no detail route, no edit form, no update handler exists today)
+- AI generation persistence layer (HIGH priority for Phase 16B): all AI outputs (Makeup AI, Makeup Looks, Routine Optimize, Skin Analysis) are currently held in component state only. If the user backgrounds the app, kills it, switches tabs, or navigates away, the generated result is lost. Users perceive AI outputs as paid digital content (credits spent, 5-15 second generation, personal inputs used), so this feels like "I paid and it disappeared." Not an App Store blocker but a monetization/trust/retention issue.
+  - Phase 16B.1 (launch-safe, AsyncStorage): cache last generation per AI type, restore on mount, show "Reprendre votre dernier résultat" entry point, "Recommencer" clears cache
+  - Phase 16B.2 (real architecture): supabase ai_generations table { id, type, created_at, payload, preview, credit_cost }, generation history screen "Mes Looks IA", cross-device restore, retention analytics
+  - design principle: AI outputs are user-owned generated content, not ephemeral state
 
 ---
 
