@@ -196,7 +196,10 @@ export default function ArchiveScreen() {
                   </Pressable>
                 )}
               >
-                <View style={s.productRow}>
+                <Pressable
+                  onPress={() => router.push(`/product/${p.id}` as any)}
+                  style={s.productRow}
+                >
                   <View style={s.productLeft}>
                     <Text style={s.productBrand}>{p.brand}</Text>
                     <Text style={s.productName} numberOfLines={1}>
@@ -204,7 +207,7 @@ export default function ArchiveScreen() {
                     </Text>
                   </View>
                   <View style={[s.statusDot, p.status === 'active' && s.statusActive, p.status === 'finished' && s.statusFinished]} />
-                </View>
+                </Pressable>
               </ReanimatedSwipeable>
             ))}
             <PillButton
