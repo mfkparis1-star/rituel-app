@@ -49,12 +49,12 @@ function todaySuggestion(latest: CheckinEmoji | null): string {
     case 'neutral': return 'Ajoute un sérum apaisant ce soir.';
     case 'tired':   return 'Allège : nettoyant doux + crème riche, pas d’actifs ce soir.';
     case 'rough':   return 'Pause des actifs. Crème barrière + masque hydratant.';
-    default:        return 'Fais ton check-in pour recevoir une suggestion personnalisée.';
+    default:        return 'Un check-in de 10 secondes suffit pour ajuster tes conseils du jour.';
   }
 }
 
 function weekSummary(emojis: CheckinEmoji[]): string {
-  if (emojis.length === 0) return 'Pas encore de check-in cette semaine.';
+  if (emojis.length === 0) return '';
   const counts: Record<string, number> = {};
   emojis.forEach((e) => { counts[e] = (counts[e] ?? 0) + 1; });
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
@@ -106,7 +106,7 @@ export default function IndexScreen() {
           >
             <Text style={s.checkinLabel}>CHECK-IN DU JOUR</Text>
             <Text style={s.checkinTitle}>Comment va ta peau aujourd’hui ?</Text>
-            <Text style={s.checkinSub}>10 secondes pour ajuster tes recommandations.</Text>
+            <Text style={s.checkinSub}>10 secondes pour ajuster ton rituel du jour.</Text>
           </Pressable>
         )}
 
@@ -119,7 +119,7 @@ export default function IndexScreen() {
               <Text style={s.blockTitle}>
                 {latestCheckin
                   ? CHECKIN_EMOJIS.find((e) => e.id === latestCheckin)?.label_fr
-                  : 'En attente'}
+                  : 'Ta peau attend son rituel'}
               </Text>
               <Text style={s.blockSub}>{todaySuggestion(latestCheckin)}</Text>
             </View>
@@ -128,14 +128,23 @@ export default function IndexScreen() {
 
         {/* Cette semaine block */}
         <Text style={s.sectionTitle}>Cette semaine</Text>
-        <PremiumCard variant="espresso" style={s.block}>
-          <Text style={s.weekTxt}>{weekSummary(weekEmojis)}</Text>
-          {weekEmojis.length > 0 && (
-            <View style={s.weekRow}>
-              {weekEmojis.slice(0, 7).map((e, i) => (
-                <Text key={i} style={s.weekEmoji}>{emojiSymbol(e)}</Text>
-              ))}
-            </View>
+        <PremiumCard variant="espresso" style={s.blockWeek}>
+          {weekEmojis.length === 0 ? (
+            <>
+              <Text style={s.weekTitle}>Ton rythme commence ici</Text>
+              <Text style={s.weekSub}>
+                Fais ton premier check-in pour construire ton suivi beauté de la semaine.
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={s.weekTxt}>{weekSummary(weekEmojis)}</Text>
+              <View style={s.weekRow}>
+                {weekEmojis.slice(0, 7).map((e, i) => (
+                  <Text key={i} style={s.weekEmoji}>{emojiSymbol(e)}</Text>
+                ))}
+              </View>
+            </>
           )}
         </PremiumCard>
 
@@ -159,9 +168,9 @@ export default function IndexScreen() {
             </>
           ) : (
             <>
-              <Text style={s.blockTitle}>Pas encore d’analyse</Text>
+              <Text style={s.blockTitle}>Rituel apprend à te connaître</Text>
               <Text style={s.blockSub}>
-                Lance ta première analyse IA pour personnaliser ton rituel.
+                Lance ta première analyse pour adapter tes conseils à ta peau, ton rythme et tes produits.
               </Text>
               <PillButton
                 label="Analyser ma peau"
@@ -189,7 +198,7 @@ export default function IndexScreen() {
         {/* Pour toi — affiliate recommendations */}
         {recommendations.length > 0 && (
           <>
-            <Text style={s.sectionTitle}>Pour toi</Text>
+            <Text style={s.sectionTitle}>Sélectionné pour toi</Text>
             {recommendations.map((p) => (
               <AffiliateProductCard key={p.id} product={p} />
             ))}
@@ -286,5 +295,18 @@ const s = StyleSheet.create({
     fontSize: 15,
     color: C.espresso,
     textTransform: 'capitalize',
+  },
+  blockWeek: { marginBottom: Sp.md, paddingHorizontal: Sp.lg, paddingVertical: Sp.md },
+  weekTitle: {
+    fontSize: 16,
+    color: C.cream,
+    fontWeight: '500',
+    marginBottom: 6,
+  },
+  weekSub: {
+    fontSize: 13,
+    color: C.cream,
+    opacity: 0.75,
+    lineHeight: 18,
   },
 });
