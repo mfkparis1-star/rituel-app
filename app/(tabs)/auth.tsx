@@ -334,6 +334,26 @@ export default function AuthScreen() {
               style={{ marginTop: Sp.md }}
             />
 
+            {mode === 'signup' && (
+              <Text style={s.legalNote}>
+                En vous inscrivant, vous acceptez nos{' '}
+                <Text
+                  style={s.legalLink}
+                  onPress={() => Linking.openURL('https://rituel.beauty/terms').catch(() => {})}
+                >
+                  Conditions générales
+                </Text>
+                {' '}et notre{' '}
+                <Text
+                  style={s.legalLink}
+                  onPress={() => Linking.openURL('https://rituel.beauty/privacy').catch(() => {})}
+                >
+                  Politique de confidentialité
+                </Text>
+                .
+              </Text>
+            )}
+
             {mode === 'signin' && (
               <Pressable onPress={handleResetPassword} disabled={submitting} style={s.forgotBtn}>
                 <Text style={s.forgotTxt}>Mot de passe oublié ?</Text>
@@ -543,6 +563,18 @@ const s = StyleSheet.create({
   },
   forgotTxt: {
     fontSize: 12, color: C.copper, fontWeight: '500',
+  },
+  legalNote: {
+    marginTop: Sp.md,
+    fontSize: 12,
+    lineHeight: 18,
+    color: C.textMid,
+    textAlign: 'center',
+    paddingHorizontal: Sp.sm,
+  },
+  legalLink: {
+    color: C.copper,
+    textDecorationLine: 'underline',
   },
 
   switchRow: {
