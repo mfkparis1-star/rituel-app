@@ -188,6 +188,62 @@ export default function AuthScreen() {
     );
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Supprimer mon compte',
+      'Cette action est définitive. Toutes tes données — produits, routines, analyses, achats — seront supprimées.\n\nTon abonnement Apple, s\'il existe, continue d\'être facturé jusqu\'à la prochaine date de renouvellement. Tu peux l\'annuler depuis Réglages > Apple ID > Abonnements.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Continuer',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Confirmer la suppression',
+              'Es-tu absolument sûr ? Cette action ne peut pas être annulée.',
+              [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                  text: 'Supprimer définitivement',
+                  style: 'destructive',
+                  onPress: async () => {
+                    setSubmitting(true);
+                    try {
+                      const { error: fnErr } = await supabase.functions.invoke('delete-user', {
+                        method: 'POST',
+                      });
+                      if (fnErr) {
+                        Alert.alert(
+                          'Suppression impossible',
+                          'Une erreur est survenue. Réessaye dans un instant ou contacte-nous.'
+                        );
+                        return;
+                      }
+                      await supabase.auth.signOut();
+                      setMode('signin');
+                      Alert.alert(
+                        'Compte supprimé',
+                        'Toutes tes données ont été supprimées. Merci d\'avoir essayé Rituel.'
+                      );
+                    } catch {
+                      Alert.alert(
+                        'Suppression impossible',
+                        'Une erreur est survenue. Réessaye dans un instant.'
+                      );
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
+
   // ----- Loading splash -----
   if (loading) {
     return (
@@ -423,6 +479,11 @@ export default function AuthScreen() {
           title="Se déconnecter"
           subtitle="Quitter cette session"
           onPress={handleSignOut}
+        />
+        <ListRow
+          title="Supprimer mon compte"
+          subtitle="Action définitive — toutes tes données seront effacées"
+          onPress={handleDeleteAccount}
         />
 
         <CreditPackModal
