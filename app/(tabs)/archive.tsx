@@ -2,8 +2,8 @@ import { type Session } from '@supabase/supabase-js';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
@@ -20,15 +20,6 @@ type Product = {
   status: 'active' | 'finished' | 'stocked';
   category?: string;
 };
-
-function CloseIcon({ color }: { color: string }) {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M18 6L6 18" />
-      <Path d="M6 6l12 12" />
-    </Svg>
-  );
-}
 
 export default function ArchiveScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -191,18 +182,30 @@ export default function ArchiveScreen() {
         ) : (
           <View style={s.list}>
             {filtered.map((p) => (
-              <View key={p.id} style={s.productRow}>
-                <View style={s.productLeft}>
-                  <Text style={s.productBrand}>{p.brand}</Text>
-                  <Text style={s.productName} numberOfLines={1}>
-                    {p.name}
-                  </Text>
+              <ReanimatedSwipeable
+                key={p.id}
+                friction={2}
+                rightThreshold={40}
+                overshootRight={false}
+                renderRightActions={() => (
+                  <Pressable
+                    onPress={() => handleDelete(p.id, p.name)}
+                    style={s.swipeDeleteAction}
+                  >
+                    <Text style={s.swipeDeleteText}>Supprimer</Text>
+                  </Pressable>
+                )}
+              >
+                <View style={s.productRow}>
+                  <View style={s.productLeft}>
+                    <Text style={s.productBrand}>{p.brand}</Text>
+                    <Text style={s.productName} numberOfLines={1}>
+                      {p.name}
+                    </Text>
+                  </View>
+                  <View style={[s.statusDot, p.status === 'active' && s.statusActive, p.status === 'finished' && s.statusFinished]} />
                 </View>
-                <View style={[s.statusDot, p.status === 'active' && s.statusActive, p.status === 'finished' && s.statusFinished]} />
-                <Pressable onPress={() => handleDelete(p.id, p.name)} style={s.deleteBtn} hitSlop={8}>
-                  <CloseIcon color={C.textSoft} />
-                </Pressable>
-              </View>
+              </ReanimatedSwipeable>
             ))}
             <PillButton
               label="+ Ajouter un produit"
@@ -257,6 +260,19 @@ const s = StyleSheet.create({
     padding: Sp.md,
     marginBottom: Sp.xs,
   },
+  swipeDeleteAction: {
+    backgroundColor: C.red,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: Sp.lg,
+    marginVertical: 4,
+    borderRadius: R.md,
+  },
+  swipeDeleteText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
   productLeft: { flex: 1 },
   productBrand: {
     fontSize: 10,
@@ -276,11 +292,4 @@ const s = StyleSheet.create({
   },
   statusActive: { backgroundColor: C.green },
   statusFinished: { backgroundColor: C.textSoft },
-  deleteBtn: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: Sp.sm,
-  },
 });
