@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -16,6 +16,7 @@ import {
   MakeupResult,
   OccasionId,
 } from '../../utils/makeupAI';
+import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Step = 'pick_occasion' | 'selfie' | 'generating' | 'result' | 'error';
@@ -62,6 +63,20 @@ export default function MakeupScreen() {
   const [unlocked, setUnlocked] = useState(false);
   const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('makeup_full');
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const cached = await loadAICache<{ result: MakeupResult; resultId: string; occasion: OccasionId }>('makeup');
+      if (!cancelled && cached?.result && cached?.resultId) {
+        setResult(cached.result);
+        setResultId(cached.resultId);
+        if (cached.occasion) setOccasion(cached.occasion);
+        setStep('result');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const openCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -130,6 +145,7 @@ export default function MakeupScreen() {
       setResult(r);
       const newResultId = `makeup_${Date.now()}`;
       setResultId(newResultId);
+      saveAICache('makeup', { result: r, resultId: newResultId, occasion });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
@@ -147,6 +163,7 @@ export default function MakeupScreen() {
     setErrorMsg('');
      setUnlocked(false);
     setResultId(null);
+    clearAICache('makeup');
   };
 
   const handleHeroCta = () => {

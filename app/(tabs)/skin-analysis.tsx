@@ -10,6 +10,7 @@ import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
+import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Step = 'intro' | 'analyzing' | 'result' | 'error';
@@ -49,6 +50,19 @@ export default function SkinAnalysisScreen() {
   const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('skin_analysis');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const cached = await loadAICache<{ result: SkinResult; resultId: string }>('skin');
+      if (!cancelled && cached?.result && cached?.resultId) {
+        setResult(cached.result);
+        setResultId(cached.resultId);
+        setStep('result');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const spinAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -128,6 +142,7 @@ export default function SkinAnalysisScreen() {
       });
       const newResultId = `skin_${Date.now()}`;
       setResultId(newResultId);
+      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence }, resultId: newResultId });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
@@ -144,6 +159,7 @@ export default function SkinAnalysisScreen() {
     setErrorMsg('');
     setUnlocked(false);
     setResultId(null);
+    clearAICache('skin');
   };
 
   const spin = spinAnim.interpolate({

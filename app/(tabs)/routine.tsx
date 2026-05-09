@@ -9,6 +9,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { optimizeRoutine, RoutineOptimizeResult } from '../../utils/routineAI';
+import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import CreditPackModal from '../../components/credits/CreditPackModal';
@@ -66,6 +67,17 @@ export default function RoutineScreen() {
   const [optimizing, setOptimizing] = useState(false);
   const [optimizeResult, setOptimizeResult] = useState<RoutineOptimizeResult | null>(null);
   const [optimizeError, setOptimizeError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const cached = await loadAICache<{ result: RoutineOptimizeResult }>('routine');
+      if (!cancelled && cached?.result) {
+        setOptimizeResult(cached.result);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // ----- Session bootstrap -----
   useEffect(() => {
@@ -189,7 +201,8 @@ export default function RoutineScreen() {
       }
     }
     setOptimizeModalOpen(true);
-    setOptimizing(true);
+    clearAICache('routine');
+      setOptimizing(true);
     setOptimizeError('');
     setOptimizeResult(null);
 
@@ -213,6 +226,7 @@ export default function RoutineScreen() {
 
       const r = await optimizeRoutine(stepsForAI, skinType, 'fr');
       setOptimizeResult(r);
+      saveAICache('routine', { result: r });
     } catch (e: any) {
       setOptimizeError(e?.message || 'Une erreur est survenue. Réessayez.');
     } finally {
