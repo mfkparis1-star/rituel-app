@@ -5,6 +5,8 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import HeroCard from '../../components/ui/HeroCard';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
+import { useEffect, useState } from 'react';
+import { getRecentAcrossTypes, AnyCacheEntry } from '../../utils/aiCache';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 function MakeupIcon({ color }: { color: string }) {
@@ -71,6 +73,33 @@ const TOOLS: ToolCard[] = [
 ];
 
 export default function AIStudioScreen() {
+  const [recent, setRecent] = useState<AnyCacheEntry[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const items = await getRecentAcrossTypes(3);
+      if (!cancelled) setRecent(items);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const typeLabel = (t: 'makeup' | 'routine' | 'skin') =>
+    t === 'makeup' ? 'Maquillage' : t === 'routine' ? 'Routine' : 'Analyse de peau';
+
+  const typeRoute = (t: 'makeup' | 'routine' | 'skin') =>
+    t === 'makeup' ? '/(tabs)/makeup' : t === 'routine' ? '/(tabs)/routine' : '/(tabs)/skin-analysis';
+
+  const formatRelative = (savedAt: number) => {
+    const mins = Math.floor((Date.now() - savedAt) / 60000);
+    if (mins < 1) return "à l'instant";
+    if (mins < 60) return `il y a ${mins} min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `il y a ${hours} h`;
+    const days = Math.floor(hours / 24);
+    return `il y a ${days} j`;
+  };
+
   return (
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -91,6 +120,25 @@ export default function AIStudioScreen() {
         />
 
         <View style={s.grid}>
+        {recent.length > 0 && (
+          <>
+            <Text style={s.sectionTitleHistory}>Mes derniers résultats</Text>
+            {recent.map((entry, i) => (
+              <Pressable
+                key={`${entry.type}-${entry.savedAt}-${i}`}
+                onPress={() => router.push(typeRoute(entry.type) as any)}
+                style={s.recentRow}
+              >
+                <View style={s.recentLeft}>
+                  <Text style={s.recentType}>{typeLabel(entry.type)}</Text>
+                  <Text style={s.recentTime}>{formatRelative(entry.savedAt)}</Text>
+                </View>
+                <Text style={s.recentArrow}>→</Text>
+              </Pressable>
+            ))}
+            <View style={{ height: Sp.md }} />
+          </>
+        )}
           {TOOLS.map((tool) => {
             const Icon = tool.Icon;
             return (
@@ -212,5 +260,37 @@ const s = StyleSheet.create({
     fontSize: 13,
     color: 'rgba(255,255,255,0.78)',
     lineHeight: 19,
+  },
+  sectionTitleHistory: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: C.text,
+    marginBottom: Sp.sm,
+    marginTop: Sp.lg,
+    letterSpacing: 0.3,
+  },
+  recentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: C.bg2,
+    paddingVertical: Sp.md,
+    paddingHorizontal: Sp.md,
+    borderRadius: R.md,
+    marginBottom: Sp.xs,
+  },
+  recentLeft: { flex: 1 },
+  recentType: {
+    fontSize: 14,
+    color: C.espresso,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  recentTime: {
+    fontSize: 11,
+    color: C.textMid,
+  },
+  recentArrow: {
+    fontSize: 18,
+    color: C.copper,
   },
 });
