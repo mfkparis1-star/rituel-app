@@ -65,16 +65,18 @@ Expected: `HTTP/2 401` (gateway rejects missing auth header). A 404 means the fu
 
 These cannot be automated. Run all four flows on a real device and confirm each step. Test against the production Supabase project (no separate staging).
 
-### 3.1 Archive CRUD
+### 3.1 Archive CRUD (scope: Create / Read / Delete)
+
+Note: Update is intentionally not implemented in Phase 16A. The archive currently exposes Create, Read, and Delete only. Tapping a product card does not open a detail/edit screen. See Section 5 for the deferral rationale.
 
 1. Sign in with a test account
 2. Add a product via manual form (name, brand, category)
-3. Open the product, edit one field, save
-4. Pull-to-refresh on archive screen
-5. Tap the X on a product, confirm deletion in Alert
-6. Verify the product disappears from the list
+3. Pull-to-refresh on archive screen — product remains visible
+4. Tap the X on a product, confirm deletion in Alert
+5. Verify the product disappears from the list
+6. Switch to another tab, return to Archive — deleted product does not reappear
 
-Pass criteria: each step works without crash; the deleted product does not reappear after a pull-to-refresh or app restart.
+Pass criteria: every step works without crash; the deleted product does not reappear after a pull-to-refresh or app restart. Update step is N/A in this phase.
 
 ### 3.2 Makeup AI full flow
 
@@ -142,6 +144,7 @@ The following are deferred to Phase 16+ and are NOT blockers for this submit. Do
 - Edge Function admin API hardening
 - Privacy contact email rituel.app vs rituel.beauty consistency
 - Privacy article 9 "16+" age check vs App Store rating consistency
+- Product edit UI in Archive (currently Create / Read / Delete only; Update deferred — no detail route, no edit form, no update handler exists today)
 
 ---
 
