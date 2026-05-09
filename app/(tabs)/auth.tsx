@@ -1,10 +1,9 @@
 import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { pickAvatarFromLibrary, uploadAvatar } from '../../utils/avatar';
 import { useProfile } from '../../hooks/useProfile';
-import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
@@ -400,7 +399,21 @@ export default function AuthScreen() {
     const pick = await pickAvatarFromLibrary();
     if (!pick.ok) {
       if (pick.reason === 'no_permission') {
-        Alert.alert('Accès photos refusé', 'Active l’accès à tes photos dans Réglages pour ajouter une photo de profil.');
+        Alert.alert(
+          'Accès aux photos refusé',
+          'Active l’accès aux photos dans Réglages pour ajouter une photo de profil.',
+          [
+            { text: 'Annuler', style: 'cancel' },
+            {
+              text: 'Ouvrir Réglages',
+              onPress: () => {
+                Linking.openSettings().catch(() => {
+                  // graceful no-op if openSettings fails on this device
+                });
+              },
+            },
+          ]
+        );
       }
       return;
     }
