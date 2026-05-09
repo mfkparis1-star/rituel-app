@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Svg, { Path } from 'react-native-svg';
 import EmptyState from '../../components/ui/EmptyState';
 import PillButton from '../../components/ui/PillButton';
@@ -269,7 +270,21 @@ export default function RoutineScreen() {
         ) : (
           <View style={s.list}>
             {steps.map((step, i) => (
-              <View key={step.id} style={[s.stepCard, Sh.soft]}>
+              <ReanimatedSwipeable
+                key={step.id}
+                friction={2}
+                rightThreshold={40}
+                overshootRight={false}
+                renderRightActions={() => (
+                  <Pressable
+                    onPress={() => handleDelete(step.id, step.product_name)}
+                    style={s.swipeDeleteAction}
+                  >
+                    <Text style={s.swipeDeleteText}>Supprimer</Text>
+                  </Pressable>
+                )}
+              >
+              <View style={[s.stepCard, Sh.soft]}>
                 <View style={s.stepNumber}>
                   <Text style={s.stepNumberTxt}>{i + 1}</Text>
                 </View>
@@ -278,10 +293,8 @@ export default function RoutineScreen() {
                   <Text style={s.stepProduct}>{step.product_name}</Text>
                   <Text style={s.stepTime}>{step.duration}</Text>
                 </View>
-                <Pressable onPress={() => handleDelete(step.id, step.product_name)} style={s.deleteBtn} hitSlop={8}>
-                  <CloseIcon color={C.textSoft} />
-                </Pressable>
               </View>
+              </ReanimatedSwipeable>
             ))}
             <PillButton
               label="Optimiser avec l'IA"
@@ -615,5 +628,18 @@ const s = StyleSheet.create({
     lineHeight: 17,
     marginTop: Sp.md,
     paddingHorizontal: Sp.md,
+  },
+  swipeDeleteAction: {
+    backgroundColor: C.red,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: Sp.lg,
+    marginVertical: 4,
+    borderRadius: R.md,
+  },
+  swipeDeleteText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
