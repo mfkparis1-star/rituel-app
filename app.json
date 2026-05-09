@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rituel",
     "slug": "rituel",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rituel",
@@ -17,7 +17,11 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.mfkparis.rituel",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryAddUsageDescription": "Rituel peut sauvegarder vos photos et r\u00e9sultats d'analyse dans votre biblioth\u00e8que."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
