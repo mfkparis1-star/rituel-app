@@ -1,6 +1,9 @@
 import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { Image } from 'react-native';
+import { pickAvatarFromLibrary, uploadAvatar } from '../../utils/avatar';
+import { useProfile } from '../../hooks/useProfile';
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
@@ -25,6 +28,10 @@ export default function AuthScreen() {
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const { count: routineCount } = useRoutineCount();
   const { isPremium, customerInfo, restore } = usePremium();
+  const { profile, update: updateProfile } = useProfile();
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [draftName, setDraftName] = useState('');
 
   const premiumExpiryISO = customerInfo?.entitlements?.active?.['Rituel Pro']?.expirationDate ?? null;
   const premiumExpiryFR = formatDateFR(premiumExpiryISO);
@@ -388,6 +395,45 @@ export default function AuthScreen() {
     (session?.user?.user_metadata as any)?.display_name ||
     userEmail.split('@')[0] ||
     'Utilisateur';
+  const handleAvatarTap = async () => {
+    if (uploadingAvatar || !session) return;
+    const pick = await pickAvatarFromLibrary();
+    if (!pick.ok) {
+      if (pick.reason === 'no_permission') {
+        Alert.alert('Accès photos refusé', 'Active l’accès à tes photos dans Réglages pour ajouter une photo de profil.');
+      }
+      return;
+    }
+    setUploadingAvatar(true);
+    const url = await uploadAvatar(session.user.id, pick.uri);
+    if (!url) {
+      setUploadingAvatar(false);
+      Alert.alert('Erreur', 'Téléchargement impossible. Réessaye dans un instant.');
+      return;
+    }
+    await updateProfile({ avatar_url: url });
+    setUploadingAvatar(false);
+  };
+
+  const handleStartEditName = () => {
+    setDraftName(profile?.full_name ?? displayName ?? '');
+    setEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmed = draftName.trim();
+    if (!trimmed) {
+      setEditingName(false);
+      return;
+    }
+    const ok = await updateProfile({ full_name: trimmed });
+    if (!ok) {
+      Alert.alert('Erreur', 'Mise à jour impossible.');
+      return;
+    }
+    setEditingName(false);
+  };
+
   const avatarLetter = (displayName[0] || 'U').toUpperCase();
 
   const profileStats = {
@@ -400,11 +446,58 @@ export default function AuthScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={[s.profileCard, Sh.soft]}>
-          <View style={s.avatar}>
-            <Text style={s.avatarLetter}>{avatarLetter}</Text>
-          </View>
-          <Text style={s.profileName}>{displayName}</Text>
+          <Pressable
+            onPress={handleAvatarTap}
+            disabled={uploadingAvatar}
+            style={s.avatarRing}
+          >
+            {profile?.avatar_url ? (
+              <Image source={{ uri: profile.avatar_url }} style={s.avatarImg} />
+            ) : (
+              <View style={s.avatar}>
+                <Text style={s.avatarLetter}>{avatarLetter}</Text>
+              </View>
+            )}
+            {uploadingAvatar && (
+              <View style={s.avatarOverlay}>
+                <Text style={s.avatarOverlayTxt}>…</Text>
+              </View>
+            )}
+          </Pressable>
+
+          {editingName ? (
+            <View style={s.nameEditRow}>
+              <TextInput
+                value={draftName}
+                onChangeText={setDraftName}
+                placeholder="Ton prénom"
+                placeholderTextColor={C.textSoft}
+                style={s.nameInput}
+                autoFocus
+                onSubmitEditing={handleSaveName}
+                returnKeyType="done"
+                maxLength={40}
+              />
+              <Pressable onPress={handleSaveName} hitSlop={8}>
+                <Text style={s.nameSaveTxt}>OK</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable onPress={handleStartEditName} hitSlop={8}>
+              <Text style={s.profileName}>
+                {profile?.full_name || displayName}
+              </Text>
+            </Pressable>
+          )}
           <Text style={s.profileEmail}>{userEmail}</Text>
+          {isPremium && (
+            <View style={s.premiumBadge}>
+              <Text style={s.premiumBadgeTxt}>RITUEL PRO</Text>
+            </View>
+          )}
+          {profile?.skin_type && (
+            <Text style={s.skinTypeTxt}>Peau {profile.skin_type}</Text>
+          )}
         </View>
 
         <View style={s.statsRow}>
@@ -640,5 +733,74 @@ const s = StyleSheet.create({
   },
   recoSub: {
     fontSize: 13, color: C.textMid, lineHeight: 19,
+  },
+  avatarRing: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 2,
+    borderColor: C.copper,
+    padding: 3,
+    marginBottom: Sp.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: C.cream,
+  },
+  avatarImg: {
+    width: 86,
+    height: 86,
+    borderRadius: 43,
+  },
+  avatarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  avatarOverlayTxt: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '600',
+  },
+  nameEditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Sp.sm,
+    marginBottom: 4,
+  },
+  nameInput: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: C.text,
+    borderBottomWidth: 1,
+    borderBottomColor: C.copper,
+    paddingVertical: 4,
+    minWidth: 160,
+    textAlign: 'center',
+  },
+  nameSaveTxt: {
+    fontSize: 14,
+    color: C.copper,
+    fontWeight: '600',
+  },
+  premiumBadge: {
+    backgroundColor: C.copper,
+    paddingHorizontal: Sp.md,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginTop: Sp.xs,
+  },
+  premiumBadgeTxt: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+  },
+  skinTypeTxt: {
+    fontSize: 12,
+    color: C.textMid,
+    marginTop: Sp.xs,
+    textTransform: 'capitalize',
   },
 });
