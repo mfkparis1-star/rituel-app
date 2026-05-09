@@ -24,13 +24,41 @@ export default function AuthScreen() {
   const [creditModalOpen, setCreditModalOpen] = useState(false);
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const { count: routineCount } = useRoutineCount();
-  const { isPremium, customerInfo } = usePremium();
+  const { isPremium, customerInfo, restore } = usePremium();
 
   const premiumExpiryISO = customerInfo?.entitlements?.active?.['Rituel Pro']?.expirationDate ?? null;
   const premiumExpiryFR = formatDateFR(premiumExpiryISO);
   const premiumSubtitle = premiumExpiryFR
     ? `Actif jusqu’au ${premiumExpiryFR}`
     : 'Abonnement actif';
+
+  const [restoring, setRestoring] = useState(false);
+
+  const handleRestore = async () => {
+    if (restoring) return;
+    setRestoring(true);
+    try {
+      const ok = await restore();
+      if (ok) {
+        Alert.alert(
+          'Achats restaurés',
+          'Ton abonnement Rituel Pro est actif.'
+        );
+      } else {
+        Alert.alert(
+          'Aucun achat trouvé',
+          "Nous n'avons pas trouvé d'achat actif lié à ton compte."
+        );
+      }
+    } catch {
+      Alert.alert(
+        'Restauration impossible',
+        'Une erreur est survenue. Réessaye plus tard.'
+      );
+    } finally {
+      setRestoring(false);
+    }
+  };
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -332,21 +360,28 @@ export default function AuthScreen() {
         />
 
         {!isPremium && (
-          <PremiumCard variant="espresso" style={s.premium}>
-            <Text style={s.premiumLabel}>PREMIUM</Text>
-            <Text style={s.premiumTitle}>Active toute la puissance IA</Text>
-            <Text style={s.premiumSub}>
-              Analyses complètes, routines IA, crédits et recommandations premium.
-            </Text>
-            <PillButton
-              label="Découvrir Premium"
-              variant="primary"
-              size="md"
-              onPress={() => router.push('/paywall' as any)}
-              textColor={C.espresso}
-              style={{ marginTop: Sp.md, backgroundColor: C.white }}
+          <>
+            <PremiumCard variant="espresso" style={s.premium}>
+              <Text style={s.premiumLabel}>PREMIUM</Text>
+              <Text style={s.premiumTitle}>Active toute la puissance IA</Text>
+              <Text style={s.premiumSub}>
+                Analyses complètes, routines IA, crédits et recommandations premium.
+              </Text>
+              <PillButton
+                label="Découvrir Premium"
+                variant="primary"
+                size="md"
+                onPress={() => router.push('/paywall' as any)}
+                textColor={C.espresso}
+                style={{ marginTop: Sp.md, backgroundColor: C.white }}
+              />
+            </PremiumCard>
+            <ListRow
+              title="Restaurer mes achats"
+              subtitle={restoring ? 'Restauration en cours...' : 'Tu as déjà acheté Rituel Pro ?'}
+              onPress={handleRestore}
             />
-          </PremiumCard>
+          </>
         )}
 
         {isPremium && (
