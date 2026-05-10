@@ -116,6 +116,17 @@ export async function fetchOwnPosts(userId: string, limit = 30): Promise<FeedPos
   return data as FeedPost[];
 }
 
+
+export async function updatePostCaption(postId: string, caption: string): Promise<boolean> {
+  const trimmed = caption.trim();
+  if (trimmed.length < 4 || trimmed.length > 280) return false;
+  const { error } = await supabase
+    .from('posts')
+    .update({ caption: trimmed })
+    .eq('id', postId);
+  return !error;
+}
+
 export async function deletePost(postId: string): Promise<boolean> {
   const { error } = await supabase.from('posts').delete().eq('id', postId);
   return !error;

@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { router, useFocusEffect } from 'expo-router';
 import { Image } from 'react-native';
 import { type Session } from '@supabase/supabase-js';
-import { fetchFeed, FeedPost } from '../../utils/posts';
+import { fetchFeed, FeedPost, updatePostCaption, deletePost } from '../../utils/posts';
 import { getLikedSet, toggleLike, bumpLikesCount } from '../../utils/postLikes';
 import { getSavedSet, toggleSave } from '../../utils/postSaves';
 import { useProfile } from '../../hooks/useProfile';
@@ -204,6 +204,72 @@ export default function CommunityScreen() {
     );
   };
 
+  const handleEditCaption = (post: Post) => {
+    Alert.prompt(
+      'Modifier la légende',
+      undefined,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Enregistrer',
+          onPress: async (text?: string) => {
+            const next = (text ?? '').trim();
+            if (next.length < 4 || next.length > 280) {
+              Alert.alert('Légende invalide', 'La légende doit faire entre 4 et 280 caractères.');
+              return;
+            }
+            // Optimistic update
+            setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: next } : p)));
+            const ok = await updatePostCaption(post.id, next);
+            if (!ok) {
+              // Revert
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: post.caption } : p)));
+              Alert.alert('Erreur', 'Modification impossible. Réessaye dans un instant.');
+            }
+          },
+        },
+      ],
+      'plain-text',
+      post.caption ?? ''
+    );
+  };
+
+  const handleDeletePost = (post: Post) => {
+    Alert.alert(
+      'Supprimer cette publication ?',
+      'Elle disparaîtra de la communauté.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            // Optimistic removal
+            setPosts((prev) => prev.filter((p) => p.id !== post.id));
+            const ok = await deletePost(post.id);
+            if (!ok) {
+              // Refetch to restore
+              await loadFeed(true);
+              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleMenuPress = (post: Post) => {
+    Alert.alert(
+      'Publication',
+      undefined,
+      [
+        { text: 'Modifier la légende', onPress: () => handleEditCaption(post) },
+        { text: 'Supprimer', style: 'destructive', onPress: () => handleDeletePost(post) },
+        { text: 'Annuler', style: 'cancel' },
+      ]
+    );
+  };
+
 
   const handleTranslate = async (post: Post) => {
     if (translated[post.id]) {
@@ -312,6 +378,8 @@ export default function CommunityScreen() {
               isSaved={savedIds.has(post.id)}
               onSavePress={() => handleSave(post.id)}
               onAuthorPress={() => handleAuthorPress(post)}
+              isOwn={session?.user.id === post.user_id}
+              onMenuPress={() => handleMenuPress(post)}
                 key={post.id}
                 post={post}
                 translatedCaption={translated[post.id]}
@@ -343,12 +411,14 @@ type PostCardProps = {
   isSaved?: boolean;
   onSavePress?: () => void;
   onAuthorPress?: () => void;
+  isOwn?: boolean;
+  onMenuPress?: () => void;
   translatedCaption?: string;
   isTranslating: boolean;
   onTranslatePress: () => void;
 };
 
-function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress, onAuthorPress }: PostCardProps) {
+function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress, onAuthorPress, isOwn, onMenuPress }: PostCardProps) {
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = SKIN_LABEL[skinType];
   const username = displayName(post);
@@ -370,7 +440,15 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
           </Text>
         </View>
         <View style={s.postUserBox}>
-          <Pressable onPress={onAuthorPress} hitSlop={6}><Text style={s.postUsername}>{username}</Text></Pressable>
+          <View style={menuS.headerRow}>
+            <Pressable onPress={onAuthorPress} hitSlop={6}><Text style={s.postUsername}>{username}</Text></Pressable>
+            <View style={{ flex: 1 }} />
+            {isOwn && (
+              <Pressable onPress={onMenuPress} hitSlop={10} style={menuS.menuBtn}>
+                <Text style={menuS.menuDots}>···</Text>
+              </Pressable>
+            )}
+          </View>
           {meta ? <Text style={s.postMeta}>{meta}</Text> : null}
         </View>
         <View style={s.skinBadge}>
@@ -681,5 +759,25 @@ const discoS = StyleSheet.create({
     marginBottom: Sp.md,
     fontStyle: 'italic',
     lineHeight: 17,
+  },
+});
+
+
+const menuS = StyleSheet.create({
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  menuBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  menuDots: {
+    fontSize: 18,
+    color: C.textMid,
+    fontWeight: '600',
+    letterSpacing: 1,
+    marginTop: -8,
   },
 });
