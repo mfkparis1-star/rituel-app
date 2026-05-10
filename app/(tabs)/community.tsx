@@ -4,6 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
 import { supabase } from '../../lib/supabase';
+import { router } from 'expo-router';
+import { Image } from 'react-native';
+import { type Session } from '@supabase/supabase-js';
+import { fetchFeed, FeedPost } from '../../utils/posts';
+import { getLikedSet, toggleLike, bumpLikesCount } from '../../utils/postLikes';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -61,20 +66,25 @@ export default function CommunityScreen() {
   const [translated, setTranslated] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
 
+  const [session, setSession] = useState<Session | null>(null);
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [refreshKey, setRefreshKey] = useState(0);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
+      const { data: sess } = await supabase.auth.getSession();
+      if (mounted) setSession(sess.session);
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const list = await fetchFeed(30);
         if (!mounted) return;
-        if (error) {
-          console.warn('community loadPosts error:', error.message);
-          setPosts([]);
-        } else if (data) {
-          setPosts(data as Post[]);
+        setPosts(list as Post[]);
+        if (sess.session) {
+          const liked = await getLikedSet(
+            sess.session.user.id,
+            list.map((p) => p.id)
+          );
+          if (mounted) setLikedIds(liked);
         }
       } catch {
         if (mounted) setPosts([]);
@@ -83,7 +93,44 @@ export default function CommunityScreen() {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [refreshKey]);
+
+  const handleLike = async (postId: string) => {
+    if (!session) {
+      router.push('/(tabs)/auth' as any);
+      return;
+    }
+    const wasLiked = likedIds.has(postId);
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (wasLiked) next.delete(postId); else next.add(postId);
+      return next;
+    });
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, likes_count: Math.max(0, (p.likes_count ?? 0) + (wasLiked ? -1 : 1)) }
+          : p
+      )
+    );
+    const ok = await toggleLike(session.user.id, postId, wasLiked);
+    if (ok) {
+      bumpLikesCount(postId, wasLiked ? -1 : 1);
+    } else {
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (wasLiked) next.add(postId); else next.delete(postId);
+        return next;
+      });
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, likes_count: Math.max(0, (p.likes_count ?? 0) + (wasLiked ? 1 : -1)) }
+            : p
+        )
+      );
+    }
+  };
 
   const handleTranslate = async (post: Post) => {
     if (translated[post.id]) {
@@ -152,6 +199,8 @@ export default function CommunityScreen() {
           <View style={s.list}>
             {filtered.map((post) => (
               <PostCard
+              isLiked={likedIds.has(post.id)}
+              onLikePress={() => handleLike(post.id)}
                 key={post.id}
                 post={post}
                 translatedCaption={translated[post.id]}
@@ -164,18 +213,28 @@ export default function CommunityScreen() {
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>
-    </SafeAreaView>
+    
+        <Pressable
+          onPress={() => router.push('/post/new' as any)}
+          style={fabS.fab}
+          hitSlop={8}
+        >
+          <Text style={fabS.fabPlus}>+</Text>
+        </Pressable>
+      </SafeAreaView>
   );
 }
 
 type PostCardProps = {
   post: Post;
+  isLiked?: boolean;
+  onLikePress?: () => void;
   translatedCaption?: string;
   isTranslating: boolean;
   onTranslatePress: () => void;
 };
 
-function PostCard({ post, translatedCaption, isTranslating, onTranslatePress }: PostCardProps) {
+function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress }: PostCardProps) {
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = SKIN_LABEL[skinType];
   const username = displayName(post);
@@ -235,7 +294,21 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress }: 
           <Text style={s.translateTxt}>{translateLabel}</Text>
         </Pressable>
       </View>
-    </View>
+    
+      {post.image_url ? (
+        <Image source={{ uri: post.image_url }} style={cardS.postImage} resizeMode="cover" />
+      ) : null}
+      <View style={cardS.likeRow}>
+        <Pressable
+          onPress={onLikePress}
+          hitSlop={8}
+          style={cardS.likeBtn}
+        >
+          <Text style={[cardS.heart, isLiked && cardS.heartActive]}>{isLiked ? '♥' : '♡'}</Text>
+          <Text style={cardS.likeCount}>{post.likes_count ?? 0}</Text>
+        </Pressable>
+      </View>
+</View>
   );
 }
 
@@ -401,4 +474,52 @@ const s = StyleSheet.create({
     color: C.copper,
     fontWeight: '600',
   },
+});
+
+
+const cardS = StyleSheet.create({
+  postImage: {
+    width: '100%',
+    aspectRatio: 4 / 5,
+    borderRadius: R.md,
+    marginTop: Sp.md,
+    backgroundColor: C.bg2,
+  },
+  likeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Sp.md,
+    paddingTop: Sp.sm,
+    borderTopWidth: 0.5,
+    borderTopColor: C.border,
+  },
+  likeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heart: { fontSize: 20, color: C.textMid },
+  heartActive: { color: C.red },
+  likeCount: { fontSize: 13, color: C.textMid, fontWeight: '500' },
+});
+
+
+const fabS = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    right: Sp.lg,
+    bottom: Sp.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: C.copper,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  fabPlus: { color: '#FFFFFF', fontSize: 28, fontWeight: '300', marginTop: -2 },
 });
