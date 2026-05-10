@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, RefreshControl } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, RefreshControl, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
@@ -10,6 +10,7 @@ import { type Session } from '@supabase/supabase-js';
 import { fetchFeed, FeedPost } from '../../utils/posts';
 import { getLikedSet, toggleLike, bumpLikesCount } from '../../utils/postLikes';
 import { getSavedSet, toggleSave } from '../../utils/postSaves';
+import { useProfile } from '../../hooks/useProfile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -67,10 +68,12 @@ export default function CommunityScreen() {
   const [loading, setLoading] = useState(true);
   const [translated, setTranslated] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
+  const { profile } = useProfile();
 
   const [session, setSession] = useState<Session | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [discoveryTab, setDiscoveryTab] = useState<'pour_toi' | 'recents'>('pour_toi');
   const [refreshing, setRefreshing] = useState(false);
   const lastFetchedAtRef = useRef(0);
 
@@ -187,6 +190,21 @@ export default function CommunityScreen() {
     }
   };
 
+  const handleAuthorPress = (post: Post) => {
+    const name = post.display_name?.trim() || (post.user_email?.split('@')[0] ?? 'Anonyme');
+    const ownPostsCount = posts.filter((p) => p.user_id === post.user_id).length;
+    const totalLikes = posts
+      .filter((p) => p.user_id === post.user_id)
+      .reduce((sum, p) => sum + (p.likes_count ?? 0), 0);
+    const skin = post.skin_type ? `\nPeau ${post.skin_type}` : '';
+    Alert.alert(
+      name,
+      `${ownPostsCount} publication${ownPostsCount > 1 ? 's' : ''} · ${totalLikes} mention${totalLikes > 1 ? 's' : ''} J\u2019aime${skin}`,
+      [{ text: 'Fermer', style: 'cancel' }]
+    );
+  };
+
+
   const handleTranslate = async (post: Post) => {
     if (translated[post.id]) {
       setTranslated((prev) => {
@@ -218,7 +236,13 @@ export default function CommunityScreen() {
     }
   };
 
-  const filtered = posts.filter((p) => filter === 'all' || mapSkinType(p.skin_type) === filter);
+  const ownSkin = profile?.skin_type ?? null;
+  const tabFiltered = discoveryTab === 'pour_toi' && ownSkin
+    ? posts.filter((p) => (p.skin_type ?? '').toLowerCase().includes(ownSkin.toLowerCase()))
+    : posts;
+  const tabFinal = discoveryTab === 'pour_toi' && tabFiltered.length === 0 ? posts : tabFiltered;
+  const filtered = tabFinal.filter((p) => filter === 'all' || mapSkinType(p.skin_type) === filter);
+  const showFallbackHint = discoveryTab === 'pour_toi' && tabFiltered.length === 0 && posts.length > 0;
   const isEmpty = !loading && filtered.length === 0;
 
   return (
@@ -232,6 +256,31 @@ export default function CommunityScreen() {
           <Text style={s.title}>Communauté</Text>
           <Text style={s.subtitle}>Découvrez les routines des femmes comme vous</Text>
         </View>
+
+        <View style={discoS.segmentRow}>
+          {[
+            { id: 'pour_toi' as const, label: 'Pour toi' },
+            { id: 'recents' as const, label: 'Récents' },
+          ].map((tab) => {
+            const active = discoveryTab === tab.id;
+            return (
+              <Pressable
+                key={tab.id}
+                onPress={() => setDiscoveryTab(tab.id)}
+                style={discoS.segmentBtn}
+                hitSlop={6}
+              >
+                <Text style={[discoS.segmentTxt, active && discoS.segmentTxtActive]}>{tab.label}</Text>
+                {active && <View style={discoS.segmentUnderline} />}
+              </Pressable>
+            );
+          })}
+        </View>
+        {showFallbackHint && (
+          <Text style={discoS.fallbackHint}>
+            On affine tes inspirations à mesure que la communauté grandit.
+          </Text>
+        )}
 
         <ScrollView
           horizontal
@@ -262,6 +311,7 @@ export default function CommunityScreen() {
               onLikePress={() => handleLike(post.id)}
               isSaved={savedIds.has(post.id)}
               onSavePress={() => handleSave(post.id)}
+              onAuthorPress={() => handleAuthorPress(post)}
                 key={post.id}
                 post={post}
                 translatedCaption={translated[post.id]}
@@ -292,12 +342,13 @@ type PostCardProps = {
   onLikePress?: () => void;
   isSaved?: boolean;
   onSavePress?: () => void;
+  onAuthorPress?: () => void;
   translatedCaption?: string;
   isTranslating: boolean;
   onTranslatePress: () => void;
 };
 
-function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress }: PostCardProps) {
+function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress, onAuthorPress }: PostCardProps) {
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = SKIN_LABEL[skinType];
   const username = displayName(post);
@@ -319,7 +370,7 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
           </Text>
         </View>
         <View style={s.postUserBox}>
-          <Text style={s.postUsername}>{username}</Text>
+          <Pressable onPress={onAuthorPress} hitSlop={6}><Text style={s.postUsername}>{username}</Text></Pressable>
           {meta ? <Text style={s.postMeta}>{meta}</Text> : null}
         </View>
         <View style={s.skinBadge}>
@@ -596,4 +647,39 @@ const fabS = StyleSheet.create({
     elevation: 6,
   },
   fabPlus: { color: '#FFFFFF', fontSize: 28, fontWeight: '300', marginTop: -2 },
+});
+
+
+const discoS = StyleSheet.create({
+  segmentRow: {
+    flexDirection: 'row',
+    gap: Sp.lg,
+    paddingHorizontal: Sp.lg,
+    marginBottom: Sp.md,
+  },
+  segmentBtn: { paddingVertical: 8 },
+  segmentTxt: {
+    fontSize: 14,
+    color: C.textMid,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+  },
+  segmentTxtActive: {
+    color: C.espresso,
+    fontWeight: '600',
+  },
+  segmentUnderline: {
+    height: 2,
+    backgroundColor: C.copper,
+    borderRadius: 1,
+    marginTop: 6,
+  },
+  fallbackHint: {
+    fontSize: 12,
+    color: C.textMid,
+    paddingHorizontal: Sp.lg,
+    marginBottom: Sp.md,
+    fontStyle: 'italic',
+    lineHeight: 17,
+  },
 });
