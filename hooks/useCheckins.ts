@@ -15,6 +15,7 @@ import {
   CheckinEmoji,
   getRecentCheckins,
   hasCheckedInToday,
+  deleteCheckin,
   insertCheckin,
 } from '../utils/checkins';
 
@@ -66,6 +67,23 @@ export function useCheckins(limit = 7) {
     };
   }, [refresh]);
 
+  const remove = useCallback(
+    async (checkinId: string) => {
+      if (!userId) return false;
+      // Optimistic removal
+      setRecent((prev) => prev.filter((c) => c.id !== checkinId));
+      const ok = await deleteCheckin(checkinId);
+      if (ok) {
+        await refresh(userId);
+      } else {
+        // Revert by re-fetching
+        await refresh(userId);
+      }
+      return ok;
+    },
+    [userId, refresh]
+  );
+
   const submit = useCallback(
     async (emoji: CheckinEmoji, note?: string) => {
       if (!userId) return false;
@@ -76,5 +94,5 @@ export function useCheckins(limit = 7) {
     [userId, refresh]
   );
 
-  return { recent, hasToday, loading, refresh: () => refresh(userId), submit };
+  return { recent, hasToday, loading, refresh: () => refresh(userId), submit, remove };
 }

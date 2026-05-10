@@ -16,13 +16,13 @@
 import { type Session } from '@supabase/supabase-js';
 import { router, Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../components/ui/PillButton';
 import { supabase } from '../lib/supabase';
 import { useMemory } from '../hooks/useMemory';
 import { useScore } from '../hooks/useScore';
-import { Checkin, CHECKIN_EMOJIS, getRecentCheckins } from '../utils/checkins';
+import { Checkin, CHECKIN_EMOJIS, getRecentCheckins, deleteCheckin } from '../utils/checkins';
 import { fetchOwnPosts, FeedPost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
 import { C, R, Sp, Type } from '../theme';
@@ -116,6 +116,33 @@ export default function GlowTimelineScreen() {
     return Array.from(map.entries()).map(([k, v]) => ({ key: k, ...v }));
   }, [items]);
 
+  const handleDeleteCheckin = (checkin: Checkin) => {
+    Alert.alert(
+      'Supprimer cette entrée ?',
+      'Cette note sera retirée de ton journal.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            // Optimistic removal from local state
+            setCheckins((prev) => prev.filter((c) => c.id !== checkin.id));
+            const ok = await deleteCheckin(checkin.id);
+            if (!ok) {
+              // Revert by re-fetching
+              if (session) {
+                const fresh = await getRecentCheckins(session.user.id, 30);
+                setCheckins(fresh);
+              }
+              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   if (!session && !loading) {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
@@ -171,7 +198,7 @@ export default function GlowTimelineScreen() {
               {group.items.map((it, idx) => {
                 if (it.kind === 'checkin') {
                   return (
-                    <View key={`c-${it.data.id}`} style={s.itemCard}>
+                    <Pressable key={`c-${it.data.id}`} onLongPress={() => handleDeleteCheckin(it.data)} delayLongPress={400} style={s.itemCard}>
                       <View style={s.itemHeader}>
                         <Text style={s.itemEmoji}>{emojiSymbol(it.data.emoji)}</Text>
                         <View style={s.itemHeaderRight}>
@@ -180,7 +207,8 @@ export default function GlowTimelineScreen() {
                         </View>
                       </View>
                       {it.data.note ? <Text style={s.itemNote}>{it.data.note}</Text> : null}
-                    </View>
+                      <Text style={s.longPressHint}>Maintiens pour supprimer</Text>
+                    </Pressable>
                   );
                 }
                 if (it.kind === 'analysis') {
@@ -327,5 +355,12 @@ const s = StyleSheet.create({
     color: C.copper,
     fontWeight: '600',
     letterSpacing: 0.5,
+  },
+  longPressHint: {
+    fontSize: 10,
+    color: C.textSoft,
+    marginTop: 6,
+    fontStyle: 'italic',
+    letterSpacing: 0.3,
   },
 });

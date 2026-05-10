@@ -65,3 +65,11 @@ export async function hasCheckedInToday(userId: string): Promise<boolean> {
   if (error) return false;
   return (count ?? 0) > 0;
 }
+
+export async function deleteCheckin(checkinId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('skin_checkins')
+    .delete()
+    .eq('id', checkinId);
+  return !error;
+}
