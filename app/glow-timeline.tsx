@@ -23,7 +23,7 @@ import { supabase } from '../lib/supabase';
 import { useMemory } from '../hooks/useMemory';
 import { useScore } from '../hooks/useScore';
 import { Checkin, CHECKIN_EMOJIS, getRecentCheckins, deleteCheckin } from '../utils/checkins';
-import { fetchOwnPosts, FeedPost } from '../utils/posts';
+import { fetchOwnPosts, FeedPost, updatePostCaption, deletePost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
 import { C, R, Sp, Type } from '../theme';
 
@@ -143,6 +143,71 @@ export default function GlowTimelineScreen() {
     );
   };
 
+  const handleEditPost = (post: FeedPost) => {
+    Alert.prompt(
+      'Modifier la légende',
+      undefined,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Enregistrer',
+          onPress: async (text?: string) => {
+            const next = (text ?? '').trim();
+            if (next.length < 4 || next.length > 280) {
+              Alert.alert('Légende invalide', 'La légende doit faire entre 4 et 280 caractères.');
+              return;
+            }
+            // Optimistic update
+            setOwnPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: next } : p)));
+            const ok = await updatePostCaption(post.id, next);
+            if (!ok) {
+              setOwnPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: post.caption } : p)));
+              Alert.alert('Erreur', 'Modification impossible. Réessaye dans un instant.');
+            }
+          },
+        },
+      ],
+      'plain-text',
+      post.caption ?? ''
+    );
+  };
+
+  const handleDeletePost = (post: FeedPost) => {
+    Alert.alert(
+      'Supprimer cette publication ?',
+      'Elle disparaîtra de ton journal et de la communauté.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            // Optimistic removal
+            setOwnPosts((prev) => prev.filter((p) => p.id !== post.id));
+            const ok = await deletePost(post.id);
+            if (!ok && session) {
+              const fresh = await fetchOwnPosts(session.user.id, 30);
+              setOwnPosts(fresh);
+              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleMenuPostPress = (post: FeedPost) => {
+    Alert.alert(
+      'Publication',
+      undefined,
+      [
+        { text: 'Modifier la légende', onPress: () => handleEditPost(post) },
+        { text: 'Supprimer', style: 'destructive', onPress: () => handleDeletePost(post) },
+        { text: 'Annuler', style: 'cancel' },
+      ]
+    );
+  };
+
   if (!session && !loading) {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
@@ -234,7 +299,7 @@ export default function GlowTimelineScreen() {
                 }
                 if (it.kind === 'post') {
                   return (
-                    <View key={`p-${it.data.id}`} style={s.itemCard}>
+                    <Pressable key={`p-${it.data.id}`} onLongPress={() => handleMenuPostPress(it.data)} delayLongPress={400} style={s.itemCard}>
                       <View style={s.itemHeader}>
                         <Text style={s.itemEmoji}>♡</Text>
                         <View style={s.itemHeaderRight}>
@@ -248,7 +313,8 @@ export default function GlowTimelineScreen() {
                       {it.data.caption ? (
                         <Text style={s.itemNote} numberOfLines={3}>{it.data.caption}</Text>
                       ) : null}
-                    </View>
+                      <Text style={s.longPressHint}>Maintiens pour modifier ou supprimer</Text>
+                    </Pressable>
                   );
                 }
                 return null;
