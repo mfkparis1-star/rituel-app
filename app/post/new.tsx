@@ -17,6 +17,7 @@ import { supabase } from '../../lib/supabase';
 import { createPost, pickPostImage, uploadPostImage } from '../../utils/posts';
 import { useProfile } from '../../hooks/useProfile';
 import { useMemory } from '../../hooks/useMemory';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { safeBack } from '../../utils/safeBack';
 import { C, R, Sp, Type } from '../../theme';
 
@@ -97,6 +98,7 @@ export default function NewPostScreen() {
       Alert.alert('Erreur', 'Publication impossible. Réessaye dans un instant.');
       return;
     }
+    await AsyncStorage.setItem('@rituel:community:invalidate', '1');
     safeBack('/(tabs)/community');
   };
 

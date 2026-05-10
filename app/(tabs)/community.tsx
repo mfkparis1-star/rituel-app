@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Chip from '../../components/ui/Chip';
 import EmptyState from '../../components/ui/EmptyState';
 import { supabase } from '../../lib/supabase';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Image } from 'react-native';
 import { type Session } from '@supabase/supabase-js';
 import { fetchFeed, FeedPost } from '../../utils/posts';
 import { getLikedSet, toggleLike, bumpLikesCount } from '../../utils/postLikes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -68,32 +69,61 @@ export default function CommunityScreen() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const lastFetchedAtRef = useRef(0);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
+  const STALE_MS = 75 * 1000;
+  const INVALIDATE_KEY = '@rituel:community:invalidate';
+
+  const loadFeed = useCallback(async (silent: boolean = false) => {
+    if (!silent) setLoading(true);
+    try {
       const { data: sess } = await supabase.auth.getSession();
-      if (mounted) setSession(sess.session);
-      try {
-        const list = await fetchFeed(30);
-        if (!mounted) return;
-        setPosts(list as Post[]);
-        if (sess.session) {
-          const liked = await getLikedSet(
-            sess.session.user.id,
-            list.map((p) => p.id)
-          );
-          if (mounted) setLikedIds(liked);
-        }
-      } catch {
-        if (mounted) setPosts([]);
-      } finally {
-        if (mounted) setLoading(false);
+      setSession(sess.session);
+      const list = await fetchFeed(30);
+      setPosts(list as Post[]);
+      if (sess.session) {
+        const liked = await getLikedSet(
+          sess.session.user.id,
+          list.map((p) => p.id)
+        );
+        setLikedIds(liked);
       }
-    })();
-    return () => { mounted = false; };
-  }, [refreshKey]);
+      lastFetchedAtRef.current = Date.now();
+    } catch {
+      // silent — keep current cache
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, []);
+
+  // Initial mount
+  useEffect(() => {
+    loadFeed(false);
+  }, [loadFeed]);
+
+  // Focus-refresh: only when stale (>75s) OR an invalidate flag is set
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        const flag = await AsyncStorage.getItem(INVALIDATE_KEY);
+        const isStale = Date.now() - lastFetchedAtRef.current > STALE_MS;
+        if (cancelled) return;
+        if (flag || isStale) {
+          if (flag) await AsyncStorage.removeItem(INVALIDATE_KEY);
+          await loadFeed(true);
+        }
+      })();
+      return () => { cancelled = true; };
+    }, [loadFeed])
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadFeed(true);
+    setRefreshing(false);
+  }, [loadFeed]);
 
   const handleLike = async (postId: string) => {
     if (!session) {
@@ -168,7 +198,11 @@ export default function CommunityScreen() {
 
   return (
     <SafeAreaView style={s.root} edges={['top']}>
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.copper} />
+        }
+      >
         <View style={s.header}>
           <Text style={s.title}>Communauté</Text>
           <Text style={s.subtitle}>Découvrez les routines des femmes comme vous</Text>
