@@ -600,6 +600,11 @@ export default function AuthScreen() {
           subtitle="Ton reflet du moment"
           onPress={() => router.push('/score' as any)}
         />
+        <ListRow
+          title="Mes favoris"
+          subtitle="Tes inspirations sauvegardées"
+          onPress={() => router.push('/saved' as any)}
+        />
 
         <ListRow
           title="Mon archive"

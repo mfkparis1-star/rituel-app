@@ -9,6 +9,7 @@ import { Image } from 'react-native';
 import { type Session } from '@supabase/supabase-js';
 import { fetchFeed, FeedPost } from '../../utils/posts';
 import { getLikedSet, toggleLike, bumpLikesCount } from '../../utils/postLikes';
+import { getSavedSet, toggleSave } from '../../utils/postSaves';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -69,6 +70,7 @@ export default function CommunityScreen() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [refreshing, setRefreshing] = useState(false);
   const lastFetchedAtRef = useRef(0);
 
@@ -83,11 +85,13 @@ export default function CommunityScreen() {
       const list = await fetchFeed(30);
       setPosts(list as Post[]);
       if (sess.session) {
-        const liked = await getLikedSet(
-          sess.session.user.id,
-          list.map((p) => p.id)
-        );
+        const ids = list.map((p) => p.id);
+        const [liked, saved] = await Promise.all([
+          getLikedSet(sess.session.user.id, ids),
+          getSavedSet(sess.session.user.id, ids),
+        ]);
         setLikedIds(liked);
+        setSavedIds(saved);
       }
       lastFetchedAtRef.current = Date.now();
     } catch {
@@ -159,6 +163,27 @@ export default function CommunityScreen() {
             : p
         )
       );
+    }
+  };
+
+  const handleSave = async (postId: string) => {
+    if (!session) {
+      router.push('/(tabs)/auth' as any);
+      return;
+    }
+    const wasSaved = savedIds.has(postId);
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (wasSaved) next.delete(postId); else next.add(postId);
+      return next;
+    });
+    const ok = await toggleSave(session.user.id, postId, wasSaved);
+    if (!ok) {
+      setSavedIds((prev) => {
+        const next = new Set(prev);
+        if (wasSaved) next.add(postId); else next.delete(postId);
+        return next;
+      });
     }
   };
 
@@ -235,6 +260,8 @@ export default function CommunityScreen() {
               <PostCard
               isLiked={likedIds.has(post.id)}
               onLikePress={() => handleLike(post.id)}
+              isSaved={savedIds.has(post.id)}
+              onSavePress={() => handleSave(post.id)}
                 key={post.id}
                 post={post}
                 translatedCaption={translated[post.id]}
@@ -263,12 +290,14 @@ type PostCardProps = {
   post: Post;
   isLiked?: boolean;
   onLikePress?: () => void;
+  isSaved?: boolean;
+  onSavePress?: () => void;
   translatedCaption?: string;
   isTranslating: boolean;
   onTranslatePress: () => void;
 };
 
-function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress }: PostCardProps) {
+function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress }: PostCardProps) {
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = SKIN_LABEL[skinType];
   const username = displayName(post);
@@ -340,6 +369,14 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
         >
           <Text style={[cardS.heart, isLiked && cardS.heartActive]}>{isLiked ? '♥' : '♡'}</Text>
           <Text style={cardS.likeCount}>{post.likes_count ?? 0}</Text>
+        </Pressable>
+        <View style={{ flex: 1 }} />
+        <Pressable
+          onPress={onSavePress}
+          hitSlop={8}
+          style={cardS.saveBtn}
+        >
+          <Text style={[cardS.bookmark, isSaved && cardS.bookmarkActive]}>{isSaved ? '◆' : '◇'}</Text>
         </Pressable>
       </View>
 </View>
@@ -535,6 +572,9 @@ const cardS = StyleSheet.create({
   heart: { fontSize: 20, color: C.textMid },
   heartActive: { color: C.red },
   likeCount: { fontSize: 13, color: C.textMid, fontWeight: '500' },
+  saveBtn: { paddingHorizontal: 4 },
+  bookmark: { fontSize: 18, color: C.textMid },
+  bookmarkActive: { color: C.copper },
 });
 
 
