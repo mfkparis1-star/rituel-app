@@ -595,6 +595,11 @@ export default function AuthScreen() {
           subtitle="Ton parcours beauté, jour après jour"
           onPress={() => router.push('/glow-timeline' as any)}
         />
+        <ListRow
+          title="Mon énergie"
+          subtitle="Ton reflet du moment"
+          onPress={() => router.push('/score' as any)}
+        />
 
         <ListRow
           title="Mon archive"

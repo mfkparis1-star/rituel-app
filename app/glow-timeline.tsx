@@ -21,6 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../components/ui/PillButton';
 import { supabase } from '../lib/supabase';
 import { useMemory } from '../hooks/useMemory';
+import { useScore } from '../hooks/useScore';
 import { Checkin, CHECKIN_EMOJIS, getRecentCheckins } from '../utils/checkins';
 import { fetchOwnPosts, FeedPost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
@@ -67,6 +68,7 @@ export default function GlowTimelineScreen() {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [ownPosts, setOwnPosts] = useState<FeedPost[]>([]);
   const { memory } = useMemory();
+  const { score } = useScore();
 
   useEffect(() => {
     let cancelled = false;
@@ -137,6 +139,13 @@ export default function GlowTimelineScreen() {
         <Text style={s.label}>JOURNAL</Text>
         <Text style={s.title}>Ton parcours</Text>
         <Text style={s.subtitle}>Chaque check-in, chaque analyse, chaque rituel partagé. Ton histoire beauté, jour après jour.</Text>
+
+        {score && (
+          <View style={s.scoreChip}>
+            <Text style={s.scoreChipLabel}>Cette semaine, tu es</Text>
+            <Text style={s.scoreChipValue}>{score.label}</Text>
+          </View>
+        )}
 
         {loading ? (
           <View style={s.centered}>
@@ -297,5 +306,26 @@ const s = StyleSheet.create({
     marginTop: Sp.sm,
     marginBottom: Sp.xs,
     backgroundColor: C.appBg,
+  },
+  scoreChip: {
+    backgroundColor: C.cream,
+    borderRadius: R.md,
+    padding: Sp.md,
+    marginBottom: Sp.lg,
+    alignItems: 'center',
+  },
+  scoreChipLabel: {
+    fontSize: 11,
+    letterSpacing: 1.2,
+    color: C.textMid,
+    fontWeight: '500',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  scoreChipValue: {
+    fontSize: 18,
+    color: C.copper,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
 });
