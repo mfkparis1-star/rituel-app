@@ -1,9 +1,8 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import {
@@ -14,6 +13,9 @@ import {
   INGREDIENT_LABELS,
 } from '../../utils/compatibility';
 import { COSMETIC_DISCLAIMER } from '../../utils/legal';
+import CompatibilityShareCard, { CompatStatus as ShareCompatStatus } from '../../components/share/CompatibilityShareCard';
+import { captureAndShare } from '../../utils/shareCard';
+import PillButton from '../../components/ui/PillButton';
 
 type Compat = 'compatible' | 'caution' | 'avoid' | null;
 
@@ -76,6 +78,20 @@ export default function CompatibilityScreen() {
     setResultTitle('');
     setResultExplanation('');
     setResultTip('');
+  };
+
+
+  const shareCardRef = useRef<View>(null);
+
+  function compatToShareStatus(c: Compat): ShareCompatStatus {
+    if (c === 'compatible') return 'compatible';
+    if (c === 'caution') return 'caution';
+    return 'avoid';
+  }
+
+  const handleShare = async () => {
+    if (!result) return;
+    await captureAndShare(shareCardRef, 'rituel-compatibilite');
   };
 
   return (
@@ -169,6 +185,25 @@ export default function CompatibilityScreen() {
             <View style={s.tipBox}>
               <Text style={s.tipLabel}>CONSEIL</Text>
               <Text style={s.tipTxt}>{resultTip}</Text>
+            </View>
+
+            <PillButton
+              label="Partager la carte"
+              variant="primary"
+              fullWidth
+              onPress={handleShare}
+              style={{ marginTop: 16 }}
+            />
+
+            <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
+              <CompatibilityShareCard
+                ref={shareCardRef}
+                status={compatToShareStatus(result)}
+                productA={key1 ?? 'Ingrédient 1'}
+                productB={key2 ?? 'Ingrédient 2'}
+                title={resultTitle}
+                explanation={resultExplanation}
+              />
             </View>
             <PillButton
               label="Nouvelle vérification"

@@ -1,6 +1,6 @@
 import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -15,6 +15,8 @@ import { useAIUnlock } from '../../hooks/useAIUnlock';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import RoutineShareCard, { RoutineSlot, RoutineStepLite } from '../../components/share/RoutineShareCard';
+import { captureAndShare } from '../../utils/shareCard';
 
 type Slot = 'matin' | 'soir';
 
@@ -49,6 +51,13 @@ function CloseIcon({ color }: { color: string }) {
 export default function RoutineScreen() {
   const [slot, setSlot] = useState<Slot>('matin');
   const [steps, setSteps] = useState<RoutineStep[]>([]);
+
+  const routineShareRef = useRef<View>(null);
+
+  const handleShareRoutine = async () => {
+    if (steps.length === 0) return;
+    await captureAndShare(routineShareRef, `rituel-routine-${slot}`);
+  };
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
@@ -487,7 +496,30 @@ export default function RoutineScreen() {
         onClose={() => setCreditPacksVisible(false)}
         onSuccess={() => setCreditPacksVisible(false)}
       />
-    </SafeAreaView>
+            {steps.length > 0 && (
+          <View style={{ paddingHorizontal: 20, paddingBottom: 12 }}>
+            <PillButton
+              label="Partager ma routine"
+              variant="ghost"
+              fullWidth
+              onPress={handleShareRoutine}
+            />
+          </View>
+        )}
+
+        <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
+          <RoutineShareCard
+            ref={routineShareRef}
+            slot={slot as RoutineSlot}
+            steps={steps.map((st) => ({
+              step_order: st.step_order,
+              name: st.product_name ?? '',
+              brand: st.brand ?? null,
+            }))}
+          />
+        </View>
+
+      </SafeAreaView>
   );
 }
 
