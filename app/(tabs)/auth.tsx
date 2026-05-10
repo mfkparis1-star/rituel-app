@@ -590,6 +590,11 @@ export default function AuthScreen() {
         </PremiumCard>
 
         <Text style={s.section}>ACCÈS RAPIDE</Text>
+        <ListRow
+          title="Mon journal"
+          subtitle="Ton parcours beauté, jour après jour"
+          onPress={() => router.push('/glow-timeline' as any)}
+        />
 
         <ListRow
           title="Mon archive"

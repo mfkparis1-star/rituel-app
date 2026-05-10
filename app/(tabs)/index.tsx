@@ -127,7 +127,12 @@ export default function IndexScreen() {
         </PremiumCard>
 
         {/* Cette semaine block */}
-        <Text style={s.sectionTitle}>Cette semaine</Text>
+        <View style={s.sectionTitleRow}>
+          <Text style={s.sectionTitle}>Cette semaine</Text>
+          <Pressable onPress={() => router.push('/glow-timeline' as any)} hitSlop={6}>
+            <Text style={s.sectionLink}>Voir tout →</Text>
+          </Pressable>
+        </View>
         <PremiumCard variant="espresso" style={s.blockWeek}>
           {weekEmojis.length === 0 ? (
             <>
@@ -308,5 +313,17 @@ const s = StyleSheet.create({
     color: C.cream,
     opacity: 0.75,
     lineHeight: 18,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    marginBottom: Sp.sm,
+    marginTop: Sp.md,
+  },
+  sectionLink: {
+    fontSize: 12,
+    color: C.copper,
+    fontWeight: '500',
   },
 });

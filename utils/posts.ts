@@ -104,6 +104,18 @@ export async function createPost(input: CreatePostInput): Promise<{ ok: boolean;
   return { ok: true, id: data.id };
 }
 
+
+export async function fetchOwnPosts(userId: string, limit = 30): Promise<FeedPost[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+  return data as FeedPost[];
+}
+
 export async function deletePost(postId: string): Promise<boolean> {
   const { error } = await supabase.from('posts').delete().eq('id', postId);
   return !error;
