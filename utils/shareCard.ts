@@ -6,7 +6,6 @@
  * is written to the document directory with a meaningful filename so
  * the share preview reads cleanly.
  */
-import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { captureRef } from 'react-native-view-shot';
 import { Alert } from 'react-native';
@@ -26,20 +25,11 @@ export async function captureAndShare(
       result: 'tmpfile',
     });
 
-    // Move to a stable path with a meaningful name so the share preview
-    // reads "Rituel · {feature}.png" rather than a hashed temp name.
-    const stamp = Date.now();
-    const destPath = `${Paths.document.uri}${filenamePrefix}-${stamp}.png`;
-    let shareUri = tmpUri.startsWith('file://') ? tmpUri : `file://${tmpUri}`;
-    try {
-      const src = new File(tmpUri.startsWith('file://') ? tmpUri : `file://${tmpUri}`);
-      const dest = new File(destPath);
-      if (dest.exists) dest.delete();
-      src.copy(dest);
-      shareUri = destPath;
-    } catch {
-      // If copy fails (rare), share the temp file directly.
-    }
+    // Always use the temp file directly. The rename-to-document-dir
+    // step was a nicety for the share-sheet filename preview but
+    // depends on a stable Paths.document.uri at module-init time,
+    // which has been the source of crashes. Temp file works for share.
+    const shareUri = tmpUri.startsWith('file://') ? tmpUri : `file://${tmpUri}`;
 
     const available = await Sharing.isAvailableAsync();
     if (!available) {

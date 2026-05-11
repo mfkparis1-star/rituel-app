@@ -507,17 +507,19 @@ export default function RoutineScreen() {
           </View>
         )}
 
-        <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
-          <RoutineShareCard
-            ref={routineShareRef}
-            slot={slot as RoutineSlot}
-            steps={steps.map((st) => ({
-              step_order: st.step_order,
-              name: st.product_name ?? '',
-              brand: st.brand ?? null,
-            }))}
-          />
-        </View>
+        {steps.length > 0 && (
+          <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
+            <RoutineShareCard
+              ref={routineShareRef}
+              slot={slot}
+              steps={steps.map((st) => ({
+                step_order: st.step_order,
+                name: st.product_name ?? '',
+                brand: st.brand ?? null,
+              }))}
+            />
+          </View>
+        )}
 
       </SafeAreaView>
   );

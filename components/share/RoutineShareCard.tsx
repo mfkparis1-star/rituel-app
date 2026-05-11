@@ -9,7 +9,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { C } from '../../theme';
 import ShareCardFrame from './ShareCardFrame';
 
-export type RoutineSlot = 'morning' | 'evening';
+export type RoutineSlot = 'matin' | 'soir';
 
 export type RoutineStepLite = {
   step_order: number;
@@ -23,15 +23,18 @@ type Props = {
 };
 
 const SLOT_COPY: Record<RoutineSlot, { kind: string; title: string }> = {
-  morning: { kind: 'RITUEL DU MATIN', title: 'Mon rituel du matin' },
-  evening: { kind: 'RITUEL DU SOIR',  title: 'Mon rituel du soir' },
+  matin: { kind: 'RITUEL DU MATIN', title: 'Mon rituel du matin' },
+  soir:  { kind: 'RITUEL DU SOIR',  title: 'Mon rituel du soir' },
 };
+
+// Defensive fallback if slot is somehow not matched
+const FALLBACK_COPY = { kind: 'RITUEL', title: 'Mon rituel' };
 
 const RoutineShareCard = forwardRef<View, Props>(function RoutineShareCard(
   { slot, steps },
   ref
 ) {
-  const copy = SLOT_COPY[slot];
+  const copy = SLOT_COPY[slot] ?? FALLBACK_COPY;
   const visible = steps.slice(0, 8);
   const remaining = Math.max(0, steps.length - visible.length);
 
