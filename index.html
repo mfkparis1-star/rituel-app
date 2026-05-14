@@ -1,1013 +1,857 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#F6F1EC" />
-
-  <title>Rituel — AI-powered skincare, personalized for every skin</title>
-  <meta name="description" content="Rituel helps users analyze their skin, build personalized routines, and discover skincare products that match their needs. A Parisian beauty-tech app for skincare-focused users and brand partners." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rituel — Votre journal de beauté intime</title>
+  <meta name="description" content="Rituel est un journal de beauté intime, alimenté par l'IA. Check-in quotidien, communauté, routines personnalisées. Disponible sur l'App Store.">
+  <meta name="theme-color" content="#F5EDE6">
+  <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Rituel — AI-powered skincare, personalized for every skin" />
-  <meta property="og:description" content="A Parisian beauty-tech app helping users analyze their skin, build routines, and discover the right products." />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="Rituel — Votre journal de beauté intime">
+  <meta property="og:description" content="Un journal de beauté pensé pour vous. Disponible sur l'App Store.">
+  <meta property="og:image" content="https://rituel.beauty/assets/images/screenshots/01_home.png">
+  <meta property="og:url" content="https://rituel.beauty">
+  <meta property="og:type" content="website">
 
-  <!-- Favicons (using app icon) -->
-  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
-  <link rel="apple-touch-icon" href="../assets/images/icon.png" />
-
-  <!-- Fonts: Playfair Display for headings, Inter for body -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ==========================================================
-       RITUEL — Brand tokens (matches docs/BRAND_BOOK.md & app theme)
-       ========================================================== */
     :root {
-      --beige: #F6F1EC;
-      --beige-deep: #EFE6DC;
-      --cream: #F5E8DC;
-      --copper: #B8856A;
-      --copper-warm: #C08A6A;
-      --espresso: #2A1410;
-      --espresso-soft: #4A3528;
-      --ink: #1A0F0B;
-      --muted: #6B5848;
-      --line: rgba(42, 20, 16, 0.08);
-      --line-strong: rgba(42, 20, 16, 0.16);
-      --shadow-sm: 0 1px 2px rgba(42, 20, 16, 0.04);
-      --shadow-md: 0 8px 32px rgba(42, 20, 16, 0.06);
-      --shadow-lg: 0 24px 64px rgba(42, 20, 16, 0.10);
+      --cream: #F5EDE6;
+      --cream-light: #FBF6F1;
+      --cream-dark: #EFE6D7;
+      --espresso: #3D2A1E;
+      --espresso-dk: #2A1810;
+      --copper: #B07A4A;
+      --copper-lt: #C08A6A;
+      --text: #2A1F18;
+      --text-mid: #7A6555;
+      --text-soft: #A99583;
+      --line: #E8DFD2;
+      --shadow-sm: 0 2px 8px rgba(61, 42, 30, 0.06);
+      --shadow-md: 0 8px 24px rgba(61, 42, 30, 0.08);
+      --shadow-lg: 0 16px 48px rgba(61, 42, 30, 0.10);
       --radius-sm: 12px;
-      --radius-md: 18px;
-      --radius-lg: 24px;
-      --maxw: 1140px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--beige);
-      color: var(--espresso);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--cream-light);
+      color: var(--text);
       line-height: 1.6;
-      font-weight: 400;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    .serif { font-family: 'Playfair Display', Georgia, serif; font-weight: 400; }
-
-    a { color: inherit; text-decoration: none; }
-
-    img, svg { display: block; max-width: 100%; }
-
-    .container {
-      max-width: var(--maxw);
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .eyebrow {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--copper);
-    }
-
-    /* ==========================================================
-       NAVIGATION
-       ========================================================== */
+    /* === NAV === */
     nav {
       position: sticky;
       top: 0;
-      z-index: 50;
-      background: rgba(246, 241, 236, 0.85);
-      backdrop-filter: saturate(180%) blur(16px);
-      -webkit-backdrop-filter: saturate(180%) blur(16px);
+      background: rgba(251, 246, 241, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--line);
+      z-index: 100;
+      padding: 16px 0;
     }
     .nav-inner {
-      max-width: var(--maxw);
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 18px 24px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
     }
     .brand {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
       letter-spacing: 4px;
-      color: var(--espresso);
-      font-weight: 500;
+      color: var(--espresso-dk);
+      font-weight: 400;
+      text-decoration: none;
     }
-    .nav-links {
+    .nav-right {
       display: flex;
-      gap: 32px;
       align-items: center;
+      gap: 24px;
     }
-    .nav-links a {
-      font-size: 13px;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-      transition: color 0.2s ease;
-    }
-    .nav-links a:hover { color: var(--espresso); }
-    .nav-cta {
-      background: var(--espresso);
-      color: var(--beige) !important;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
+    .nav-link {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-size: 14px;
       font-weight: 500;
-      transition: background 0.2s ease, transform 0.2s ease;
+      transition: color 0.2s;
     }
-    .nav-cta:hover {
-      background: var(--ink);
-      transform: translateY(-1px);
+    .nav-link:hover { color: var(--copper); }
+    .lang-switcher {
+      display: flex;
+      gap: 4px;
+      background: var(--cream);
+      border-radius: 100px;
+      padding: 4px;
+    }
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+    .lang-btn.active {
+      background: var(--espresso-dk);
+      color: var(--cream);
     }
 
-    @media (max-width: 720px) {
-      .nav-links a:not(.nav-cta) { display: none; }
-    }
-
-    /* ==========================================================
-       HERO
-       ========================================================== */
+    /* === HERO === */
     .hero {
-      padding: 80px 0 60px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -200px;
-      right: -200px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(184, 133, 106, 0.10) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .hero-grid {
+      padding: 80px 24px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 64px;
       align-items: center;
-      position: relative;
     }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(184, 133, 106, 0.08);
-      border: 1px solid rgba(184, 133, 106, 0.20);
+    .hero-text .kind {
       color: var(--copper);
-      font-size: 11px;
-      letter-spacing: 2.5px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      margin-bottom: 28px;
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-    .hero-badge .dot {
-      width: 6px; height: 6px;
-      background: var(--copper);
-      border-radius: 50%;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(34px, 5.2vw, 58px);
-      font-weight: 400;
-      line-height: 1.08;
-      letter-spacing: -0.02em;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 4px;
       margin-bottom: 24px;
-      color: var(--espresso);
     }
-    .hero h1 em {
+    .hero-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 60px;
+      line-height: 1.05;
+      color: var(--espresso-dk);
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+    .hero-text h1 em {
       font-style: italic;
       color: var(--copper);
       font-weight: 400;
     }
-    .hero-sub {
-      font-size: 18px;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 520px;
-      margin-bottom: 36px;
+    .hero-text p.lede {
+      font-size: 19px;
+      color: var(--text-mid);
+      margin-bottom: 40px;
+      max-width: 480px;
+      line-height: 1.55;
     }
-    .hero-cta {
+    .cta-row {
       display: flex;
-      gap: 12px;
+      align-items: center;
+      gap: 16px;
       flex-wrap: wrap;
-      align-items: center;
     }
-    .btn-primary {
-      background: var(--espresso);
-      color: var(--beige) !important;
-      padding: 16px 28px;
-      border-radius: var(--radius-sm);
+    .appstore-badge {
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+    .appstore-badge:hover { transform: translateY(-2px); }
+    .appstore-badge img { height: 56px; display: block; }
+    .btn-secondary {
+      color: var(--espresso-dk);
+      text-decoration: none;
       font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      border: 1px solid var(--espresso);
+      font-weight: 600;
+      padding: 18px 28px;
+      border-radius: 100px;
+      background: white;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
     }
-    .btn-primary:hover {
-      background: var(--ink);
+    .btn-secondary:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
-    .btn-secondary {
-      background: transparent;
-      color: var(--espresso) !important;
-      padding: 16px 28px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      border: 1px solid var(--line-strong);
-      transition: all 0.2s ease;
+    .hero-image {
+      position: relative;
     }
-    .btn-secondary:hover {
-      border-color: var(--espresso);
-      background: rgba(42, 20, 16, 0.03);
-    }
-
-    /* Hero phone mockup */
     .phone-mockup {
-      position: relative;
-      max-width: 320px;
-      margin: 0 auto;
-      aspect-ratio: 9 / 19.5;
-      border-radius: 44px;
-      background: var(--espresso);
-      padding: 12px;
-      box-shadow: var(--shadow-lg);
-      transform: rotate(-2deg);
-    }
-    .phone-screen {
       width: 100%;
-      height: 100%;
-      border-radius: 32px;
-      background: linear-gradient(160deg, var(--cream) 0%, var(--beige) 100%);
-      overflow: hidden;
-      position: relative;
-      padding: 36px 22px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .phone-screen::before {
-      content: '';
-      position: absolute;
-      top: 8px; left: 50%;
-      transform: translateX(-50%);
-      width: 100px; height: 24px;
-      background: var(--espresso);
-      border-radius: 0 0 14px 14px;
-    }
-    .mock-eyebrow {
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: var(--copper);
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-    .mock-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--espresso);
-      line-height: 1.2;
-      margin-top: 4px;
-    }
-    .mock-card {
-      background: white;
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 2px 8px rgba(42, 20, 16, 0.05);
-    }
-    .mock-card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .mock-dot {
-      width: 8px; height: 8px;
-      background: var(--copper);
-      border-radius: 50%;
-    }
-    .mock-label {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--espresso);
-      letter-spacing: 0.3px;
-    }
-    .mock-line {
-      height: 6px;
-      background: var(--beige-deep);
-      border-radius: 3px;
-      margin-bottom: 6px;
-    }
-    .mock-line.short { width: 60%; }
-    .mock-line.long { width: 90%; }
-    .mock-score {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--espresso);
-      color: var(--beige);
-      border-radius: 14px;
-    }
-    .mock-score-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      color: var(--copper-warm);
-    }
-    .mock-score-label {
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: rgba(246, 241, 236, 0.6);
+      max-width: 380px;
+      margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 30px 60px rgba(61, 42, 30, 0.15));
+      border-radius: 36px;
     }
 
-    @media (max-width: 880px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 48px; text-align: center; }
-      .hero-sub { margin-left: auto; margin-right: auto; }
-      .hero-cta { justify-content: center; }
-      .phone-mockup { max-width: 260px; transform: rotate(0); }
+    /* === FEATURES === */
+    .section {
+      padding: 100px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-
-    /* ==========================================================
-       SECTIONS — generic
-       ========================================================== */
-    section {
-      padding: 96px 0;
-    }
-    section.tight { padding: 72px 0; }
     .section-header {
-      max-width: 680px;
-      margin: 0 auto 56px;
       text-align: center;
+      margin-bottom: 64px;
     }
-    .section-header .eyebrow { margin-bottom: 12px; display: inline-block; }
-    .section-header h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 4vw, 42px);
-      font-weight: 400;
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-      color: var(--espresso);
+    .section-kind {
+      color: var(--copper);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 4px;
       margin-bottom: 16px;
     }
-    .section-header h2 em { font-style: italic; color: var(--copper); }
-    .section-header p {
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.7;
+    .section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 44px;
+      line-height: 1.15;
+      color: var(--espresso-dk);
+      font-weight: 600;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .section h2 em {
+      font-style: italic;
+      color: var(--copper);
+      font-weight: 400;
+    }
+    .section .subtitle {
+      font-size: 18px;
+      color: var(--text-mid);
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    /* ==========================================================
-       WHAT RITUEL DOES (3 cards)
-       ========================================================== */
-    .features {
-      background: white;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
-    .feature-card {
-      background: var(--beige);
+    .feature {
+      background: white;
       border-radius: var(--radius-md);
       padding: 36px 28px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s;
     }
-    .feature-card:hover {
+    .feature:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
     }
+    .feature-badge {
+      display: inline-block;
+      background: var(--copper);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
     .feature-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: var(--espresso);
-      color: var(--copper-warm);
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--cream);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 24px;
-    }
-    .feature-card h3 {
+      margin-bottom: 20px;
       font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--espresso);
-      margin-bottom: 12px;
-      line-height: 1.3;
-    }
-    .feature-card p {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    @media (max-width: 880px) {
-      .features-grid { grid-template-columns: 1fr; }
-    }
-
-    /* ==========================================================
-       WHY BRANDS — alternating layout
-       ========================================================== */
-    .brands-section {
-      background: var(--beige);
-    }
-    .brand-points {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      max-width: 920px;
-      margin: 0 auto;
-    }
-    .brand-point {
-      background: white;
-      border-radius: var(--radius-md);
-      padding: 32px;
-      border: 1px solid var(--line);
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-    }
-    .brand-point-num {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
       font-size: 28px;
       color: var(--copper);
-      line-height: 1;
-      min-width: 32px;
     }
-    .brand-point h4 {
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--espresso);
-      margin-bottom: 8px;
-      letter-spacing: -0.01em;
-    }
-    .brand-point p {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    @media (max-width: 720px) {
-      .brand-points { grid-template-columns: 1fr; }
-    }
-
-    /* ==========================================================
-       PARTNERSHIP MODEL
-       ========================================================== */
-    .partnership {
-      background: var(--espresso);
-      color: var(--beige);
-    }
-    .partnership .section-header h2 { color: var(--beige); }
-    .partnership .section-header h2 em { color: var(--copper-warm); }
-    .partnership .section-header p { color: rgba(246, 241, 236, 0.7); }
-    .partnership .eyebrow { color: var(--copper-warm); }
-
-    .partnership-list {
-      max-width: 720px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .partnership-item {
-      padding: 28px 8px;
-      border-bottom: 1px solid rgba(246, 241, 236, 0.10);
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 28px;
-      align-items: center;
-    }
-    .partnership-item:last-child { border-bottom: none; }
-    .partnership-item-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(192, 138, 106, 0.12);
-      color: var(--copper-warm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .partnership-item h4 {
-      font-family: 'Playfair Display', serif;
-      font-size: 19px;
-      color: var(--beige);
-      font-weight: 400;
-      margin-bottom: 4px;
-    }
-    .partnership-item p {
-      font-size: 14px;
-      color: rgba(246, 241, 236, 0.65);
-      line-height: 1.6;
-    }
-
-    /* ==========================================================
-       FOR USERS — minimal text section
-       ========================================================== */
-    .for-users {
-      background: white;
-      text-align: center;
-    }
-    .for-users-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 48px;
-      max-width: 880px;
-      margin: 48px auto 0;
-    }
-    .user-pillar h4 {
+    .feature h3 {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
-      color: var(--espresso);
+      color: var(--espresso-dk);
+      font-weight: 600;
       margin-bottom: 10px;
-      font-weight: 400;
-      font-style: italic;
+      letter-spacing: -0.3px;
     }
-    .user-pillar p {
-      font-size: 14px;
-      color: var(--muted);
+    .feature p {
+      font-size: 15px;
+      color: var(--text-mid);
       line-height: 1.6;
     }
 
-    @media (max-width: 720px) {
-      .for-users-grid { grid-template-columns: 1fr; gap: 32px; }
+    /* === SCREENSHOTS GALLERY === */
+    .gallery {
+      background: var(--cream);
+      padding: 100px 0;
+      overflow: hidden;
     }
-
-    /* ==========================================================
-       TRUST / POSITIONING
-       ========================================================== */
-    .trust {
-      background: var(--beige);
-      text-align: center;
-    }
-    .trust-card {
-      max-width: 760px;
+    .gallery-track {
+      display: flex;
+      gap: 24px;
+      padding: 0 24px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 64px 48px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 8px;
+    }
+    .gallery-track::-webkit-scrollbar { display: none; }
+    .gallery-item {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+      border-radius: var(--radius-md);
+      overflow: hidden;
       background: white;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--line);
-      position: relative;
-    }
-    .trust-quote-mark {
-      font-family: 'Playfair Display', serif;
-      font-size: 72px;
-      color: var(--copper);
-      line-height: 0.5;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-    .trust-text {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(20px, 2.6vw, 26px);
-      font-style: italic;
-      color: var(--espresso);
-      line-height: 1.5;
-      font-weight: 400;
-    }
-    .trust-attr {
-      margin-top: 28px;
-      font-size: 12px;
-      letter-spacing: 3px;
-      color: var(--copper);
-      text-transform: uppercase;
-    }
-
-    @media (max-width: 720px) {
-      .trust-card { padding: 40px 28px; }
-    }
-
-    /* ==========================================================
-       CONTACT
-       ========================================================== */
-    .contact {
-      background: white;
-      text-align: center;
-      border-top: 1px solid var(--line);
-    }
-    .contact h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(32px, 4.5vw, 48px);
-      font-weight: 400;
-      color: var(--espresso);
-      margin-bottom: 20px;
-      letter-spacing: -0.01em;
-    }
-    .contact h2 em { font-style: italic; color: var(--copper); }
-    .contact p {
-      font-size: 17px;
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto 36px;
-      line-height: 1.7;
-    }
-    .contact-email {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--espresso);
-      color: var(--beige) !important;
-      padding: 18px 32px;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      transition: all 0.2s ease;
-    }
-    .contact-email:hover {
-      background: var(--ink);
-      transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
+    .gallery-item img {
+      width: 100%;
+      display: block;
+    }
+    .gallery-item-caption {
+      padding: 20px;
+    }
+    .gallery-item-caption .kind {
+      color: var(--copper);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .gallery-item-caption h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--espresso-dk);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .gallery-item-caption p {
+      font-size: 13px;
+      color: var(--text-mid);
+    }
 
-    /* ==========================================================
-       FOOTER
-       ========================================================== */
+    /* === PHILOSOPHY === */
+    .philosophy {
+      background: var(--espresso-dk);
+      color: var(--cream);
+      padding: 100px 24px;
+    }
+    .philosophy-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .philosophy .section-kind { color: var(--copper-lt); }
+    .philosophy h2 {
+      color: var(--cream);
+      font-size: 40px;
+      margin-bottom: 32px;
+    }
+    .philosophy h2 em { color: var(--copper-lt); }
+    .philosophy p {
+      font-size: 18px;
+      color: rgba(245, 237, 230, 0.85);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    /* === CTA SECTION === */
+    .cta-section {
+      padding: 120px 24px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .cta-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      color: var(--espresso-dk);
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+    .cta-section h2 em {
+      font-style: italic;
+      color: var(--copper);
+      font-weight: 400;
+    }
+    .cta-section p {
+      font-size: 19px;
+      color: var(--text-mid);
+      margin-bottom: 40px;
+    }
+
+    /* === FOOTER === */
     footer {
-      background: var(--beige);
-      padding: 48px 0 32px;
+      background: var(--cream-dark);
+      padding: 60px 24px 40px;
       border-top: 1px solid var(--line);
     }
     .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .brand-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      letter-spacing: 4px;
+      color: var(--espresso-dk);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .footer-brand p {
+      font-size: 14px;
+      color: var(--text-mid);
+      max-width: 280px;
+      line-height: 1.6;
+    }
+    .footer-col h5 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 14px;
+      color: var(--text-mid);
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--copper); }
+    .footer-bottom {
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      letter-spacing: 4px;
-      color: var(--espresso);
-    }
-    .footer-meta {
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.3px;
-    }
-    .footer-meta a { color: var(--muted); margin-left: 16px; }
-    .footer-meta a:hover { color: var(--espresso); }
-
-    @media (max-width: 600px) {
-      .footer-inner { justify-content: center; text-align: center; }
+      font-size: 13px;
+      color: var(--text-soft);
     }
 
-    /* ==========================================================
-       UTILITIES
-       ========================================================== */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+    /* === MOBILE === */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 60px 24px 40px;
+        gap: 40px;
+        text-align: center;
       }
+      .hero-text h1 { font-size: 42px; }
+      .hero-text p.lede { font-size: 17px; margin: 0 auto 32px; }
+      .cta-row { justify-content: center; }
+      .hero-image { order: -1; }
+      .phone-mockup { max-width: 280px; }
+      .section { padding: 60px 24px; }
+      .section h2 { font-size: 32px; }
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .cta-section h2 { font-size: 36px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+      .nav-right .nav-link { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===================== NAV ===================== -->
   <nav>
     <div class="nav-inner">
-      <a href="#" class="brand">RITUEL</a>
-      <div class="nav-links">
-        <a href="#features">Product</a>
-        <a href="#brands">For Brands</a>
-        <a href="#partnership">Partnership</a>
-        <a href="#contact" class="nav-cta">Contact</a>
+      <a href="/" class="brand" data-i18n="brand">R I T U E L</a>
+      <div class="nav-right">
+        <a href="#features" class="nav-link" data-i18n="navFeatures">Fonctionnalités</a>
+        <a href="#philosophy" class="nav-link" data-i18n="navPhilosophy">Philosophie</a>
+        <div class="lang-switcher">
+          <button class="lang-btn active" data-lang="fr">FR</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="tr">TR</button>
+        </div>
       </div>
     </div>
   </nav>
 
-  <!-- ===================== HERO ===================== -->
+  <!-- HERO -->
   <section class="hero">
-    <div class="container">
-      <div class="hero-grid">
-        <div>
-          <div class="hero-badge">
-            <span class="dot"></span>
-            <span>Beauty &middot; AI &middot; Paris</span>
-          </div>
-          <h1>AI-powered skincare recommendations, <em>personalized</em> for every skin.</h1>
-          <p class="hero-sub">
-            Rituel helps users analyze their skin, build personalized routines, and discover products that truly match their needs. Built in Paris for skincare-focused users and beauty brands.
-          </p>
-          <div class="hero-cta">
-            <a href="#contact" class="btn-primary">
-              Partner with Rituel
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-            <a href="#features" class="btn-secondary">Learn more</a>
-          </div>
-        </div>
+    <div class="hero-text">
+      <div class="kind" data-i18n="heroKind">DISPONIBLE SUR L'APP STORE</div>
+      <h1 data-i18n-html="heroH1">Votre journal de <em>beauté intime</em>.</h1>
+      <p class="lede" data-i18n="heroLede">Pas un coach productivité. Pas un réseau social. Un journal de beauté pensé pour vous, alimenté par l'intelligence artificielle quand elle aide vraiment.</p>
+      <div class="cta-row">
+        <a href="https://apps.apple.com/fr/app/rituel/id6761560472" class="appstore-badge" target="_blank" rel="noopener">
+          <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" width="180" height="56">
+        </a>
+        <a href="#features" class="btn-secondary" data-i18n="heroLearn">Découvrir</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="assets/images/screenshots/01_home.png" alt="Rituel — Home" class="phone-mockup">
+    </div>
+  </section>
 
-        <!-- Phone mockup placeholder -->
-        <div>
-          <div class="phone-mockup" aria-hidden="true">
-            <div class="phone-screen">
-              <div>
-                <div class="mock-eyebrow">Skin Analysis</div>
-                <div class="mock-title">Your skin, today</div>
-              </div>
-              <div class="mock-score">
-                <div>
-                  <div class="mock-score-label">Overall Score</div>
-                  <div class="mock-score-num">82</div>
-                </div>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C08A6A" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l3 3 5-6"></path></svg>
-              </div>
-              <div class="mock-card">
-                <div class="mock-card-header">
-                  <div class="mock-dot"></div>
-                  <div class="mock-label">Hydration</div>
-                </div>
-                <div class="mock-line long"></div>
-                <div class="mock-line short"></div>
-              </div>
-              <div class="mock-card">
-                <div class="mock-card-header">
-                  <div class="mock-dot"></div>
-                  <div class="mock-label">Recommended routine</div>
-                </div>
-                <div class="mock-line long"></div>
-                <div class="mock-line long"></div>
-                <div class="mock-line short"></div>
-              </div>
-            </div>
-          </div>
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <div class="section-kind" data-i18n="featKind">FONCTIONNALITÉS</div>
+      <h2 data-i18n-html="featH2">Un <em>journal</em> qui vous comprend.</h2>
+      <p class="subtitle" data-i18n="featSub">Chaque écran a été pensé pour ne pas ressembler aux apps de productivité ou aux réseaux sociaux génériques.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">✦</div>
+        <h3 data-i18n="feat1H">Check-in quotidien</h3>
+        <p data-i18n="feat1P">Un emoji, une note libre. Rituel se rappelle de chaque instant pour mieux vous accompagner. Pas de streak anxiogène.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">◆</div>
+        <h3 data-i18n="feat2H">Intelligence beauté</h3>
+        <p data-i18n="feat2P">Cinq outils IA : analyse de peau par photo, maquillage personnalisé, optimisation de routine, compatibilité d'ingrédients.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-badge">NOUVEAU</span>
+        <div class="feature-icon">❀</div>
+        <h3 data-i18n="feat3H">Glow Timeline</h3>
+        <p data-i18n="feat3P">Toutes vos analyses, check-ins et publications dans une chronologie douce. Votre parcours beauté, jour après jour.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-badge">NOUVEAU</span>
+        <div class="feature-icon">✧</div>
+        <h3 data-i18n="feat4H">Rituel Score</h3>
+        <p data-i18n="feat4P">Un reflet sur 100 — Naissant, En éveil, En rituel, Rayonnant. Jamais une note ni un objectif, un simple signal.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-badge">NOUVEAU</span>
+        <div class="feature-icon">♡</div>
+        <h3 data-i18n="feat5H">Communauté</h3>
+        <p data-i18n="feat5P">Un journal collectif. Pas de comparaisons, pas d'algorithme agressif. Découvrez des routines compatibles avec votre peau.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-badge">NOUVEAU</span>
+        <div class="feature-icon">◇</div>
+        <h3 data-i18n="feat6H">Cartes partageables</h3>
+        <p data-i18n="feat6P">Transformez votre vérification de compatibilité ou votre routine en carte éditoriale prête pour Stories. Format luxe.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS GALLERY -->
+  <section class="gallery">
+    <div class="section-header" style="max-width:1200px;margin:0 auto 48px;padding:0 24px;">
+      <div class="section-kind" data-i18n="galKind">À L'INTÉRIEUR</div>
+      <h2 data-i18n-html="galH2">Découvrez <em>Rituel</em>.</h2>
+    </div>
+    <div class="gallery-track">
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/01_home.png" alt="Accueil">
+        <div class="gallery-item-caption">
+          <div class="kind">ACCUEIL</div>
+          <h4 data-i18n="g1H">Votre rituel commence ici</h4>
+          <p data-i18n="g1P">Check-in, rythme, conseils du jour.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/02_ai_studio.png" alt="AI Studio">
+        <div class="gallery-item-caption">
+          <div class="kind">STUDIO IA</div>
+          <h4 data-i18n="g2H">Cinq outils, une intelligence</h4>
+          <p data-i18n="g2P">Analyse, maquillage, routine, compatibilité.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/03_makeup.png" alt="Maquillage">
+        <div class="gallery-item-caption">
+          <div class="kind">MAQUILLAGE</div>
+          <h4 data-i18n="g3H">Votre look, votre événement</h4>
+          <p data-i18n="g3P">L'IA compose pour vous, étape par étape.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/04_archive.png" alt="Archive">
+        <div class="gallery-item-caption">
+          <div class="kind">ARCHIVE</div>
+          <h4 data-i18n="g4H">Organisez vos soins</h4>
+          <p data-i18n="g4P">Tous vos produits, au bon moment.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/05_community.png" alt="Communauté">
+        <div class="gallery-item-caption">
+          <div class="kind">COMMUNAUTÉ</div>
+          <h4 data-i18n="g5H">Pour celles qui vous ressemblent</h4>
+          <p data-i18n="g5P">Partagez, sauvegardez, découvrez.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="assets/images/screenshots/06_profile.png" alt="Profil">
+        <div class="gallery-item-caption">
+          <div class="kind">PROFIL</div>
+          <h4 data-i18n="g6H">Votre identité beauté</h4>
+          <p data-i18n="g6P">Mémoire, crédits, et plus encore.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== WHAT RITUEL DOES ===================== -->
-  <section class="features" id="features">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">What Rituel does</span>
-        <h2>A complete skincare <em>intelligence layer</em></h2>
-        <p>From diagnosis to discovery — Rituel guides users through three core experiences.</p>
-      </div>
-      <div class="features-grid">
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 3a9 9 0 0 1 0 18"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </div>
-          <h3>AI skin analysis</h3>
-          <p>Users capture a selfie and receive an evidence-based read of hydration, texture, sensitivity, and key concerns — powered by computer vision.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 6h16"></path>
-              <path d="M4 12h16"></path>
-              <path d="M4 18h10"></path>
-              <circle cx="20" cy="18" r="2"></circle>
-            </svg>
-          </div>
-          <h3>Personalized routines</h3>
-          <p>Morning and evening rituals built around each user's skin profile, lifestyle, and goals — adaptive, not generic.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 7l9-4 9 4-9 4-9-4z"></path>
-              <path d="M3 12l9 4 9-4"></path>
-              <path d="M3 17l9 4 9-4"></path>
-            </svg>
-          </div>
-          <h3>Product recommendations</h3>
-          <p>Suggestions matched to real user needs — not random catalog noise. Surfaced at the moment users are actively deciding what to buy.</p>
-        </div>
-
-      </div>
+  <!-- PHILOSOPHY -->
+  <section class="philosophy" id="philosophy">
+    <div class="philosophy-inner">
+      <div class="section-kind" data-i18n="phiKind">NOTRE PHILOSOPHIE</div>
+      <h2 data-i18n-html="phiH2">Rituel n'ajoute pas une fonctionnalité parce que c'est <em>techniquement possible</em>.</h2>
+      <p data-i18n="phiP1">Chaque écran, chaque bouton, chaque mot a été pensé pour ne pas ressembler aux apps de productivité ou aux réseaux sociaux génériques.</p>
+      <p data-i18n="phiP2">Les streaks anxiogènes, les compteurs de likes en grand, les notifications agressives : tout cela est volontairement absent.</p>
+      <p data-i18n="phiP3"><em>Rituel se rappelle de votre histoire pour mieux vous accompagner. Vous restez maîtresse de votre journal.</em></p>
     </div>
   </section>
 
-  <!-- ===================== WHY BRANDS ===================== -->
-  <section class="brands-section" id="brands">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">For brands</span>
-        <h2>Reach skincare-focused users at the <em>moment of decision</em></h2>
-        <p>Rituel is built for relevance. Every recommendation is tied to a diagnosed need, not a banner placement.</p>
-      </div>
-
-      <div class="brand-points">
-        <div class="brand-point">
-          <div class="brand-point-num">01</div>
-          <div>
-            <h4>High-intent users after diagnosis</h4>
-            <p>Users see recommendations only after completing skin analysis — meaning intent and context are already established.</p>
-          </div>
-        </div>
-        <div class="brand-point">
-          <div class="brand-point-num">02</div>
-          <div>
-            <h4>Product discovery at decision moment</h4>
-            <p>Recommendations appear inside personalized routines, where users are already evaluating what to add or replace.</p>
-          </div>
-        </div>
-        <div class="brand-point">
-          <div class="brand-point-num">03</div>
-          <div>
-            <h4>Qualified traffic, not generic clicks</h4>
-            <p>Each click reflects a matched skin need — concern, type, or routine gap — rather than broad demographic targeting.</p>
-          </div>
-        </div>
-        <div class="brand-point">
-          <div class="brand-point-num">04</div>
-          <div>
-            <h4>Beauty &amp; skincare focused audience</h4>
-            <p>The user base self-selects for skincare engagement: they download Rituel specifically to improve their routines.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== PARTNERSHIP MODEL ===================== -->
-  <section class="partnership" id="partnership">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">Partnership model</span>
-        <h2>Multiple ways to <em>work together</em></h2>
-        <p>Flexible formats — from affiliate integrations to featured placements inside personalized routines.</p>
-      </div>
-
-      <div class="partnership-list">
-
-        <div class="partnership-item">
-          <div class="partnership-item-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          </div>
-          <div>
-            <h4>Affiliate partnerships</h4>
-            <p>Standard affiliate integrations through established networks — performance-based, transparent, easy to set up.</p>
-          </div>
-        </div>
-
-        <div class="partnership-item">
-          <div class="partnership-item-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>
-          </div>
-          <div>
-            <h4>Featured product recommendations</h4>
-            <p>Selected products surfaced in routines where they fit the user's diagnosed concern — context-aware, never intrusive.</p>
-          </div>
-        </div>
-
-        <div class="partnership-item">
-          <div class="partnership-item-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          </div>
-          <div>
-            <h4>AI routine matching</h4>
-            <p>Brand catalogs integrated into the AI recommendation engine, so products surface dynamically based on user skin profiles.</p>
-          </div>
-        </div>
-
-        <div class="partnership-item">
-          <div class="partnership-item-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-          </div>
-          <div>
-            <h4>Campaign &amp; product testing</h4>
-            <p>Targeted reach for new launches or limited campaigns — with feedback loops via routine adoption and engagement.</p>
-          </div>
-        </div>
-
-        <div class="partnership-item">
-          <div class="partnership-item-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div>
-            <h4>Brand visibility in personalized routines</h4>
-            <p>Editorial-style placement inside routines and skin reports, where users actively engage with content.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== FOR USERS ===================== -->
-  <section class="for-users tight">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">For users</span>
-        <h2>Skincare, <em>made personal</em></h2>
-      </div>
-      <div class="for-users-grid">
-        <div class="user-pillar">
-          <h4>Understand your skin</h4>
-          <p>AI-driven analysis turns vague concerns into clear, trackable insights.</p>
-        </div>
-        <div class="user-pillar">
-          <h4>Build better routines</h4>
-          <p>Morning and evening rituals tailored to your skin, refined over time.</p>
-        </div>
-        <div class="user-pillar">
-          <h4>Discover better products</h4>
-          <p>Recommendations grounded in real needs — not trends or generic catalogs.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== TRUST / POSITIONING ===================== -->
-  <section class="trust">
-    <div class="container">
-      <div class="trust-card">
-        <div class="trust-quote-mark">&ldquo;</div>
-        <p class="trust-text">
-          Rituel is built for skincare-focused users and beauty brands looking for more relevant, personalized product discovery.
-        </p>
-        <div class="trust-attr">Made in Paris</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== CONTACT ===================== -->
-  <section class="contact" id="contact">
-    <div class="container">
-      <span class="eyebrow">Get in touch</span>
-      <h2 style="margin-top:12px;">Let's build something <em>relevant</em>.</h2>
-      <p>
-        We work with affiliate and brand partners across the beauty ecosystem. If you'd like to explore a partnership, integration, or campaign — get in touch.
-      </p>
-      <a href="mailto:partnerships@rituel.beauty?subject=Rituel%20%E2%80%94%20Partnership%20inquiry" class="contact-email">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        partnerships@rituel.beauty
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2 data-i18n-html="ctaH2">Commencez votre <em>rituel</em>.</h2>
+    <p data-i18n="ctaP">Gratuit au téléchargement. Aucune publicité, aucun tracking tiers.</p>
+    <div class="cta-row" style="justify-content:center;">
+      <a href="https://apps.apple.com/fr/app/rituel/id6761560472" class="appstore-badge" target="_blank" rel="noopener">
+        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" width="180" height="56">
       </a>
     </div>
   </section>
 
-  <!-- ===================== FOOTER ===================== -->
+  <!-- FOOTER -->
   <footer>
-    <div class="container footer-inner">
-      <div class="footer-brand">RITUEL</div>
-      <div class="footer-meta">
-        &copy; 2026 Rituel &middot; Paris
-        <a href="../privacy.html">Privacy</a>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="brand-mark">R I T U E L</span>
+          <p data-i18n="footTagline">Un journal de beauté intime, pensé à Paris.</p>
+        </div>
+        <div class="footer-col">
+          <h5 data-i18n="footProduct">Produit</h5>
+          <a href="#features" data-i18n="navFeatures">Fonctionnalités</a>
+          <a href="#philosophy" data-i18n="navPhilosophy">Philosophie</a>
+          <a href="https://apps.apple.com/fr/app/rituel/id6761560472" target="_blank" rel="noopener" data-i18n="footAppStore">App Store</a>
+        </div>
+        <div class="footer-col">
+          <h5 data-i18n="footLegal">Légal</h5>
+          <a href="privacy.html" data-i18n="footPrivacy">Confidentialité</a>
+          <a href="terms.html" data-i18n="footTerms">Conditions</a>
+        </div>
+        <div class="footer-col">
+          <h5 data-i18n="footContact">Contact</h5>
+          <a href="mailto:partnerships@rituel.beauty">partnerships@rituel.beauty</a>
+          <a href="mailto:info@mfatihkucuk.com">info@mfatihkucuk.com</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Rituel · Atelier MFK · Paris</span>
+        <span data-i18n="footMade">Conçu avec soin à Paris</span>
       </div>
     </div>
   </footer>
 
   <script>
-    // Minimal smooth scroll for older browsers + offset for sticky nav
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-      link.addEventListener('click', e => {
-        const id = link.getAttribute('href');
-        if (id === '#' || id.length < 2) return;
-        const target = document.querySelector(id);
-        if (!target) return;
-        e.preventDefault();
-        const navH = document.querySelector('nav').offsetHeight;
-        const y = target.getBoundingClientRect().top + window.pageYOffset - navH - 8;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+    // === i18n ===
+    const TRANSLATIONS = {
+      fr: {
+        brand: 'R I T U E L',
+        navFeatures: 'Fonctionnalités',
+        navPhilosophy: 'Philosophie',
+        heroKind: "DISPONIBLE SUR L'APP STORE",
+        heroH1: 'Votre journal de <em>beauté intime</em>.',
+        heroLede: "Pas un coach productivité. Pas un réseau social. Un journal de beauté pensé pour vous, alimenté par l'intelligence artificielle quand elle aide vraiment.",
+        heroLearn: 'Découvrir',
+        featKind: 'FONCTIONNALITÉS',
+        featH2: 'Un <em>journal</em> qui vous comprend.',
+        featSub: 'Chaque écran a été pensé pour ne pas ressembler aux apps de productivité ou aux réseaux sociaux génériques.',
+        feat1H: 'Check-in quotidien',
+        feat1P: 'Un emoji, une note libre. Rituel se rappelle de chaque instant pour mieux vous accompagner. Pas de streak anxiogène.',
+        feat2H: 'Intelligence beauté',
+        feat2P: "Cinq outils IA : analyse de peau par photo, maquillage personnalisé, optimisation de routine, compatibilité d'ingrédients.",
+        feat3H: 'Glow Timeline',
+        feat3P: 'Toutes vos analyses, check-ins et publications dans une chronologie douce. Votre parcours beauté, jour après jour.',
+        feat4H: 'Rituel Score',
+        feat4P: 'Un reflet sur 100 — Naissant, En éveil, En rituel, Rayonnant. Jamais une note ni un objectif, un simple signal.',
+        feat5H: 'Communauté',
+        feat5P: "Un journal collectif. Pas de comparaisons, pas d'algorithme agressif. Découvrez des routines compatibles avec votre peau.",
+        feat6H: 'Cartes partageables',
+        feat6P: 'Transformez votre vérification de compatibilité ou votre routine en carte éditoriale prête pour Stories. Format luxe.',
+        galKind: "À L'INTÉRIEUR",
+        galH2: 'Découvrez <em>Rituel</em>.',
+        g1H: 'Votre rituel commence ici',
+        g1P: 'Check-in, rythme, conseils du jour.',
+        g2H: 'Cinq outils, une intelligence',
+        g2P: 'Analyse, maquillage, routine, compatibilité.',
+        g3H: 'Votre look, votre événement',
+        g3P: "L'IA compose pour vous, étape par étape.",
+        g4H: 'Organisez vos soins',
+        g4P: 'Tous vos produits, au bon moment.',
+        g5H: 'Pour celles qui vous ressemblent',
+        g5P: 'Partagez, sauvegardez, découvrez.',
+        g6H: 'Votre identité beauté',
+        g6P: 'Mémoire, crédits, et plus encore.',
+        phiKind: 'NOTRE PHILOSOPHIE',
+        phiH2: "Rituel n'ajoute pas une fonctionnalité parce que c'est <em>techniquement possible</em>.",
+        phiP1: 'Chaque écran, chaque bouton, chaque mot a été pensé pour ne pas ressembler aux apps de productivité ou aux réseaux sociaux génériques.',
+        phiP2: 'Les streaks anxiogènes, les compteurs de likes en grand, les notifications agressives : tout cela est volontairement absent.',
+        phiP3: '<em>Rituel se rappelle de votre histoire pour mieux vous accompagner. Vous restez maîtresse de votre journal.</em>',
+        ctaH2: 'Commencez votre <em>rituel</em>.',
+        ctaP: 'Gratuit au téléchargement. Aucune publicité, aucun tracking tiers.',
+        footTagline: 'Un journal de beauté intime, pensé à Paris.',
+        footProduct: 'Produit',
+        footAppStore: 'App Store',
+        footLegal: 'Légal',
+        footPrivacy: 'Confidentialité',
+        footTerms: 'Conditions',
+        footContact: 'Contact',
+        footMade: 'Conçu avec soin à Paris',
+      },
+      en: {
+        brand: 'R I T U E L',
+        navFeatures: 'Features',
+        navPhilosophy: 'Philosophy',
+        heroKind: 'AVAILABLE ON THE APP STORE',
+        heroH1: 'Your intimate <em>beauty diary</em>.',
+        heroLede: 'Not a productivity coach. Not a social network. A beauty diary designed for you, powered by AI when it actually helps.',
+        heroLearn: 'Discover',
+        featKind: 'FEATURES',
+        featH2: 'A <em>diary</em> that understands you.',
+        featSub: 'Every screen was designed to not feel like productivity apps or generic social networks.',
+        feat1H: 'Daily check-in',
+        feat1P: 'One emoji, a free note. Rituel remembers each moment to better accompany you. No anxiety-inducing streaks.',
+        feat2H: 'Beauty intelligence',
+        feat2P: 'Five AI tools: photo skin analysis, personalized makeup, routine optimization, ingredient compatibility.',
+        feat3H: 'Glow Timeline',
+        feat3P: 'All your analyses, check-ins, and posts in a gentle chronology. Your beauty journey, day by day.',
+        feat4H: 'Rituel Score',
+        feat4P: 'A reflection out of 100 — Emerging, Awakening, In Rituel, Radiant. Never a grade or goal, just a signal.',
+        feat5H: 'Community',
+        feat5P: 'A collective diary. No comparisons, no aggressive algorithm. Discover routines compatible with your skin.',
+        feat6H: 'Shareable cards',
+        feat6P: 'Turn your compatibility check or routine into an editorial card ready for Stories. Luxury format.',
+        galKind: 'INSIDE',
+        galH2: 'Discover <em>Rituel</em>.',
+        g1H: 'Your ritual starts here',
+        g1P: 'Check-in, rhythm, daily guidance.',
+        g2H: 'Five tools, one intelligence',
+        g2P: 'Analysis, makeup, routine, compatibility.',
+        g3H: 'Your look, your event',
+        g3P: 'AI composes for you, step by step.',
+        g4H: 'Organize your products',
+        g4P: 'Every product, at the right moment.',
+        g5H: 'For those who resemble you',
+        g5P: 'Share, save, discover.',
+        g6H: 'Your beauty identity',
+        g6P: 'Memory, credits, and more.',
+        phiKind: 'OUR PHILOSOPHY',
+        phiH2: "Rituel doesn't add a feature because it's <em>technically possible</em>.",
+        phiP1: 'Every screen, every button, every word was designed to not feel like productivity apps or generic social networks.',
+        phiP2: 'Anxiety-inducing streaks, large like counters, aggressive notifications: all deliberately absent.',
+        phiP3: '<em>Rituel remembers your story to better accompany you. You stay in charge of your diary.</em>',
+        ctaH2: 'Start your <em>ritual</em>.',
+        ctaP: 'Free to download. No ads, no third-party tracking.',
+        footTagline: 'An intimate beauty diary, crafted in Paris.',
+        footProduct: 'Product',
+        footAppStore: 'App Store',
+        footLegal: 'Legal',
+        footPrivacy: 'Privacy',
+        footTerms: 'Terms',
+        footContact: 'Contact',
+        footMade: 'Designed with care in Paris',
+      },
+      tr: {
+        brand: 'R I T U E L',
+        navFeatures: 'Özellikler',
+        navPhilosophy: 'Felsefe',
+        heroKind: "APP STORE'DA YAYINDA",
+        heroH1: 'Kişisel <em>güzellik günlüğünüz</em>.',
+        heroLede: 'Verimlilik koçu değil. Sosyal ağ değil. Sizin için tasarlanmış, gerçekten yardım ettiğinde yapay zekayla beslenen bir güzellik günlüğü.',
+        heroLearn: 'Keşfedin',
+        featKind: 'ÖZELLİKLER',
+        featH2: 'Sizi <em>anlayan</em> bir günlük.',
+        featSub: 'Her ekran, verimlilik uygulamalarına veya genel sosyal ağlara benzemesin diye düşünüldü.',
+        feat1H: 'Günlük check-in',
+        feat1P: 'Bir emoji, serbest bir not. Rituel her anı sizi daha iyi anlamak için hatırlar. Stres yaratan streak yok.',
+        feat2H: 'Güzellik zekası',
+        feat2P: 'Beş AI aracı: fotoğrafla cilt analizi, kişisel makyaj, rutin optimizasyonu, içerik uyumu.',
+        feat3H: 'Glow Timeline',
+        feat3P: 'Tüm analizleriniz, check-in\'leriniz ve paylaşımlarınız yumuşak bir kronolojide. Güzellik yolculuğunuz, gün gün.',
+        feat4H: 'Rituel Skor',
+        feat4P: '100 üzerinden bir yansıma — Filizlenen, Uyanan, Rituel\'de, Işıldayan. Asla not ya da hedef değil, sadece bir sinyal.',
+        feat5H: 'Topluluk',
+        feat5P: 'Kolektif bir günlük. Karşılaştırma yok, agresif algoritma yok. Cildinizle uyumlu rutinleri keşfedin.',
+        feat6H: 'Paylaşılabilir kartlar',
+        feat6P: 'Uyum kontrolünüzü veya rutininizi Stories\'e hazır editöryal karta dönüştürün. Lüks format.',
+        galKind: 'İÇERİDEN',
+        galH2: '<em>Rituel</em>\'i keşfedin.',
+        g1H: 'Rituel\'iniz burada başlar',
+        g1P: 'Check-in, ritim, günün rehberi.',
+        g2H: 'Beş araç, tek zeka',
+        g2P: 'Analiz, makyaj, rutin, uyum.',
+        g3H: 'Sizin look\'unuz, sizin etkinliğiniz',
+        g3P: 'AI sizin için adım adım oluşturur.',
+        g4H: 'Bakımınızı düzenleyin',
+        g4P: 'Her ürün, doğru anda.',
+        g5H: 'Size benzeyenler için',
+        g5P: 'Paylaşın, kaydedin, keşfedin.',
+        g6H: 'Güzellik kimliğiniz',
+        g6P: 'Hafıza, krediler ve daha fazlası.',
+        phiKind: 'FELSEFEMİZ',
+        phiH2: "Rituel, sadece <em>teknik olarak mümkün</em> diye bir özellik eklemez.",
+        phiP1: 'Her ekran, her buton, her kelime, verimlilik uygulamalarına veya genel sosyal ağlara benzemesin diye düşünüldü.',
+        phiP2: 'Stres yaratan streak\'ler, büyük beğeni sayaçları, agresif bildirimler: hepsi kasıtlı olarak yok.',
+        phiP3: '<em>Rituel hikayenizi sizi daha iyi anlamak için hatırlar. Günlüğünüzün sahibi sizsiniz.</em>',
+        ctaH2: '<em>Rituel</em>\'inize başlayın.',
+        ctaP: 'İndirme ücretsiz. Reklam yok, üçüncü taraf takip yok.',
+        footTagline: "Paris'te tasarlanmış kişisel güzellik günlüğü.",
+        footProduct: 'Ürün',
+        footAppStore: 'App Store',
+        footLegal: 'Hukuki',
+        footPrivacy: 'Gizlilik',
+        footTerms: 'Koşullar',
+        footContact: 'İletişim',
+        footMade: "Paris'te özenle tasarlandı",
+      }
+    };
+
+    function setLang(lang) {
+      const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
       });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (dict[key]) el.innerHTML = dict[key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      localStorage.setItem('rituel-lang', lang);
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.dataset.lang));
     });
+
+    // Init: stored pref > browser lang > fr
+    const stored = localStorage.getItem('rituel-lang');
+    const browser = (navigator.language || 'fr').slice(0, 2);
+    const initial = stored || (TRANSLATIONS[browser] ? browser : 'fr');
+    setLang(initial);
   </script>
 
 </body>
