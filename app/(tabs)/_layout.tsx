@@ -1,6 +1,10 @@
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import Svg, { Circle, Path, Polyline, Rect } from 'react-native-svg';
 import { C } from '../../theme';
+import { useEffect, useState } from 'react';
+import { Session } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
+import { useOnboarded } from '../../hooks/useOnboarded';
 
 function HomeIcon({ color }: { color: string }) {
   return (
@@ -50,6 +54,19 @@ function ProfileIcon({ color }: { color: string }) {
 }
 
 export default function TabLayout() {
+  const [session, setSession] = useState<Session | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+  const { onboarded, loading: onboardedLoading } = useOnboarded(session?.user?.id);
+  useEffect(() => {
+    if (!onboardedLoading && session?.user?.id && onboarded === false) {
+      router.replace('/onboarding' as any);
+    }
+  }, [onboarded, onboardedLoading, session?.user?.id]);
+
   return (
     <Tabs
       screenOptions={{
