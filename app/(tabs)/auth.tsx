@@ -3,7 +3,8 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { pickAvatarFromLibrary, uploadAvatar } from '../../utils/avatar';
-import { useProfile } from '../../hooks/useProfile';
+import { useProfile } from '../../hooks/useProfile'
+import { useFavoriteProducts } from '../../hooks/useFavoriteProducts';;
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
@@ -28,6 +29,7 @@ export default function AuthScreen() {
   const { count: routineCount } = useRoutineCount();
   const { isPremium, customerInfo, restore } = usePremium();
   const { profile, update: updateProfile } = useProfile();
+  const { products: favoriteProducts } = useFavoriteProducts(profile?.id ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState('');
@@ -589,7 +591,19 @@ export default function AuthScreen() {
           </Text>
         </PremiumCard>
 
-        <Text style={s.section}>ACCÈS RAPIDE</Text>
+{favoriteProducts.length > 0 ? (
+          <View style={s.ritualSection}>
+            <Text style={s.section}>DANS MON RITUEL</Text>
+            <View style={s.ritualChipsWrap}>
+              {favoriteProducts.map((name) => (
+                <View key={name} style={s.ritualChip}>
+                  <Text style={s.ritualChipTxt} numberOfLines={1}>{name}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        ) : null}
+                <Text style={s.section}>ACCÈS RAPIDE</Text>
         <ListRow
           title="Mon journal"
           subtitle="Ton parcours beauté, jour après jour"
@@ -751,6 +765,32 @@ const s = StyleSheet.create({
     fontSize: 11, fontWeight: '700', color: C.copper,
     letterSpacing: 1.6, textTransform: 'uppercase',
     marginTop: Sp.lg, marginBottom: Sp.sm,
+  },
+  ritualSection: {
+    marginTop: 24,
+    marginBottom: 4,
+  },
+  ritualChipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+    paddingHorizontal: 16,
+  },
+  ritualChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 100,
+    backgroundColor: '#FBF6F1',
+    borderWidth: 1,
+    borderColor: '#E8DFD2',
+    maxWidth: 220,
+  },
+  ritualChipTxt: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: C.copper,
+    letterSpacing: 0.3,
   },
   recoLabel: {
     fontSize: 10, fontWeight: '700', color: C.copper,
