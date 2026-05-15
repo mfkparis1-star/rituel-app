@@ -134,3 +134,26 @@ export async function deletePost(postId: string): Promise<boolean> {
   const { error } = await supabase.from('posts').delete().eq('id', postId);
   return !error;
 }
+
+/**
+ * Phase 17B — Product discovery.
+ *
+ * Returns posts where product_names array contains the given product
+ * name. Uses PostgREST array contains operator (cs). Case-sensitive
+ * for now; can be tuned with ilike pattern if needed.
+ *
+ * No RLS changes — posts are already publicly readable per Phase 16D.
+ */
+export async function fetchPostsByProduct(name: string, limit = 30): Promise<FeedPost[]> {
+  const trimmed = name.trim();
+  if (!trimmed) return [];
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .contains('product_names', [trimmed])
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+  return data as FeedPost[];
+}
+

@@ -596,9 +596,14 @@ export default function AuthScreen() {
             <Text style={s.section}>DANS MON RITUEL</Text>
             <View style={s.ritualChipsWrap}>
               {favoriteProducts.map((name) => (
-                <View key={name} style={s.ritualChip}>
+                <Pressable
+                  key={name}
+                  onPress={() => router.push(`/product-discovery/${encodeURIComponent(name)}` as any)}
+                  style={s.ritualChip}
+                  hitSlop={4}
+                >
                   <Text style={s.ritualChipTxt} numberOfLines={1}>{name}</Text>
-                </View>
+                </Pressable>
               ))}
             </View>
           </View>

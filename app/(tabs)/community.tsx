@@ -471,9 +471,14 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
           <Text style={s.productsLabel}>PRODUITS UTILISÉS</Text>
           <View style={s.productChipsBox}>
             {productNames.map((name, i) => (
-              <View key={`${post.id}-p-${i}`} style={s.productChip}>
+              <Pressable
+                key={`${post.id}-p-${i}`}
+                onPress={() => router.push(`/product-discovery/${encodeURIComponent(name)}` as any)}
+                style={s.productChip}
+                hitSlop={4}
+              >
                 <Text style={s.productChipTxt} numberOfLines={1}>{name}</Text>
-              </View>
+              </Pressable>
             ))}
           </View>
         </>
