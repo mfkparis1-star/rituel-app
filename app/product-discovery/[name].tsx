@@ -15,7 +15,7 @@
  *   - posts where product_names contains :name (newest first, capped 30)
  */
 import { type Session } from '@supabase/supabase-js';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -43,7 +43,13 @@ function authorName(post: FeedPost): string {
 
 export default function ProductDiscoveryScreen() {
   const { name } = useLocalSearchParams<{ name: string }>();
-  const productName = decodeURIComponent(name || '').trim();
+  const productName = (() => {
+    try {
+      return decodeURIComponent(name || '').trim();
+    } catch {
+      return (name || '').trim();
+    }
+  })();
 
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,10 +72,8 @@ export default function ProductDiscoveryScreen() {
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      <Stack.Screen options={{ headerShown: false }} />
-
       <View style={s.header}>
-        <Pressable onPress={() => safeBack('/(tabs)/community')} hitSlop={10} style={s.backBtn}>
+        <Pressable onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/(tabs)/community' as any); }} hitSlop={10} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </Pressable>
         <View style={s.headerCenter}>
