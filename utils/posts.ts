@@ -17,6 +17,7 @@ export type FeedPost = {
   caption: string;
   skin_type: string | null;
   product_names: string[] | null;
+  emotion: string | null;
   likes_count: number;
   created_at: string;
   user_email?: string | null;
@@ -77,6 +78,7 @@ export type CreatePostInput = {
   userId: string;
   caption: string;
   skinType?: string | null;
+  emotion?: string | null;
   productNames?: string[];
   imageUrl?: string | null;
   displayName?: string | null;
@@ -91,6 +93,7 @@ export async function createPost(input: CreatePostInput): Promise<{ ok: boolean;
       user_id: input.userId,
       caption: input.caption.trim(),
       skin_type: input.skinType ?? null,
+      emotion: input.emotion ?? null,
       product_names: input.productNames ?? null,
       image_url: input.imageUrl ?? null,
       display_name: input.displayName ?? null,

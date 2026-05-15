@@ -30,6 +30,7 @@ export default function NewPostScreen() {
 
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [caption, setCaption] = useState('');
+  const [emotion, setEmotion] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function NewPostScreen() {
     const result = await createPost({
       userId: session.user.id,
       caption: caption.trim(),
+      emotion,
       skinType,
       imageUrl,
       displayName: display,
@@ -155,6 +157,27 @@ export default function NewPostScreen() {
           </View>
         )}
 
+        {/* Phase 17A — emotion picker (optional, beauty ritual emotion) */}
+        <View style={s.emotionWrap}>
+          <Text style={s.emotionLabel}>Comment t'es-tu sentie ?</Text>
+          <View style={s.emotionRow}>
+            {(['Apaisant','Réconfortant','Lumineux','Énergisant','Fragile','Doux'] as const).map((e) => {
+              const active = emotion === e;
+              return (
+                <Pressable
+                  key={e}
+                  onPress={() => setEmotion(active ? null : e)}
+                  style={[s.emotionChip, active && s.emotionChipActive]}
+                  hitSlop={6}
+                >
+                  <Text style={[s.emotionChipTxt, active && s.emotionChipTxtActive]}>{e}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={s.emotionHint}>Facultatif</Text>
+        </View>
+
         <PillButton
           label="Publier"
           variant="primary"
@@ -201,6 +224,51 @@ const s = StyleSheet.create({
   captionInput: {
     backgroundColor: C.bg2, borderRadius: R.md, padding: Sp.md,
     minHeight: 120, fontSize: 14, color: C.text, textAlignVertical: 'top', lineHeight: 20,
+  },
+  emotionWrap: {
+    marginTop: 18,
+    marginBottom: 4,
+  },
+  emotionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 2,
+    color: C.copper,
+    textTransform: 'uppercase',
+    marginBottom: 12,
+  },
+  emotionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  emotionChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#E8DFD2',
+  },
+  emotionChipActive: {
+    backgroundColor: '#FBF6F1',
+    borderColor: C.copper,
+  },
+  emotionChipTxt: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: '#7A6555',
+  },
+  emotionChipTxtActive: {
+    color: C.copper,
+    fontWeight: '500',
+  },
+  emotionHint: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#A99583',
+    marginTop: 8,
+    letterSpacing: 0.3,
   },
   counter: { fontSize: 11, color: C.textSoft, textAlign: 'right', marginTop: 4 },
 

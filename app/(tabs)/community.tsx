@@ -23,6 +23,7 @@ type Post = {
   caption: string;
   skin_type: string;
   product_names: string[] | null;
+  emotion: string | null;
   likes_count: number;
   created_at: string;
   user_email?: string;
@@ -456,6 +457,11 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
         </View>
       </View>
 
+      {post.emotion ? (
+        <View style={s.emotionPill}>
+          <Text style={s.emotionPillTxt}>{post.emotion}</Text>
+        </View>
+      ) : null}
       {captionToShow ? (
         <Text style={s.postContent}>{captionToShow}</Text>
       ) : null}
@@ -673,6 +679,23 @@ const s = StyleSheet.create({
     fontSize: 12,
     color: C.copper,
     fontWeight: '600',
+  },
+
+  emotionPill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 100,
+    backgroundColor: '#FBF6F1',
+    borderWidth: 1,
+    borderColor: '#E8DFD2',
+    marginBottom: 8,
+  },
+  emotionPillTxt: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: C.copper,
+    letterSpacing: 0.4,
   },
 });
 
