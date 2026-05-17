@@ -32,6 +32,9 @@ export default function NewPostScreen() {
   const [caption, setCaption] = useState('');
   const [emotion, setEmotion] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Phase 17B/C data integrity — auto-fill product_names from active archive
+  const [archiveProducts, setArchiveProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let mounted = true;
@@ -41,6 +44,32 @@ export default function NewPostScreen() {
     })();
     return () => { mounted = false; };
   }, []);
+
+  // Fetch user's active archive on mount + when session resolves.
+  // Default: all active products selected. User can opt out per chip.
+  useEffect(() => {
+    if (!session) return;
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('brand, name')
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (!mounted || error || !data) return;
+      const labels = data
+        .map((p: any) => `${(p.brand ?? '').trim()} ${(p.name ?? '').trim()}`.trim())
+        .filter((s: string) => s.length > 0);
+      // Deduplicate (same brand+name repeated)
+      const unique = Array.from(new Set(labels));
+      setArchiveProducts(unique);
+      // Default-select everything (auto-fill behavior)
+      setSelectedProducts(new Set(unique));
+    })();
+    return () => { mounted = false; };
+  }, [session]);
 
   const skinType = useMemo(
     () => memory?.last_analysis_summary?.skinType ?? profile?.skin_type ?? null,
@@ -84,11 +113,13 @@ export default function NewPostScreen() {
     }
 
     const display = profile?.full_name?.trim() || (session.user.email ?? '').split('@')[0] || null;
+    const productNames = Array.from(selectedProducts);
     const result = await createPost({
       userId: session.user.id,
       caption: caption.trim(),
       emotion,
       skinType,
+      productNames: productNames.length > 0 ? productNames : undefined,
       imageUrl,
       displayName: display,
       userEmail: session.user.email ?? null,
@@ -178,6 +209,41 @@ export default function NewPostScreen() {
           <Text style={s.emotionHint}>Facultatif</Text>
         </View>
 
+        {/* Phase 17B/C data integrity — products from active archive */}
+        {archiveProducts.length > 0 && (
+          <View style={s.productsWrap}>
+            <Text style={s.productsLabelLg}>PRODUITS DE TON RITUEL</Text>
+            <View style={s.productsRow}>
+              {archiveProducts.map((label) => {
+                const active = selectedProducts.has(label);
+                return (
+                  <Pressable
+                    key={label}
+                    onPress={() => {
+                      setSelectedProducts((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(label)) next.delete(label);
+                        else next.add(label);
+                        return next;
+                      });
+                    }}
+                    style={[s.productChipBtn, active && s.productChipBtnActive]}
+                    hitSlop={4}
+                  >
+                    <Text
+                      style={[s.productChipBtnTxt, active && s.productChipBtnTxtActive]}
+                      numberOfLines={1}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Text style={s.productsHint}>Touche pour retirer · Facultatif</Text>
+          </View>
+        )}
+
         <PillButton
           label="Publier"
           variant="primary"
@@ -264,6 +330,53 @@ const s = StyleSheet.create({
     fontWeight: '500',
   },
   emotionHint: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#A99583',
+    marginTop: 8,
+    letterSpacing: 0.3,
+  },
+  productsWrap: {
+    marginTop: 20,
+    marginBottom: 4,
+  },
+  productsLabelLg: {
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 2,
+    color: C.copper,
+    textTransform: 'uppercase',
+    marginBottom: 12,
+  },
+  productsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  productChipBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 100,
+    backgroundColor: '#FBF6F1',
+    borderWidth: 1,
+    borderColor: C.copper,
+    maxWidth: 240,
+  },
+  productChipBtnActive: {
+    backgroundColor: '#FBF6F1',
+    borderColor: C.copper,
+  },
+  productChipBtnTxt: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#A99583',
+    textDecorationLine: 'line-through',
+  },
+  productChipBtnTxtActive: {
+    color: C.copper,
+    textDecorationLine: 'none',
+  },
+  productsHint: {
     fontSize: 11,
     fontStyle: 'italic',
     color: '#A99583',
