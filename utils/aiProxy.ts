@@ -20,7 +20,8 @@ export type Endpoint =
   | 'makeup'
   | 'product'
   | 'translate'
-  | 'routine_optimize';
+  | 'routine_optimize'
+  | 'reflection';
 
 export type Lang = 'fr' | 'en' | 'tr';
 

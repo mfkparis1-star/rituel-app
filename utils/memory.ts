@@ -33,11 +33,19 @@ export type ArchiveSignals = {
   categories?: string[];
 };
 
+export type LastReflection = {
+  text: string;
+  at: string;             // ISO timestamp
+  count_today: number;    // soft per-day quota counter
+  count_date: string;     // YYYY-MM-DD when counter applies
+};
+
 export type Memory = {
   last_analysis_summary?: LastAnalysisSummary;
   routine_preference?: RoutinePreference;
   archive_signals?: ArchiveSignals;
   concerns_extracted?: string[];
+  last_reflection?: LastReflection;
 };
 
 /**

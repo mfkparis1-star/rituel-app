@@ -28,6 +28,9 @@ import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
 import { useRoutineCount } from '../../hooks/useRoutineCount';
 import { useMemory } from '../../hooks/useMemory';
 import { useCheckins } from '../../hooks/useCheckins';
+import { generateReflection, getCachedReflection, getQuotaRemaining, REFLECTION_FALLBACK } from '../../utils/reflection';
+import { usePremium } from '../../hooks/usePremium';
+import { supabase } from '../../lib/supabase';
 import { CHECKIN_EMOJIS, CheckinEmoji } from '../../utils/checkins';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -88,6 +91,55 @@ export default function IndexScreen() {
   const weekEmojis = recent.map((c) => c.emoji);
   const lastSummary = memory?.last_analysis_summary ?? null;
 
+  // Phase 17D — soft AI reflection
+  const { isPremium } = usePremium();
+  const [reflectionText, setReflectionText] = useState<string | null>(null);
+  const [reflectionAt, setReflectionAt] = useState<string | null>(null);
+  const [reflectionLoading, setReflectionLoading] = useState(false);
+  const [reflectionRemaining, setReflectionRemaining] = useState<number | null>(null);
+  const [reflectionUserId, setReflectionUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const uid = data.session?.user?.id ?? null;
+      if (!mounted) return;
+      setReflectionUserId(uid);
+      if (!uid) return;
+      const cached = await getCachedReflection(uid);
+      if (!mounted) return;
+      if (cached) {
+        setReflectionText(cached.text);
+        setReflectionAt(cached.at);
+      }
+      const remaining = await getQuotaRemaining(uid, isPremium);
+      if (mounted) setReflectionRemaining(remaining);
+    })();
+    return () => { mounted = false; };
+  }, [isPremium]);
+
+  const handleReceiveReflection = async () => {
+    if (!reflectionUserId || reflectionLoading) return;
+    setReflectionLoading(true);
+    try {
+      const result = await generateReflection(reflectionUserId, isPremium, {
+        checkinEmojis: weekEmojis,
+        skinType: memory?.last_analysis_summary?.skinType ?? null,
+        concerns: memory?.last_analysis_summary?.issues ?? memory?.concerns_extracted ?? [],
+        lastEmotion: null,
+      });
+      setReflectionText(result.text);
+      setReflectionAt(new Date().toISOString());
+      const remaining = await getQuotaRemaining(reflectionUserId, isPremium);
+      setReflectionRemaining(remaining);
+    } catch {
+      setReflectionText(REFLECTION_FALLBACK);
+    } finally {
+      setReflectionLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -97,6 +149,48 @@ export default function IndexScreen() {
           <Text style={s.greeting}>{greeting}</Text>
           <Text style={s.subtitle}>Prête pour ton rituel beauté ?</Text>
         </View>
+
+        {/* Phase 17D — Soft AI Reflection (Home top) */}
+        {reflectionUserId ? (
+          <View style={[s.reflectionCard, Sh.soft]}>
+            <Text style={s.reflectionLabel}>RÉFLEXION DU JOUR</Text>
+            {reflectionText ? (
+              <Text style={s.reflectionText}>{reflectionText}</Text>
+            ) : (
+              <Text style={s.reflectionPrompt}>
+                Recevez une réflexion personnelle sur votre peau et votre rituel.
+              </Text>
+            )}
+            {!reflectionText ? (
+              <Pressable
+                onPress={handleReceiveReflection}
+                disabled={reflectionLoading || (reflectionRemaining !== null && reflectionRemaining <= 0)}
+                style={[
+                  s.reflectionBtn,
+                  (reflectionLoading || (reflectionRemaining !== null && reflectionRemaining <= 0)) && s.reflectionBtnDisabled,
+                ]}
+                hitSlop={6}
+              >
+                <Text style={s.reflectionBtnTxt}>
+                  {reflectionLoading ? 'Un instant…' : 'Recevoir ma réflexion'}
+                </Text>
+              </Pressable>
+            ) : reflectionRemaining !== null && reflectionRemaining > 0 ? (
+              <Pressable
+                onPress={handleReceiveReflection}
+                disabled={reflectionLoading}
+                style={s.reflectionRefresh}
+                hitSlop={6}
+              >
+                <Text style={s.reflectionRefreshTxt}>
+                  {reflectionLoading ? 'Un instant…' : 'Une autre réflexion'}
+                </Text>
+              </Pressable>
+            ) : (
+              <Text style={s.reflectionHint}>Une nouvelle réflexion demain.</Text>
+            )}
+          </View>
+        ) : null}
 
         {/* Check-in CTA (only when not done today) */}
         {!hasToday && (
@@ -326,4 +420,72 @@ const s = StyleSheet.create({
     color: C.copper,
     fontWeight: '500',
   },
-});
+
+  reflectionCard: {
+    backgroundColor: '#FBF6F1',
+    borderRadius: R.lg,
+    paddingHorizontal: Sp.md,
+    paddingVertical: Sp.lg,
+    marginHorizontal: Sp.md,
+    marginBottom: Sp.lg,
+    borderWidth: 1,
+    borderColor: '#EFE6D7',
+  },
+  reflectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: C.copper,
+    marginBottom: 12,
+  },
+  reflectionText: {
+    fontSize: 15,
+    lineHeight: 23,
+    fontStyle: 'italic',
+    color: '#3A2E25',
+    letterSpacing: 0.2,
+    marginBottom: 8,
+  },
+  reflectionPrompt: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#7A6555',
+    fontStyle: 'italic',
+    marginBottom: 14,
+  },
+  reflectionBtn: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 100,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: C.copper,
+  },
+  reflectionBtnDisabled: {
+    opacity: 0.4,
+  },
+  reflectionBtnTxt: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: C.copper,
+    letterSpacing: 0.3,
+  },
+  reflectionRefresh: {
+    alignSelf: 'flex-start',
+    paddingVertical: 4,
+    marginTop: 4,
+  },
+  reflectionRefreshTxt: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#A99583',
+    letterSpacing: 0.3,
+  },
+  reflectionHint: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#A99583',
+    marginTop: 4,
+    letterSpacing: 0.3,
+  },});
