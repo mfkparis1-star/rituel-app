@@ -296,12 +296,15 @@ export default function IndexScreen() {
 
         {/* Pour toi — affiliate recommendations */}
         {recommendations.length > 0 && (
-          <>
+          <View style={s.selectedWrap}>
             <Text style={s.sectionTitle}>Sélectionné pour toi</Text>
-            {recommendations.map((p) => (
+            <Text style={s.selectedSubtitle}>
+              Des soins choisis pour accompagner ton rituel.
+            </Text>
+            {recommendations.slice(0, 3).map((p) => (
               <AffiliateProductCard key={p.id} product={p} />
             ))}
-          </>
+          </View>
         )}
 
         <View style={{ height: Sp.huge }} />
@@ -357,6 +360,20 @@ const s = StyleSheet.create({
     marginBottom: Sp.sm,
     marginTop: Sp.md,
     letterSpacing: 0.3,
+  },
+  selectedWrap: {
+    paddingHorizontal: Sp.md,
+    marginTop: Sp.lg,
+    marginBottom: Sp.md,
+  },
+  selectedSubtitle: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: '#7A6555',
+    marginTop: 4,
+    marginBottom: 16,
+    letterSpacing: 0.2,
+    lineHeight: 19,
   },
 
   block: { marginBottom: Sp.md, padding: Sp.lg },

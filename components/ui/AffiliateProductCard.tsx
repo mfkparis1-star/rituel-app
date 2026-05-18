@@ -2,6 +2,18 @@ import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native'
 import { C, R, Sh, Sp } from '../../theme';
 import { formatPriceFR } from '../../utils/format';
 
+/**
+ * AffiliateProductCard — Phase 17 polish
+ *
+ * Full-width editorial card. Image left (104x104 rounded), content
+ * right (brand uppercase copper, product name, soft reason, price).
+ * Cream surface, copper accents, soft shadow, 24px radius. Brand
+ * initial fallback when no image — never a flat beige rectangle.
+ *
+ * Tone: soft luxury beauty editorial. NOT shopping spam, NOT
+ * influencer card. Each card feels like a curated note, not an ad.
+ */
+
 export type AffiliateProductCardData = {
   id: string;
   brand: string;
@@ -14,15 +26,18 @@ export type AffiliateProductCardData = {
 
 type Props = {
   product: AffiliateProductCardData;
-  variant?: 'horizontal' | 'vertical';
   onPress?: () => void;
 };
 
-export default function AffiliateProductCard({
-  product,
-  variant = 'vertical',
-  onPress,
-}: Props) {
+function brandInitials(brand: string): string {
+  if (!brand) return '·';
+  const words = brand.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '·';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+export default function AffiliateProductCard({ product, onPress }: Props) {
   const handlePress = async () => {
     if (onPress) onPress();
     if (!product.affiliateUrl) return;
@@ -36,7 +51,7 @@ export default function AffiliateProductCard({
     }
   };
 
-  const isHorizontal = variant === 'horizontal';
+  const priceFR = formatPriceFR(product.price);
 
   return (
     <Pressable
@@ -44,29 +59,29 @@ export default function AffiliateProductCard({
       style={({ pressed }) => [
         s.card,
         Sh.soft,
-        isHorizontal ? s.horizontal : s.vertical,
-        pressed && { opacity: 0.85 },
+        pressed && { opacity: 0.92, transform: [{ scale: 0.995 }] },
       ]}
     >
-      <View style={[s.imageBox, isHorizontal ? s.imageHorizontal : s.imageVertical]}>
+      <View style={s.imageBox}>
         {product.imageUrl ? (
           <Image source={{ uri: product.imageUrl }} style={s.image} resizeMode="cover" />
         ) : (
-          <View style={s.imagePlaceholder} />
+          <View style={s.imageFallback}>
+            <Text style={s.imageFallbackTxt}>{brandInitials(product.brand)}</Text>
+          </View>
         )}
       </View>
+
       <View style={s.content}>
         <Text style={s.brand} numberOfLines={1}>{product.brand}</Text>
         <Text style={s.name} numberOfLines={2}>{product.name}</Text>
-        {product.reason && (
+        {product.reason ? (
           <Text style={s.reason} numberOfLines={2}>{product.reason}</Text>
-        )}
-        {formatPriceFR(product.price) ? (
-          <Text style={s.price}>{formatPriceFR(product.price)}</Text>
         ) : null}
-        {isHorizontal && (
-          <Text style={s.cta}>Voir le produit ›</Text>
-        )}
+        <View style={s.footerRow}>
+          {priceFR ? <Text style={s.price}>{priceFR}</Text> : <View />}
+          <Text style={s.cta}>Découvrir ›</Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -74,69 +89,83 @@ export default function AffiliateProductCard({
 
 const s = StyleSheet.create({
   card: {
-    backgroundColor: C.white,
-    borderRadius: R.md,
-    overflow: 'hidden',
-  },
-  vertical: {
-    width: 160,
-    marginRight: Sp.sm,
-  },
-  horizontal: {
     flexDirection: 'row',
-    marginBottom: Sp.sm,
-    padding: Sp.sm,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#EFE6D7',
     alignItems: 'center',
   },
   imageBox: {
-    backgroundColor: C.cream,
+    width: 96,
+    height: 96,
+    borderRadius: 18,
     overflow: 'hidden',
+    backgroundColor: '#FBF6F1',
+    marginRight: 14,
   },
-  imageVertical: { width: '100%', height: 140 },
-  imageHorizontal: {
-    width: 64,
-    height: 64,
-    borderRadius: R.sm,
-    marginRight: Sp.md,
-  },
-  image: { width: '100%', height: '100%' },
-  imagePlaceholder: {
+  image: {
     width: '100%',
     height: '100%',
-    backgroundColor: C.cream,
   },
-  content: { padding: Sp.sm, flex: 1 },
+  imageFallback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FBF6F1',
+  },
+  imageFallbackTxt: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: C.copper,
+    letterSpacing: 2,
+    fontStyle: 'italic',
+  },
+  content: {
+    flex: 1,
+    paddingVertical: 2,
+  },
   brand: {
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '700',
     color: C.copper,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   name: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '500',
-    color: C.text,
-    lineHeight: 18,
-    marginBottom: Sp.xxs,
+    color: '#3A2E25',
+    lineHeight: 19,
+    marginBottom: 4,
   },
   reason: {
-    fontSize: 11,
-    color: C.textMid,
-    lineHeight: 15,
-    marginBottom: Sp.xxs,
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#7A6555',
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
   },
   price: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: C.espresso,
-    marginTop: 2,
+    color: '#3A2E25',
+    letterSpacing: 0.2,
   },
   cta: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
+    fontStyle: 'italic',
     color: C.copper,
-    marginTop: 6,
+    letterSpacing: 0.3,
   },
 });
