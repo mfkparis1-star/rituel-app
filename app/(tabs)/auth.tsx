@@ -608,7 +608,24 @@ export default function AuthScreen() {
             </View>
           </View>
         ) : null}
-                <Text style={s.section}>ACCÈS RAPIDE</Text>
+<View style={s.skinQuizSection}>
+                  <Text style={s.section}>DÉCOUVRIR MA PEAU</Text>
+                  <Pressable
+                    onPress={() => router.push('/profile/skin-quiz' as any)}
+                    style={s.skinQuizCard}
+                    hitSlop={4}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.skinQuizTitle}>Mon profil de peau</Text>
+                      <Text style={s.skinQuizSub}>
+                        Quelques questions douces pour mieux t'accompagner.
+                      </Text>
+                    </View>
+                    <Text style={s.skinQuizArrow}>›</Text>
+                  </Pressable>
+                </View>
+
+                                <Text style={s.section}>ACCÈS RAPIDE</Text>
         <ListRow
           title="Mon journal"
           subtitle="Ton parcours beauté, jour après jour"
@@ -796,6 +813,42 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     color: C.copper,
     letterSpacing: 0.3,
+  },
+  skinQuizSection: {
+    marginTop: 24,
+    marginBottom: 4,
+    paddingHorizontal: 0,
+  },
+  skinQuizCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginTop: 12,
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#EFE6D7',
+  },
+  skinQuizTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#3A2E25',
+    marginBottom: 4,
+    letterSpacing: 0.2,
+  },
+  skinQuizSub: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#7A6555',
+    lineHeight: 17,
+    letterSpacing: 0.2,
+  },
+  skinQuizArrow: {
+    fontSize: 24,
+    color: C.copper,
+    fontWeight: '300',
+    marginLeft: 12,
   },
   recoLabel: {
     fontSize: 10, fontWeight: '700', color: C.copper,

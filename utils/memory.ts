@@ -40,12 +40,23 @@ export type LastReflection = {
   count_date: string;     // YYYY-MM-DD when counter applies
 };
 
+export type SkinProfile = {
+  skin_type?: string;          // sec | mixte | gras | normal | sensible | unknown
+  concerns?: string[];         // 1-3 picked concerns
+  sensitivity?: string;        // souvent | parfois | rarement | unknown
+  routine_level?: string;      // basique | intermediaire | avancee | aucune
+  self_note?: string;          // optional free text (max 140)
+  goal?: string;               // hydratation | eclat | apaisement | equilibre | aucun
+  completed_at?: string;       // ISO timestamp
+};
+
 export type Memory = {
   last_analysis_summary?: LastAnalysisSummary;
   routine_preference?: RoutinePreference;
   archive_signals?: ArchiveSignals;
   concerns_extracted?: string[];
   last_reflection?: LastReflection;
+  skin_profile?: SkinProfile;
 };
 
 /**

@@ -49,6 +49,9 @@ export type ReflectionSignals = {
   skinType?: string | null;
   concerns?: string[];
   lastEmotion?: string | null;  // from most recent shared post
+  // Phase 17E — optional skin quiz personalization
+  sensitivity?: string | null;
+  goal?: string | null;
 };
 
 function todayYmd(): string {
@@ -119,15 +122,20 @@ function buildPrompt(signals: ReflectionSignals): { system: string; user: string
     "- Pas d'emojis, pas de listes, pas de titres.",
   ].join('\n');
 
-  const user = [
+  const sensitivity = signals.sensitivity ? signals.sensitivity : null;
+  const goal = signals.goal ? signals.goal : null;
+
+  const lines: string[] = [
     "Voici les signaux récents:",
     `- Check-ins (7 derniers jours): ${emojiLine}`,
     `- Type de peau: ${skin}`,
     `- Préoccupations: ${concernsLine}`,
     `- Émotion du dernier rituel partagé: ${emotion}`,
-    "",
-    "Écris une réflexion en 1 ou 2 phrases.",
-  ].join('\n');
+  ];
+  if (sensitivity) lines.push(`- Sensibilité: ${sensitivity}`);
+  if (goal) lines.push(`- Objectif du moment: ${goal}`);
+  lines.push("", "Écris une réflexion en 1 ou 2 phrases.");
+  const user = lines.join('\n');
 
   return { system, user };
 }
