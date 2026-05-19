@@ -40,8 +40,8 @@ export default function AuthScreen() {
   const premiumExpiryISO = customerInfo?.entitlements?.active?.['Rituel Pro']?.expirationDate ?? null;
   const premiumExpiryFR = formatDateFR(premiumExpiryISO);
   const premiumSubtitle = premiumExpiryFR
-    ? `Actif jusqu’au ${premiumExpiryFR}`
-    : 'Abonnement actif';
+    ? t('auth.alerts.subscription.activeUntil').replace('{date}', premiumExpiryFR)
+    : t('auth.alerts.subscription.activeFallback');
 
   const [restoring, setRestoring] = useState(false);
 
@@ -52,19 +52,19 @@ export default function AuthScreen() {
       const ok = await restore();
       if (ok) {
         Alert.alert(
-          'Achats restaurés',
-          'Ton abonnement Rituel Pro est actif.'
+          t('auth.alerts.restore.successTitle'),
+          t('auth.alerts.restore.successBody')
         );
       } else {
         Alert.alert(
-          'Aucun achat trouvé',
-          "Nous n'avons pas trouvé d'achat actif lié à ton compte."
+          t('auth.alerts.restore.emptyTitle'),
+          t('auth.alerts.restore.emptyBody')
         );
       }
     } catch {
       Alert.alert(
-        'Restauration impossible',
-        'Une erreur est survenue. Réessaye plus tard.'
+        t('auth.alerts.restore.errorTitle'),
+        t('auth.alerts.restore.errorBody')
       );
     } finally {
       setRestoring(false);
@@ -122,7 +122,7 @@ export default function AuthScreen() {
   const handleSignIn = async () => {
     clearMessages();
     if (!canSubmitSignin) {
-      setError(localizedAuthInfo('empty_field'));
+      setError(localizedAuthInfo('empty_field', currentLang));
       return;
     }
     setSubmitting(true);
@@ -131,7 +131,7 @@ export default function AuthScreen() {
       password,
     });
     if (err) {
-      setError(mapAuthError(err));
+      setError(mapAuthError(err, currentLang));
       setSubmitting(false);
     }
   };
@@ -139,7 +139,7 @@ export default function AuthScreen() {
   const handleSignUp = async () => {
     clearMessages();
     if (!canSubmitSignup) {
-      setError(localizedAuthInfo('empty_field'));
+      setError(localizedAuthInfo('empty_field', currentLang));
       return;
     }
     setSubmitting(true);
@@ -152,11 +152,11 @@ export default function AuthScreen() {
     });
     setSubmitting(false);
     if (err) {
-      setError(mapAuthError(err));
+      setError(mapAuthError(err, currentLang));
       return;
     }
     if (!data.session) {
-      setInfo(localizedAuthInfo('signup_check_email'));
+      setInfo(localizedAuthInfo('signup_check_email', currentLang));
       setMode('signin');
       setPassword('');
     }
@@ -165,27 +165,27 @@ export default function AuthScreen() {
   const handleResetPassword = async () => {
     clearMessages();
     if (!isEmailValid(email)) {
-      setError(localizedAuthInfo('empty_field'));
+      setError(localizedAuthInfo('empty_field', currentLang));
       return;
     }
     setSubmitting(true);
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim());
     setSubmitting(false);
     if (err) {
-      setError(mapAuthError(err));
+      setError(mapAuthError(err, currentLang));
       return;
     }
-    setInfo(localizedAuthInfo('reset_sent'));
+    setInfo(localizedAuthInfo('reset_sent', currentLang));
   };
 
   const handleSignOut = async () => {
     Alert.alert(
-      'Déconnexion',
-      'Vous voulez vraiment vous déconnecter ?',
+      t('auth.alerts.signOut.title'),
+      t('auth.alerts.signOut.body'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('auth.alerts.signOut.cancel'), style: 'cancel' },
         {
-          text: 'Se déconnecter',
+          text: t('auth.alerts.signOut.confirm'),
           style: 'destructive',
           onPress: async () => {
             setSubmitting(true);
@@ -201,21 +201,21 @@ export default function AuthScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Supprimer mon compte',
-      'Cette action est définitive. Toutes tes données — produits, routines, analyses, achats — seront supprimées.\n\nTon abonnement Apple, s\'il existe, continue d\'être facturé jusqu\'à la prochaine date de renouvellement. Tu peux l\'annuler depuis Réglages > Apple ID > Abonnements.',
+      t('auth.alerts.deleteAccount.title'),
+      t('auth.alerts.deleteAccount.body'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('auth.alerts.deleteAccount.cancel'), style: 'cancel' },
         {
-          text: 'Continuer',
+          text: t('auth.alerts.deleteAccount.continue'),
           style: 'destructive',
           onPress: () => {
             Alert.alert(
-              'Confirmer la suppression',
-              'Es-tu absolument sûr ? Cette action ne peut pas être annulée.',
+              t('auth.alerts.deleteAccount.confirmTitle'),
+              t('auth.alerts.deleteAccount.confirmBody'),
               [
-                { text: 'Annuler', style: 'cancel' },
+                { text: t('auth.alerts.deleteAccount.confirmCancel'), style: 'cancel' },
                 {
-                  text: 'Supprimer définitivement',
+                  text: t('auth.alerts.deleteAccount.confirmDelete'),
                   style: 'destructive',
                   onPress: async () => {
                     setSubmitting(true);
@@ -225,21 +225,21 @@ export default function AuthScreen() {
                       });
                       if (fnErr) {
                         Alert.alert(
-                          'Suppression impossible',
-                          'Une erreur est survenue. Réessaye dans un instant ou contacte-nous.'
+                          t('auth.alerts.deleteAccount.errorTitle'),
+                          t('auth.alerts.deleteAccount.errorBody')
                         );
                         return;
                       }
                       await supabase.auth.signOut();
                       setMode('signin');
                       Alert.alert(
-                        'Compte supprimé',
-                        'Toutes tes données ont été supprimées. Merci d\'avoir essayé Rituel.'
+                        t('auth.alerts.deleteAccount.successTitle'),
+                        t('auth.alerts.deleteAccount.successBody')
                       );
                     } catch {
                       Alert.alert(
-                        'Suppression impossible',
-                        'Une erreur est survenue. Réessaye dans un instant.'
+                        t('auth.alerts.deleteAccount.retryTitle'),
+                        t('auth.alerts.deleteAccount.retryBody')
                       );
                     } finally {
                       setSubmitting(false);
@@ -404,12 +404,12 @@ export default function AuthScreen() {
     if (!pick.ok) {
       if (pick.reason === 'no_permission') {
         Alert.alert(
-          'Accès aux photos refusé',
-          'Active l’accès aux photos dans Réglages pour ajouter une photo de profil.',
+          t('auth.alerts.avatar.permissionTitle'),
+          t('auth.alerts.avatar.permissionBody'),
           [
-            { text: 'Annuler', style: 'cancel' },
+            { text: t('auth.alerts.avatar.permissionCancel'), style: 'cancel' },
             {
-              text: 'Ouvrir Réglages',
+              text: t('auth.alerts.avatar.permissionOpenSettings'),
               onPress: () => {
                 Linking.openSettings().catch(() => {
                   // graceful no-op if openSettings fails on this device
@@ -425,7 +425,7 @@ export default function AuthScreen() {
     const url = await uploadAvatar(session.user.id, pick.uri);
     if (!url) {
       setUploadingAvatar(false);
-      Alert.alert('Erreur', 'Téléchargement impossible. Réessaye dans un instant.');
+      Alert.alert(t('auth.alerts.avatar.uploadErrorTitle'), t('auth.alerts.avatar.uploadErrorBody'));
       return;
     }
     await updateProfile({ avatar_url: url });
@@ -445,7 +445,7 @@ export default function AuthScreen() {
     }
     const ok = await updateProfile({ full_name: trimmed });
     if (!ok) {
-      Alert.alert('Erreur', 'Mise à jour impossible.');
+      Alert.alert(t('auth.alerts.name.updateErrorTitle'), t('auth.alerts.name.updateErrorBody'));
       return;
     }
     setEditingName(false);
