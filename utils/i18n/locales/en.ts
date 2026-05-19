@@ -164,6 +164,51 @@ export const en: LocaleDict = {
     },
   },
 
+  glowTimeline: {
+    kicker: 'JOURNAL',
+    title: 'Your journey',
+    subtitle: 'Every check-in, every analysis, every ritual shared. Your beauty story, day after day.',
+    needSignIn: 'Sign in to open your journal.',
+    scoreChipLabel: 'This week, you are',
+    emptyTitle: 'Your journal begins today',
+    emptyCta: 'Do my check-in',
+    relative: {
+      today: 'Today',
+      yesterday: 'Yesterday',
+    },
+    item: {
+      kindAnalysis: 'Skin analysis',
+      kindPost: 'Post',
+      hintCheckin: 'Hold to delete',
+      hintPost: 'Hold to edit or delete',
+    },
+    actions: {
+      checkin: {
+        deleteTitle: 'Delete this entry?',
+        deleteBody: 'This note will be removed from your journal.',
+        delete: 'Delete',
+        cancel: 'Cancel',
+        errorTitle: 'Error',
+        errorBody: "Couldn't delete. Try again in a moment.",
+      },
+      post: {
+        sheetTitle: 'Post',
+        edit: 'Edit caption',
+        delete: 'Delete',
+        cancel: 'Cancel',
+        editTitle: 'Edit caption',
+        editSave: 'Save',
+        editInvalidTitle: 'Invalid caption',
+        editInvalidBody: 'The caption must be between 4 and 280 characters.',
+        editErrorTitle: 'Error',
+        editErrorBody: "Couldn't update. Try again in a moment.",
+        deleteTitle: 'Delete this post?',
+        deleteBody: 'It will disappear from your journal and from the community.',
+        deleteErrorBody: "Couldn't delete. Try again in a moment.",
+      },
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

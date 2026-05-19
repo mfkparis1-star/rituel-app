@@ -25,6 +25,8 @@ import { useScore } from '../hooks/useScore';
 import { Checkin, CHECKIN_EMOJIS, getRecentCheckins, deleteCheckin } from '../utils/checkins';
 import { fetchOwnPosts, FeedPost, updatePostCaption, deletePost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
+import { useLanguage } from '../hooks/useLanguage';
+import { localeToBcp47, type Lang } from '../utils/i18n';
 import { C, R, Sp, Type } from '../theme';
 
 type TimelineItem =
@@ -36,25 +38,31 @@ function emojiSymbol(id: string): string {
   return CHECKIN_EMOJIS.find((e) => e.id === id)?.symbol ?? '·';
 }
 
-function emojiLabel(id: string): string {
-  return CHECKIN_EMOJIS.find((e) => e.id === id)?.label_fr ?? '';
+function makeEmojiLabel(t: (k: string) => string) {
+  return (id: string): string => t(`checkin.emojis.${id}`);
 }
 
-function formatDay(iso: string): string {
-  const d = new Date(iso);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-  const sameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-  if (sameDay(d, today)) return "Aujourd’hui";
-  if (sameDay(d, yesterday)) return 'Hier';
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+function makeFormatDay(t: (k: string) => string, lang: Lang) {
+  const bcp = localeToBcp47(lang);
+  return (iso: string): string => {
+    const d = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    const sameDay = (a: Date, b: Date) =>
+      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    if (sameDay(d, today)) return t('glowTimeline.relative.today');
+    if (sameDay(d, yesterday)) return t('glowTimeline.relative.yesterday');
+    return d.toLocaleDateString(bcp, { day: 'numeric', month: 'long' });
+  };
 }
 
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+function makeFormatTime(lang: Lang) {
+  const bcp = localeToBcp47(lang);
+  return (iso: string): string => {
+    const d = new Date(iso);
+    return d.toLocaleTimeString(bcp, { hour: '2-digit', minute: '2-digit' });
+  };
 }
 
 function dayKey(iso: string): string {
@@ -63,6 +71,11 @@ function dayKey(iso: string): string {
 }
 
 export default function GlowTimelineScreen() {
+  const { t, lang } = useLanguage();
+  const formatDay = useMemo(() => makeFormatDay(t, lang), [t, lang]);
+  const formatTime = useMemo(() => makeFormatTime(lang), [lang]);
+  const emojiLabel = useMemo(() => makeEmojiLabel(t), [t]);
+
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
@@ -118,12 +131,12 @@ export default function GlowTimelineScreen() {
 
   const handleDeleteCheckin = (checkin: Checkin) => {
     Alert.alert(
-      'Supprimer cette entrée ?',
-      'Cette note sera retirée de ton journal.',
+      t('glowTimeline.actions.checkin.deleteTitle'),
+      t('glowTimeline.actions.checkin.deleteBody'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('glowTimeline.actions.post.cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('glowTimeline.actions.post.delete'),
           style: 'destructive',
           onPress: async () => {
             // Optimistic removal from local state
@@ -135,7 +148,7 @@ export default function GlowTimelineScreen() {
                 const fresh = await getRecentCheckins(session.user.id, 30);
                 setCheckins(fresh);
               }
-              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+              Alert.alert(t('glowTimeline.actions.checkin.errorTitle'), t('glowTimeline.actions.checkin.errorBody'));
             }
           },
         },
@@ -145,16 +158,16 @@ export default function GlowTimelineScreen() {
 
   const handleEditPost = (post: FeedPost) => {
     Alert.prompt(
-      'Modifier la légende',
+      t('glowTimeline.actions.post.editTitle'),
       undefined,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('glowTimeline.actions.post.cancel'), style: 'cancel' },
         {
-          text: 'Enregistrer',
+          text: t('glowTimeline.actions.post.editSave'),
           onPress: async (text?: string) => {
             const next = (text ?? '').trim();
             if (next.length < 4 || next.length > 280) {
-              Alert.alert('Légende invalide', 'La légende doit faire entre 4 et 280 caractères.');
+              Alert.alert(t('glowTimeline.actions.post.editInvalidTitle'), t('glowTimeline.actions.post.editInvalidBody'));
               return;
             }
             // Optimistic update
@@ -162,7 +175,7 @@ export default function GlowTimelineScreen() {
             const ok = await updatePostCaption(post.id, next);
             if (!ok) {
               setOwnPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: post.caption } : p)));
-              Alert.alert('Erreur', 'Modification impossible. Réessaye dans un instant.');
+              Alert.alert(t('glowTimeline.actions.post.editErrorTitle'), t('glowTimeline.actions.post.editErrorBody'));
             }
           },
         },
@@ -174,10 +187,10 @@ export default function GlowTimelineScreen() {
 
   const handleDeletePost = (post: FeedPost) => {
     Alert.alert(
-      'Supprimer cette publication ?',
-      'Elle disparaîtra de ton journal et de la communauté.',
+      t('glowTimeline.actions.post.deleteTitle'),
+      t('glowTimeline.actions.post.deleteBody'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('glowTimeline.actions.post.cancel'), style: 'cancel' },
         {
           text: 'Supprimer',
           style: 'destructive',
@@ -188,7 +201,7 @@ export default function GlowTimelineScreen() {
             if (!ok && session) {
               const fresh = await fetchOwnPosts(session.user.id, 30);
               setOwnPosts(fresh);
-              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+              Alert.alert(t('glowTimeline.actions.checkin.errorTitle'), t('glowTimeline.actions.post.deleteErrorBody'));
             }
           },
         },
@@ -198,11 +211,11 @@ export default function GlowTimelineScreen() {
 
   const handleMenuPostPress = (post: FeedPost) => {
     Alert.alert(
-      'Publication',
+      t('glowTimeline.actions.post.sheetTitle'),
       undefined,
       [
-        { text: 'Modifier la légende', onPress: () => handleEditPost(post) },
-        { text: 'Supprimer', style: 'destructive', onPress: () => handleDeletePost(post) },
+        { text: t('glowTimeline.actions.post.edit'), onPress: () => handleEditPost(post) },
+        { text: t('glowTimeline.actions.post.delete'), style: 'destructive', onPress: () => handleDeletePost(post) },
         { text: 'Annuler', style: 'cancel' },
       ]
     );
@@ -213,7 +226,7 @@ export default function GlowTimelineScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
-          <Text style={s.muted}>Connecte-toi pour ouvrir ton journal.</Text>
+          <Text style={s.muted}>{t('glowTimeline.needSignIn')}</Text>
           <PillButton label="Retour" variant="primary" onPress={() => safeBack('/(tabs)')} style={{ marginTop: Sp.md }} />
         </View>
       </SafeAreaView>
@@ -228,13 +241,13 @@ export default function GlowTimelineScreen() {
           <Text style={s.backTxt}>{'←  Retour'}</Text>
         </Pressable>
 
-        <Text style={s.label}>JOURNAL</Text>
-        <Text style={s.title}>Ton parcours</Text>
-        <Text style={s.subtitle}>Chaque check-in, chaque analyse, chaque rituel partagé. Ton histoire beauté, jour après jour.</Text>
+        <Text style={s.label}>{t('glowTimeline.kicker')}</Text>
+        <Text style={s.title}>{t('glowTimeline.title')}</Text>
+        <Text style={s.subtitle}>{t('glowTimeline.subtitle')}</Text>
 
         {score && (
           <View style={s.scoreChip}>
-            <Text style={s.scoreChipLabel}>Cette semaine, tu es</Text>
+            <Text style={s.scoreChipLabel}>{t('glowTimeline.scoreChipLabel')}</Text>
             <Text style={s.scoreChipValue}>{score.label}</Text>
           </View>
         )}
@@ -245,12 +258,12 @@ export default function GlowTimelineScreen() {
           </View>
         ) : grouped.length === 0 ? (
           <View style={s.emptyBox}>
-            <Text style={s.emptyTitle}>Ton journal commence aujourd’hui</Text>
+            <Text style={s.emptyTitle}>{t('glowTimeline.emptyTitle')}</Text>
             <Text style={s.emptySub}>
               Fais ton premier check-in pour ouvrir ton parcours beauté personnel.
             </Text>
             <PillButton
-              label="Faire mon check-in"
+              label={t('glowTimeline.emptyCta')}
               variant="primary"
               onPress={() => router.push('/check-in' as any)}
               style={{ marginTop: Sp.lg }}
@@ -272,7 +285,7 @@ export default function GlowTimelineScreen() {
                         </View>
                       </View>
                       {it.data.note ? <Text style={s.itemNote}>{it.data.note}</Text> : null}
-                      <Text style={s.longPressHint}>Maintiens pour supprimer</Text>
+                      <Text style={s.longPressHint}>{t('glowTimeline.item.hintCheckin')}</Text>
                     </Pressable>
                   );
                 }
@@ -282,7 +295,7 @@ export default function GlowTimelineScreen() {
                       <View style={s.itemHeader}>
                         <Text style={s.itemEmoji}>✦</Text>
                         <View style={s.itemHeaderRight}>
-                          <Text style={s.itemKind}>Analyse de peau</Text>
+                          <Text style={s.itemKind}>{t('glowTimeline.item.kindAnalysis')}</Text>
                           <Text style={s.itemTime}>{formatTime(it.at)}</Text>
                         </View>
                       </View>
@@ -303,7 +316,7 @@ export default function GlowTimelineScreen() {
                       <View style={s.itemHeader}>
                         <Text style={s.itemEmoji}>♡</Text>
                         <View style={s.itemHeaderRight}>
-                          <Text style={s.itemKind}>Publication</Text>
+                          <Text style={s.itemKind}>{t('glowTimeline.item.kindPost')}</Text>
                           <Text style={s.itemTime}>{formatTime(it.at)}</Text>
                         </View>
                       </View>
@@ -313,7 +326,7 @@ export default function GlowTimelineScreen() {
                       {it.data.caption ? (
                         <Text style={s.itemNote} numberOfLines={3}>{it.data.caption}</Text>
                       ) : null}
-                      <Text style={s.longPressHint}>Maintiens pour modifier ou supprimer</Text>
+                      <Text style={s.longPressHint}>{t('glowTimeline.item.hintPost')}</Text>
                     </Pressable>
                   );
                 }

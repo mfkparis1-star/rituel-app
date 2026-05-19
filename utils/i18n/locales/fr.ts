@@ -166,6 +166,52 @@ export const fr = {
     },
   },
 
+  // Glow Timeline (Phase 16D)
+  glowTimeline: {
+    kicker: 'JOURNAL',
+    title: 'Ton parcours',
+    subtitle: 'Chaque check-in, chaque analyse, chaque rituel partagé. Ton histoire beauté, jour après jour.',
+    needSignIn: 'Connecte-toi pour ouvrir ton journal.',
+    scoreChipLabel: 'Cette semaine, tu es',
+    emptyTitle: 'Ton journal commence aujourd\u2019hui',
+    emptyCta: 'Faire mon check-in',
+    relative: {
+      today: 'Aujourd\u2019hui',
+      yesterday: 'Hier',
+    },
+    item: {
+      kindAnalysis: 'Analyse de peau',
+      kindPost: 'Publication',
+      hintCheckin: 'Maintiens pour supprimer',
+      hintPost: 'Maintiens pour modifier ou supprimer',
+    },
+    actions: {
+      checkin: {
+        deleteTitle: 'Supprimer cette entrée ?',
+        deleteBody: 'Cette note sera retirée de ton journal.',
+        delete: 'Supprimer',
+        cancel: 'Annuler',
+        errorTitle: 'Erreur',
+        errorBody: 'Suppression impossible. Réessaye dans un instant.',
+      },
+      post: {
+        sheetTitle: 'Publication',
+        edit: 'Modifier la légende',
+        delete: 'Supprimer',
+        cancel: 'Annuler',
+        editTitle: 'Modifier la légende',
+        editSave: 'Enregistrer',
+        editInvalidTitle: 'Légende invalide',
+        editInvalidBody: 'La légende doit faire entre 4 et 280 caractères.',
+        editErrorTitle: 'Erreur',
+        editErrorBody: 'Modification impossible. Réessaye dans un instant.',
+        deleteTitle: 'Supprimer cette publication ?',
+        deleteBody: 'Elle disparaîtra de ton journal et de la communauté.',
+        deleteErrorBody: 'Suppression impossible. Réessaye dans un instant.',
+      },
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

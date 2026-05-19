@@ -71,3 +71,16 @@ export function normalizeDeviceLocale(raw: string | null | undefined): Lang | nu
   if (lower.startsWith('tr')) return 'tr';
   return null;
 }
+
+/**
+ * Map our Lang to a BCP-47 locale tag suitable for Intl APIs
+ * (toLocaleDateString, toLocaleTimeString, Intl.NumberFormat, etc.)
+ */
+export function localeToBcp47(lang: Lang): string {
+  switch (lang) {
+    case 'fr': return 'fr-FR';
+    case 'en': return 'en-US';
+    case 'tr': return 'tr-TR';
+    default: return 'fr-FR';
+  }
+}

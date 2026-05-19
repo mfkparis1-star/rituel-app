@@ -164,6 +164,51 @@ export const tr: LocaleDict = {
     },
   },
 
+  glowTimeline: {
+    kicker: 'GÜNLÜK',
+    title: 'Yolculuğun',
+    subtitle: 'Her check-in, her analiz, paylaştığın her ritüel. Güzellik hikâyen, gün gün.',
+    needSignIn: 'Günlüğünü açmak için giriş yap.',
+    scoreChipLabel: 'Bu hafta sen',
+    emptyTitle: 'Günlüğün bugün başlıyor',
+    emptyCta: 'Check-in\'imi yap',
+    relative: {
+      today: 'Bugün',
+      yesterday: 'Dün',
+    },
+    item: {
+      kindAnalysis: 'Cilt analizi',
+      kindPost: 'Paylaşım',
+      hintCheckin: 'Silmek için basılı tut',
+      hintPost: 'Düzenlemek veya silmek için basılı tut',
+    },
+    actions: {
+      checkin: {
+        deleteTitle: 'Bu kaydı sil?',
+        deleteBody: 'Bu not günlüğünden kaldırılacak.',
+        delete: 'Sil',
+        cancel: 'İptal',
+        errorTitle: 'Hata',
+        errorBody: 'Silinemedi. Birazdan tekrar dene.',
+      },
+      post: {
+        sheetTitle: 'Paylaşım',
+        edit: 'Açıklamayı düzenle',
+        delete: 'Sil',
+        cancel: 'İptal',
+        editTitle: 'Açıklamayı düzenle',
+        editSave: 'Kaydet',
+        editInvalidTitle: 'Geçersiz açıklama',
+        editInvalidBody: 'Açıklama 4 ile 280 karakter arasında olmalı.',
+        editErrorTitle: 'Hata',
+        editErrorBody: 'Güncellenemedi. Birazdan tekrar dene.',
+        deleteTitle: 'Bu paylaşımı sil?',
+        deleteBody: 'Günlüğünden ve topluluktan kaybolacak.',
+        deleteErrorBody: 'Silinemedi. Birazdan tekrar dene.',
+      },
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',
