@@ -209,6 +209,38 @@ export const en: LocaleDict = {
     },
   },
 
+  auth: {
+    brand: 'RITUEL',
+    signin: {
+      title: 'Sign in',
+      subtitle: 'Find your beauty ritual again',
+      submit: 'Sign in',
+      forgot: 'Forgot password?',
+      switchPrompt: "Don't have an account yet?",
+      switchLink: 'Sign up',
+    },
+    signup: {
+      title: 'Create account',
+      subtitle: 'Start your account to begin',
+      submit: 'Create my account',
+      switchPrompt: 'Already have an account?',
+      switchLink: 'Sign in',
+      legalPrefix: 'By signing up, you accept our ',
+      legalTerms: 'Terms of Service',
+      legalAnd: ' and our ',
+      legalPrivacy: 'Privacy Policy',
+      legalSuffix: '.',
+    },
+    fields: {
+      nameLabel: 'NAME',
+      namePlaceholder: 'Your name',
+      emailLabel: 'EMAIL',
+      emailPlaceholder: 'you@email.com',
+      passwordLabel: 'PASSWORD',
+      passwordPlaceholder: '••••••••',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

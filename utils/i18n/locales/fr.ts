@@ -212,6 +212,40 @@ export const fr = {
     },
   },
 
+  // Auth — sign-in / sign-up forms (Phase 19.6a)
+  auth: {
+    brand: 'RITUEL',
+    signin: {
+      title: 'Connexion',
+      subtitle: 'Retrouve ton rituel beauté',
+      submit: 'Se connecter',
+      forgot: 'Mot de passe oublié ?',
+      switchPrompt: 'Pas encore de compte ?',
+      switchLink: "S'inscrire",
+    },
+    signup: {
+      title: 'Inscription',
+      subtitle: 'Crée ton compte pour commencer',
+      submit: 'Créer mon compte',
+      switchPrompt: 'Déjà inscrite ?',
+      switchLink: 'Se connecter',
+      // Legal copy keeps the vous form intentionally.
+      legalPrefix: 'En vous inscrivant, vous acceptez nos ',
+      legalTerms: 'Conditions générales',
+      legalAnd: ' et notre ',
+      legalPrivacy: 'Politique de confidentialité',
+      legalSuffix: '.',
+    },
+    fields: {
+      nameLabel: 'NOM',
+      namePlaceholder: 'Votre nom',
+      emailLabel: 'EMAIL',
+      emailPlaceholder: 'vous@email.com',
+      passwordLabel: 'MOT DE PASSE',
+      passwordPlaceholder: '••••••••',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

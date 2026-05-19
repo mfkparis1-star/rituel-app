@@ -209,6 +209,39 @@ export const tr: LocaleDict = {
     },
   },
 
+  auth: {
+    brand: 'RITUEL',
+    signin: {
+      title: 'Giriş',
+      subtitle: 'Güzellik ritüeline geri dön',
+      submit: 'Giriş yap',
+      forgot: 'Şifreni mi unuttun?',
+      switchPrompt: 'Henüz hesabın yok mu?',
+      switchLink: 'Kayıt ol',
+    },
+    signup: {
+      title: 'Kayıt',
+      subtitle: 'Başlamak için hesabını oluştur',
+      submit: 'Hesabımı oluştur',
+      switchPrompt: 'Zaten hesabın var mı?',
+      switchLink: 'Giriş yap',
+      // Legal copy keeps formal "siz" register intentionally.
+      legalPrefix: 'Kayıt olarak ',
+      legalTerms: 'Kullanım Koşulları',
+      legalAnd: ' ve ',
+      legalPrivacy: 'Gizlilik Politikası',
+      legalSuffix: 'nı kabul edersiniz.',
+    },
+    fields: {
+      nameLabel: 'AD',
+      namePlaceholder: 'Adın',
+      emailLabel: 'E-POSTA',
+      emailPlaceholder: 'sen@email.com',
+      passwordLabel: 'ŞİFRE',
+      passwordPlaceholder: '••••••••',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

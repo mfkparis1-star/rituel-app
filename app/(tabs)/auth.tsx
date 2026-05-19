@@ -31,7 +31,7 @@ export default function AuthScreen() {
   const { count: routineCount } = useRoutineCount();
   const { isPremium, customerInfo, restore } = usePremium();
   const { profile, update: updateProfile } = useProfile();
-  const { lang: currentLang, setLanguage } = useLanguage();
+  const { lang: currentLang, setLanguage, t } = useLanguage();
   const { products: favoriteProducts } = useFavoriteProducts(profile?.id ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -272,24 +272,24 @@ export default function AuthScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={s.header}>
-            <Text style={s.brand}>RITUEL</Text>
+            <Text style={s.brand}>{t('auth.brand')}</Text>
             <Text style={s.title}>
-              {mode === 'signin' ? 'Connexion' : 'Inscription'}
+              {mode === 'signin' ? t('auth.signin.title') : t('auth.signup.title')}
             </Text>
             <Text style={s.subtitle}>
               {mode === 'signin'
-                ? 'Retrouve ton rituel beauté'
-                : 'Crée ton compte pour commencer'}
+                ? t('auth.signin.subtitle')
+                : t('auth.signup.subtitle')}
             </Text>
           </View>
 
           <View style={[s.formCard, Sh.soft]}>
             {mode === 'signup' && (
               <>
-                <Text style={s.fieldLabel}>NOM</Text>
+                <Text style={s.fieldLabel}>{t('auth.fields.nameLabel')}</Text>
                 <TextInput
                   style={s.input}
-                  placeholder="Votre nom"
+                  placeholder={t('auth.fields.namePlaceholder')}
                   placeholderTextColor={C.textSoft}
                   value={name}
                   onChangeText={(v) => { setName(v); clearMessages(); }}
@@ -299,10 +299,10 @@ export default function AuthScreen() {
               </>
             )}
 
-            <Text style={s.fieldLabel}>EMAIL</Text>
+            <Text style={s.fieldLabel}>{t('auth.fields.emailLabel')}</Text>
             <TextInput
               style={s.input}
-              placeholder="vous@email.com"
+              placeholder={t('auth.fields.emailPlaceholder')}
               placeholderTextColor={C.textSoft}
               value={email}
               onChangeText={(v) => { setEmail(v); clearMessages(); }}
@@ -312,10 +312,10 @@ export default function AuthScreen() {
               editable={!submitting}
             />
 
-            <Text style={s.fieldLabel}>MOT DE PASSE</Text>
+            <Text style={s.fieldLabel}>{t('auth.fields.passwordLabel')}</Text>
             <TextInput
               style={s.input}
-              placeholder="••••••••"
+              placeholder={t('auth.fields.passwordPlaceholder')}
               placeholderTextColor={C.textSoft}
               value={password}
               onChangeText={(v) => { setPassword(v); clearMessages(); }}
@@ -336,7 +336,7 @@ export default function AuthScreen() {
             )}
 
             <PillButton
-              label={mode === 'signin' ? 'Se connecter' : 'Créer mon compte'}
+              label={mode === 'signin' ? t('auth.signin.submit') : t('auth.signup.submit')}
               variant="primary"
               fullWidth
               loading={submitting}
@@ -347,34 +347,33 @@ export default function AuthScreen() {
 
             {mode === 'signup' && (
               <Text style={s.legalNote}>
-                En vous inscrivant, vous acceptez nos{' '}
+                {t('auth.signup.legalPrefix')}
                 <Text
                   style={s.legalLink}
                   onPress={() => Linking.openURL('https://rituel.beauty/terms').catch(() => {})}
                 >
                   Conditions générales
                 </Text>
-                {' '}et notre{' '}
+                {t('auth.signup.legalAnd')}
                 <Text
                   style={s.legalLink}
                   onPress={() => Linking.openURL('https://rituel.beauty/privacy').catch(() => {})}
                 >
                   Politique de confidentialité
                 </Text>
-                .
-              </Text>
+                {t('auth.signup.legalSuffix')}</Text>
             )}
 
             {mode === 'signin' && (
               <Pressable onPress={handleResetPassword} disabled={submitting} style={s.forgotBtn}>
-                <Text style={s.forgotTxt}>Mot de passe oublié ?</Text>
+                <Text style={s.forgotTxt}>{t('auth.signin.forgot')}</Text>
               </Pressable>
             )}
           </View>
 
           <View style={s.switchRow}>
             <Text style={s.switchTxt}>
-              {mode === 'signin' ? 'Pas encore de compte ?' : 'Déjà inscrite ?'}
+              {mode === 'signin' ? t('auth.signin.switchPrompt') : t('auth.signup.switchPrompt')}
             </Text>
             <Pressable
               onPress={() => {
@@ -384,7 +383,7 @@ export default function AuthScreen() {
               disabled={submitting}
             >
               <Text style={s.switchLink}>
-                {mode === 'signin' ? 'S\'inscrire' : 'Se connecter'}
+                {mode === 'signin' ? t('auth.signin.switchLink') : t('auth.signup.switchLink')}
               </Text>
             </Pressable>
           </View>
