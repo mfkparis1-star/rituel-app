@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { pickAvatarFromLibrary, uploadAvatar } from '../../utils/avatar';
 import { useProfile } from '../../hooks/useProfile'
-import { useFavoriteProducts } from '../../hooks/useFavoriteProducts';;
+import { useFavoriteProducts } from '../../hooks/useFavoriteProducts';
+import { useLanguage } from '../../hooks/useLanguage';
+import { SUPPORTED_LANGS, type Lang } from '../../utils/i18n';;
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
@@ -29,6 +31,7 @@ export default function AuthScreen() {
   const { count: routineCount } = useRoutineCount();
   const { isPremium, customerInfo, restore } = usePremium();
   const { profile, update: updateProfile } = useProfile();
+  const { lang: currentLang, setLanguage } = useLanguage();
   const { products: favoriteProducts } = useFavoriteProducts(profile?.id ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -451,6 +454,22 @@ export default function AuthScreen() {
 
   const avatarLetter = (displayName[0] || 'U').toUpperCase();
 
+
+  // Phase 19.2 — hidden dev language switcher (__DEV__ only)
+  const handleDevLangSwitch = () => {
+    Alert.alert(
+      'DEV — Language',
+      `Active: ${currentLang.toUpperCase()}`,
+      [
+        ...SUPPORTED_LANGS.map((l) => ({
+          text: l.toUpperCase(),
+          onPress: () => setLanguage(l as Lang),
+        })),
+        { text: 'Annuler', style: 'cancel' as const },
+      ]
+    );
+  };
+
   const profileStats = {
     productCount: 0,
     analysisCount: 0,
@@ -668,6 +687,11 @@ export default function AuthScreen() {
           onClose={() => setCreditModalOpen(false)}
         />
 
+        {__DEV__ ? (
+          <Pressable onPress={handleDevLangSwitch} hitSlop={6} style={s.devLangRow}>
+            <Text style={s.devLangTxt}>🔧 DEV · Language: {currentLang.toUpperCase()}</Text>
+          </Pressable>
+        ) : null}
         <View style={{ height: Sp.huge }} />
       </ScrollView>
     </SafeAreaView>
@@ -849,6 +873,19 @@ const s = StyleSheet.create({
     color: C.copper,
     fontWeight: '300',
     marginLeft: 12,
+  },
+  devLangRow: {
+    alignSelf: 'center',
+    marginTop: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    opacity: 0.4,
+  },
+  devLangTxt: {
+    fontSize: 10,
+    fontStyle: 'italic',
+    color: '#A99583',
+    letterSpacing: 0.5,
   },
   recoLabel: {
     fontSize: 10, fontWeight: '700', color: C.copper,

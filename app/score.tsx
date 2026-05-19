@@ -23,7 +23,7 @@ const SIGNAL_DESC: Record<string, string> = {
 };
 
 export default function ScoreScreen() {
-  const { t: _t } = useLanguage(); // Phase 19.1 wiring smoke; pilot conversion lands in 19.2
+  const { t } = useLanguage(); // Phase 19.1 wiring smoke; pilot conversion lands in 19.2
   const { score, loading } = useScore();
 
   return (

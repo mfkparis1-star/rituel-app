@@ -26,31 +26,32 @@ import OnboardingSlide from '../components/onboarding/OnboardingSlide';
 import PillButton from '../components/ui/PillButton';
 import { useOnboarded } from '../hooks/useOnboarded';
 import { C, Sp } from '../theme';
+import { useLanguage } from '../hooks/useLanguage';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
-const SLIDES = [
-  {
-    kind: 'BIENVENUE',
-    headline: 'Votre journal de beauté\nvous attend.',
-    subtitle: "Un espace intime, pensé pour vous. Pas un coach, pas un réseau social — juste votre histoire, jour après jour.",
-    mark: '✦',
-  },
-  {
-    kind: 'VOTRE RYTHME',
-    headline: 'Chaque check-in\ncompte.',
-    subtitle: 'Un emoji, une note libre. Rituel se rappelle de chaque instant pour mieux vous accompagner. La Glow Timeline garde votre histoire.',
-    mark: '❀',
-  },
-  {
-    kind: 'COMMUNAUTÉ',
-    headline: 'Inspirée par celles\nqui vous ressemblent.',
-    subtitle: 'Partagez vos rituels, sauvegardez vos inspirations. Pas de comparaisons, pas d\'algorithme agressif — un journal collectif.',
-    mark: '♡',
-  },
-];
-
 export default function OnboardingScreen() {
+  const { t } = useLanguage();
+  const SLIDES = [
+    {
+      kind: t('onboarding.slide1.kicker'),
+      headline: t('onboarding.slide1.headline'),
+      subtitle: t('onboarding.slide1.subtitle'),
+      mark: '✦',
+    },
+    {
+      kind: t('onboarding.slide2.kicker'),
+      headline: t('onboarding.slide2.headline'),
+      subtitle: t('onboarding.slide2.subtitle'),
+      mark: '❀',
+    },
+    {
+      kind: t('onboarding.slide3.kicker'),
+      headline: t('onboarding.slide3.headline'),
+      subtitle: t('onboarding.slide3.subtitle'),
+      mark: '♡',
+    },
+  ];
   const [session, setSession] = useState<Session | null>(null);
   const [index, setIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -103,7 +104,7 @@ export default function OnboardingScreen() {
       {/* Top-right Passer */}
       <SafeAreaView style={s.topBar} edges={['top']} pointerEvents="box-none">
         <Pressable onPress={finish} hitSlop={16} style={s.skipBtn}>
-          <Text style={s.skipTxt}>Passer</Text>
+          <Text style={s.skipTxt}>{t('onboarding.skip')}</Text>
         </Pressable>
       </SafeAreaView>
 
@@ -124,7 +125,7 @@ export default function OnboardingScreen() {
         {isLast ? (
           <View style={s.ctaWrap}>
             <PillButton
-              label="Commencer"
+              label={t('onboarding.start')}
               variant="primary"
               fullWidth
               onPress={finish}
