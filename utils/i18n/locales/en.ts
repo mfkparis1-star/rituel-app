@@ -239,7 +239,66 @@ export const en: LocaleDict = {
       passwordLabel: 'PASSWORD',
       passwordPlaceholder: '••••••••',
     },
-  },
+      profile: {
+      namePlaceholder: 'Your first name',
+      skinTypePrefix: 'Skin: ',
+      premiumBadge: 'RITUEL PRO',
+      stats: {
+        products: 'Products',
+        analysis: 'Analyses',
+        routine: 'Routine',
+      },
+      analysis: {
+        kicker: 'ANALYSIS',
+        title: 'Update your analysis',
+        subtitle: 'Keep your recommendations in sync with your skin.',
+        cta: 'Start',
+      },
+      credits: {
+        title: 'AI Credits',
+        loading: 'Loading...',
+        availableOne: '{n} credit available',
+        availableMany: '{n} credits available',
+      },
+      premium: {
+        kicker: 'PREMIUM',
+        title: 'Unlock the full AI power',
+        subtitle: 'Full analyses, AI routines, credits, and premium recommendations.',
+        cta: 'Discover Premium',
+        restoreTitle: 'Restore my purchases',
+        restoreSubtitle: 'Already purchased Rituel Pro?',
+        restoreLoading: 'Restoring...',
+      },
+      sections: {
+        subscription: 'SUBSCRIPTION',
+        forYou: 'FOR YOU',
+        inMyRitual: 'IN MY RITUAL',
+        discoverSkin: 'DISCOVER MY SKIN',
+        quickAccess: 'QUICK ACCESS',
+      },
+      subscription: {
+        rituelProTitle: 'Rituel Pro',
+      },
+      reco: {
+        kicker: 'RECOMMENDATION',
+        title: 'Begin your ritual tonight',
+        subtitle: 'A soothing routine to take care of yourself.',
+      },
+      skinQuiz: {
+        title: 'My skin profile',
+        subtitle: 'A few gentle questions to accompany you better.',
+      },
+      rows: {
+        journal: { title: 'My journal', subtitle: 'Your beauty journey, day after day' },
+        energy: { title: 'My energy', subtitle: 'Your reflection of the moment' },
+        favorites: { title: 'My favorites', subtitle: 'Your saved inspirations' },
+        archive: { title: 'My archive', subtitle: 'Your products, your tracking' },
+        ritual: { title: 'My ritual', subtitle: 'Morning and evening routine' },
+        signOut: { title: 'Sign out', subtitle: 'Leave this session' },
+        deleteAccount: { title: 'Delete my account', subtitle: 'Permanent action — all your data will be erased' },
+      },
+    },
+},
 
   common: {
     back: 'Back',

@@ -240,7 +240,66 @@ export const tr: LocaleDict = {
       passwordLabel: 'ŞİFRE',
       passwordPlaceholder: '••••••••',
     },
-  },
+      profile: {
+      namePlaceholder: 'Adın',
+      skinTypePrefix: 'Cilt: ',
+      premiumBadge: 'RITUEL PRO',
+      stats: {
+        products: 'Ürün',
+        analysis: 'Analiz',
+        routine: 'Rutin',
+      },
+      analysis: {
+        kicker: 'ANALİZ',
+        title: 'Analizini güncelle',
+        subtitle: 'Önerilerin cildinle aynı ritimde kalsın.',
+        cta: 'Başlat',
+      },
+      credits: {
+        title: 'AI Kredisi',
+        loading: 'Yükleniyor...',
+        availableOne: '{n} kredi mevcut',
+        availableMany: '{n} kredi mevcut',
+      },
+      premium: {
+        kicker: 'PREMIUM',
+        title: 'AI gücünün tamamını aç',
+        subtitle: 'Tam analizler, AI rutinleri, krediler ve premium öneriler.',
+        cta: 'Premium\'u keşfet',
+        restoreTitle: 'Satın alımlarımı geri yükle',
+        restoreSubtitle: 'Rituel Pro\'yu zaten aldın mı?',
+        restoreLoading: 'Geri yükleniyor...',
+      },
+      sections: {
+        subscription: 'ABONELİK',
+        forYou: 'SANA ÖZEL',
+        inMyRitual: 'RİTÜELİMDE',
+        discoverSkin: 'CİLDİMİ KEŞFET',
+        quickAccess: 'HIZLI ERİŞİM',
+      },
+      subscription: {
+        rituelProTitle: 'Rituel Pro',
+      },
+      reco: {
+        kicker: 'ÖNERİ',
+        title: 'Bu akşam ritüeline başla',
+        subtitle: 'Kendine iyi bakmak için yatıştırıcı bir rutin.',
+      },
+      skinQuiz: {
+        title: 'Cilt profilim',
+        subtitle: 'Sana daha iyi eşlik etmek için birkaç yumuşak soru.',
+      },
+      rows: {
+        journal: { title: 'Günlüğüm', subtitle: 'Güzellik yolculuğun, gün gün' },
+        energy: { title: 'Enerjim', subtitle: 'Şu anki yansıman' },
+        favorites: { title: 'Favorilerim', subtitle: 'Kaydettiğin ilhamlar' },
+        archive: { title: 'Arşivim', subtitle: 'Ürünlerin, takibin' },
+        ritual: { title: 'Ritüelim', subtitle: 'Sabah ve akşam rutini' },
+        signOut: { title: 'Çıkış yap', subtitle: 'Bu oturumdan ayrıl' },
+        deleteAccount: { title: 'Hesabımı sil', subtitle: 'Kalıcı işlem — tüm verilerin silinecek' },
+      },
+    },
+},
 
   common: {
     back: 'Geri',

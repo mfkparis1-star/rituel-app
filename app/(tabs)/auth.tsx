@@ -503,7 +503,7 @@ export default function AuthScreen() {
               <TextInput
                 value={draftName}
                 onChangeText={setDraftName}
-                placeholder="Ton prénom"
+                placeholder={t('auth.profile.namePlaceholder')}
                 placeholderTextColor={C.textSoft}
                 style={s.nameInput}
                 autoFocus
@@ -525,38 +525,40 @@ export default function AuthScreen() {
           <Text style={s.profileEmail}>{userEmail}</Text>
           {isPremium && (
             <View style={s.premiumBadge}>
-              <Text style={s.premiumBadgeTxt}>RITUEL PRO</Text>
+              <Text style={s.premiumBadgeTxt}>{t('auth.profile.premiumBadge')}</Text>
             </View>
           )}
           {profile?.skin_type && (
-            <Text style={s.skinTypeTxt}>Peau {profile.skin_type}</Text>
+            <Text style={s.skinTypeTxt}>{t('auth.profile.skinTypePrefix')}{profile.skin_type}</Text>
           )}
         </View>
 
         <View style={s.statsRow}>
-          <StatCard label="Produit" value={profileStats.productCount} />
+          <StatCard label={t('auth.profile.stats.products')} value={profileStats.productCount} />
           <View style={s.gap} />
-          <StatCard label="Analyse" value={profileStats.analysisCount} />
+          <StatCard label={t('auth.profile.stats.analysis')} value={profileStats.analysisCount} />
           <View style={s.gap} />
-          <StatCard label="Routine" value={routineCount} />
+          <StatCard label={t('auth.profile.stats.routine')} value={routineCount} />
         </View>
 
         <HeroCard
-          label="ANALYSE"
-          title="Mettre à jour l'analyse"
-          subtitle="Garde tes recommandations synchronisées avec ta peau."
-          ctaLabel="Lancer"
+          label={t('auth.profile.analysis.kicker')}
+          title={t('auth.profile.analysis.title')}
+          subtitle={t('auth.profile.analysis.subtitle')}
+          ctaLabel={t('auth.profile.analysis.cta')}
           variant="espresso"
           onPress={() => router.push('/(tabs)/skin-analysis' as any)}
           style={{ marginBottom: Sp.lg }}
         />
 
         <ListRow
-          title="Crédits IA"
+          title={t('auth.profile.credits.title')}
           subtitle={
             creditsLoading
-              ? 'Chargement...'
-              : `${creditBalance} crédit${creditBalance !== 1 ? 's' : ''} disponible${creditBalance !== 1 ? 's' : ''}`
+              ? t('auth.profile.credits.loading')
+              : (creditBalance === 1
+                  ? t('auth.profile.credits.availableOne').replace('{n}', String(creditBalance))
+                  : t('auth.profile.credits.availableMany').replace('{n}', String(creditBalance)))
           }
           onPress={() => setCreditModalOpen(true)}
         />
@@ -564,13 +566,11 @@ export default function AuthScreen() {
         {!isPremium && (
           <>
             <PremiumCard variant="espresso" style={s.premium}>
-              <Text style={s.premiumLabel}>PREMIUM</Text>
-              <Text style={s.premiumTitle}>Active toute la puissance IA</Text>
-              <Text style={s.premiumSub}>
-                Analyses complètes, routines IA, crédits et recommandations premium.
-              </Text>
+              <Text style={s.premiumLabel}>{t('auth.profile.premium.kicker')}</Text>
+              <Text style={s.premiumTitle}>{t('auth.profile.premium.title')}</Text>
+              <Text style={s.premiumSub}>{t('auth.profile.premium.subtitle')}</Text>
               <PillButton
-                label="Découvrir Premium"
+                label={t('auth.profile.premium.cta')}
                 variant="primary"
                 size="md"
                 onPress={() => router.push('/paywall' as any)}
@@ -579,8 +579,8 @@ export default function AuthScreen() {
               />
             </PremiumCard>
             <ListRow
-              title="Restaurer mes achats"
-              subtitle={restoring ? 'Restauration en cours...' : 'Tu as déjà acheté Rituel Pro ?'}
+              title={t('auth.profile.premium.restoreTitle')}
+              subtitle={restoring ? t('auth.profile.premium.restoreLoading') : t('auth.profile.premium.restoreSubtitle')}
               onPress={handleRestore}
             />
           </>
@@ -588,9 +588,9 @@ export default function AuthScreen() {
 
         {isPremium && (
           <>
-            <Text style={s.section}>ABONNEMENT</Text>
+            <Text style={s.section}>{t('auth.profile.sections.subscription')}</Text>
             <ListRow
-              title="Rituel Pro"
+              title={t('auth.profile.subscription.rituelProTitle')}
               subtitle={premiumSubtitle}
               onPress={() =>
                 Linking.openURL('https://apps.apple.com/account/subscriptions').catch(() => {})
@@ -599,19 +599,17 @@ export default function AuthScreen() {
           </>
         )}
 
-        <Text style={s.section}>POUR TOI</Text>
+        <Text style={s.section}>{t('auth.profile.sections.forYou')}</Text>
 
         <PremiumCard variant="cream" style={{ marginBottom: Sp.sm }}>
-          <Text style={s.recoLabel}>RECOMMANDATION</Text>
-          <Text style={s.recoTitle}>Commence ton rituel ce soir</Text>
-          <Text style={s.recoSub}>
-            Une routine apaisante pour prendre soin de toi.
-          </Text>
+          <Text style={s.recoLabel}>{t('auth.profile.reco.kicker')}</Text>
+          <Text style={s.recoTitle}>{t('auth.profile.reco.title')}</Text>
+          <Text style={s.recoSub}>{t('auth.profile.reco.subtitle')}</Text>
         </PremiumCard>
 
 {favoriteProducts.length > 0 ? (
           <View style={s.ritualSection}>
-            <Text style={s.section}>DANS MON RITUEL</Text>
+            <Text style={s.section}>{t('auth.profile.sections.inMyRitual')}</Text>
             <View style={s.ritualChipsWrap}>
               {favoriteProducts.map((name) => (
                 <Pressable
@@ -627,57 +625,57 @@ export default function AuthScreen() {
           </View>
         ) : null}
 <View style={s.skinQuizSection}>
-                  <Text style={s.section}>DÉCOUVRIR MA PEAU</Text>
+                  <Text style={s.section}>{t('auth.profile.sections.discoverSkin')}</Text>
                   <Pressable
                     onPress={() => router.push('/profile/skin-quiz' as any)}
                     style={s.skinQuizCard}
                     hitSlop={4}
                   >
                     <View style={{ flex: 1 }}>
-                      <Text style={s.skinQuizTitle}>Mon profil de peau</Text>
+                      <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.title')}</Text>
                       <Text style={s.skinQuizSub}>
-                        Quelques questions douces pour mieux t'accompagner.
+                        {t('auth.profile.skinQuiz.subtitle')}
                       </Text>
                     </View>
                     <Text style={s.skinQuizArrow}>›</Text>
                   </Pressable>
                 </View>
 
-                                <Text style={s.section}>ACCÈS RAPIDE</Text>
+                                <Text style={s.section}>{t('auth.profile.sections.quickAccess')}</Text>
         <ListRow
-          title="Mon journal"
-          subtitle="Ton parcours beauté, jour après jour"
+          title={t('auth.profile.rows.journal.title')}
+          subtitle={t('auth.profile.rows.journal.subtitle')}
           onPress={() => router.push('/glow-timeline' as any)}
         />
         <ListRow
-          title="Mon énergie"
-          subtitle="Ton reflet du moment"
+          title={t('auth.profile.rows.energy.title')}
+          subtitle={t('auth.profile.rows.energy.subtitle')}
           onPress={() => router.push('/score' as any)}
         />
         <ListRow
-          title="Mes favoris"
-          subtitle="Tes inspirations sauvegardées"
+          title={t('auth.profile.rows.favorites.title')}
+          subtitle={t('auth.profile.rows.favorites.subtitle')}
           onPress={() => router.push('/saved' as any)}
         />
 
         <ListRow
-          title="Mon archive"
-          subtitle="Tes produits, ton suivi"
+          title={t('auth.profile.rows.archive.title')}
+          subtitle={t('auth.profile.rows.archive.subtitle')}
           onPress={() => router.push('/(tabs)/archive' as any)}
         />
         <ListRow
-          title="Mon rituel"
-          subtitle="Routine matin et soir"
+          title={t('auth.profile.rows.ritual.title')}
+          subtitle={t('auth.profile.rows.ritual.subtitle')}
           onPress={() => router.push('/(tabs)/routine' as any)}
         />
         <ListRow
-          title="Se déconnecter"
-          subtitle="Quitter cette session"
+          title={t('auth.profile.rows.signOut.title')}
+          subtitle={t('auth.profile.rows.signOut.subtitle')}
           onPress={handleSignOut}
         />
         <ListRow
-          title="Supprimer mon compte"
-          subtitle="Action définitive — toutes tes données seront effacées"
+          title={t('auth.profile.rows.deleteAccount.title')}
+          subtitle={t('auth.profile.rows.deleteAccount.subtitle')}
           onPress={handleDeleteAccount}
         />
 

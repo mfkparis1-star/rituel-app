@@ -244,7 +244,66 @@ export const fr = {
       passwordLabel: 'MOT DE PASSE',
       passwordPlaceholder: '••••••••',
     },
-  },
+      profile: {
+      namePlaceholder: 'Ton prénom',
+      skinTypePrefix: 'Peau ',
+      premiumBadge: 'RITUEL PRO',
+      stats: {
+        products: 'Produit',
+        analysis: 'Analyse',
+        routine: 'Routine',
+      },
+      analysis: {
+        kicker: 'ANALYSE',
+        title: "Mettre à jour l'analyse",
+        subtitle: 'Garde tes recommandations synchronisées avec ta peau.',
+        cta: 'Lancer',
+      },
+      credits: {
+        title: 'Crédits IA',
+        loading: 'Chargement...',
+        availableOne: '{n} crédit disponible',
+        availableMany: '{n} crédits disponibles',
+      },
+      premium: {
+        kicker: 'PREMIUM',
+        title: 'Active toute la puissance IA',
+        subtitle: 'Analyses complètes, routines IA, crédits et recommandations premium.',
+        cta: 'Découvrir Premium',
+        restoreTitle: 'Restaurer mes achats',
+        restoreSubtitle: 'Tu as déjà acheté Rituel Pro ?',
+        restoreLoading: 'Restauration en cours...',
+      },
+      sections: {
+        subscription: 'ABONNEMENT',
+        forYou: 'POUR TOI',
+        inMyRitual: 'DANS MON RITUEL',
+        discoverSkin: 'DÉCOUVRIR MA PEAU',
+        quickAccess: 'ACCÈS RAPIDE',
+      },
+      subscription: {
+        rituelProTitle: 'Rituel Pro',
+      },
+      reco: {
+        kicker: 'RECOMMANDATION',
+        title: 'Commence ton rituel ce soir',
+        subtitle: 'Une routine apaisante pour prendre soin de toi.',
+      },
+      skinQuiz: {
+        title: 'Mon profil de peau',
+        subtitle: 'Quelques questions douces pour mieux t\'accompagner.',
+      },
+      rows: {
+        journal: { title: 'Mon journal', subtitle: 'Ton parcours beauté, jour après jour' },
+        energy: { title: 'Mon énergie', subtitle: 'Ton reflet du moment' },
+        favorites: { title: 'Mes favoris', subtitle: 'Tes inspirations sauvegardées' },
+        archive: { title: 'Mon archive', subtitle: 'Tes produits, ton suivi' },
+        ritual: { title: 'Mon rituel', subtitle: 'Routine matin et soir' },
+        signOut: { title: 'Se déconnecter', subtitle: 'Quitter cette session' },
+        deleteAccount: { title: 'Supprimer mon compte', subtitle: 'Action définitive — toutes tes données seront effacées' },
+      },
+    },
+},
 
   common: {
     back: 'Retour',
