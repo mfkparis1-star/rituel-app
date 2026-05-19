@@ -12,6 +12,7 @@ import { Pressable } from 'react-native';
 import { useScore } from '../hooks/useScore';
 import { safeBack } from '../utils/safeBack';
 import { C, R, Sp, Type } from '../theme';
+import { useLanguage } from '../hooks/useLanguage';
 
 const SIGNAL_DESC: Record<string, string> = {
   checkins:  'Tes check-ins de la semaine',
@@ -22,6 +23,7 @@ const SIGNAL_DESC: Record<string, string> = {
 };
 
 export default function ScoreScreen() {
+  const { t: _t } = useLanguage(); // Phase 19.1 wiring smoke; pilot conversion lands in 19.2
   const { score, loading } = useScore();
 
   return (
