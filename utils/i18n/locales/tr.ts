@@ -142,6 +142,28 @@ export const tr: LocaleDict = {
     },
   },
 
+  checkin: {
+    back: 'Geri',
+    kicker: 'GÜNÜN CHECK-IN\'İ',
+    title: 'Cildin nasıl?',
+    subtitle: 'Kendine bir an ayır. Bu sinyal, önerilerimizi sana daha iyi uydurmamıza yardım eder.',
+    alreadyToday: 'Bugün check-in yaptın bile. Hissin değiştiyse bir tane daha ekleyebilirsin.',
+    noteLabel: 'Bir not (isteğe bağlı)',
+    notePlaceholder: 'Nem, uyku, bir olay…',
+    save: 'Kaydet',
+    error: {
+      title: 'Kaydedilemedi',
+      body: 'Bir hata oluştu. Birazdan tekrar dene.',
+    },
+    emojis: {
+      glowing: 'Işıltılı',
+      good: 'İyi',
+      neutral: 'Nötr',
+      tired: 'Yorgun',
+      rough: 'Zor',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

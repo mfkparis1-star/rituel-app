@@ -143,6 +143,29 @@ export const fr = {
     },
   },
 
+  // Daily skin check-in (Phase 16C)
+  checkin: {
+    back: 'Retour',
+    kicker: 'CHECK-IN DU JOUR',
+    title: 'Comment va ta peau ?',
+    subtitle: 'Un instant pour toi. Ce signal nous aide à affiner tes recommandations.',
+    alreadyToday: "Tu as déjà fait ton check-in aujourd'hui. Tu peux en ajouter un autre si ton ressenti a changé.",
+    noteLabel: 'Une note (optionnel)',
+    notePlaceholder: 'Hydratation, sommeil, événement…',
+    save: 'Enregistrer',
+    error: {
+      title: 'Enregistrement impossible',
+      body: 'Une erreur est survenue. Réessaye dans un instant.',
+    },
+    emojis: {
+      glowing: 'Rayonnante',
+      good: 'Bien',
+      neutral: 'Neutre',
+      tired: 'Fatiguée',
+      rough: 'Difficile',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

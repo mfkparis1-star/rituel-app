@@ -14,9 +14,15 @@ type Props = {
   value: CheckinEmoji | null;
   onChange: (emoji: CheckinEmoji) => void;
   disabled?: boolean;
+  /**
+   * Optional per-locale label override.
+   * Falls back to label_fr from CHECKIN_EMOJIS when not provided,
+   * keeping existing consumers (Glow Timeline, Home) untouched.
+   */
+  labelMap?: Partial<Record<CheckinEmoji, string>>;
 };
 
-export default function EmojiScale({ value, onChange, disabled }: Props) {
+export default function EmojiScale({ value, onChange, disabled, labelMap }: Props) {
   return (
     <View style={s.row}>
       {CHECKIN_EMOJIS.map((e) => {
@@ -31,7 +37,7 @@ export default function EmojiScale({ value, onChange, disabled }: Props) {
           >
             <Text style={s.symbol}>{e.symbol}</Text>
             <Text style={[s.label, selected && s.labelSelected]} numberOfLines={1}>
-              {e.label_fr}
+              {labelMap?.[e.id] ?? e.label_fr}
             </Text>
           </Pressable>
         );

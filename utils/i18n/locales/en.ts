@@ -142,6 +142,28 @@ export const en: LocaleDict = {
     },
   },
 
+  checkin: {
+    back: 'Back',
+    kicker: 'TODAY\'S CHECK-IN',
+    title: 'How is your skin?',
+    subtitle: 'A moment for you. This signal helps us tune your recommendations.',
+    alreadyToday: "You've already checked in today. You can add another if your feeling has shifted.",
+    noteLabel: 'A note (optional)',
+    notePlaceholder: 'Hydration, sleep, an event…',
+    save: 'Save',
+    error: {
+      title: "Couldn't save",
+      body: 'Something went wrong. Try again in a moment.',
+    },
+    emojis: {
+      glowing: 'Radiant',
+      good: 'Good',
+      neutral: 'Neutral',
+      tired: 'Tired',
+      rough: 'Rough',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

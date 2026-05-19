@@ -16,9 +16,17 @@ import PillButton from '../components/ui/PillButton';
 import { useCheckins } from '../hooks/useCheckins';
 import { CheckinEmoji } from '../utils/checkins';
 import { safeBack } from '../utils/safeBack';
+import { useLanguage } from '../hooks/useLanguage';
+import { CHECKIN_EMOJIS } from '../utils/checkins';
 import { C, R, Sp, Type } from '../theme';
 
 export default function CheckinScreen() {
+  const { t } = useLanguage();
+  const emojiLabelMap = CHECKIN_EMOJIS.reduce((acc, e) => {
+    acc[e.id] = t(`checkin.emojis.${e.id}`);
+    return acc;
+  }, {} as Record<CheckinEmoji, string>);
+
   const { hasToday, submit } = useCheckins();
   const [emoji, setEmoji] = useState<CheckinEmoji | null>(null);
   const [note, setNote] = useState('');
@@ -33,8 +41,8 @@ export default function CheckinScreen() {
     setSubmitting(false);
     if (!ok) {
       Alert.alert(
-        'Enregistrement impossible',
-        'Une erreur est survenue. Réessaye dans un instant.'
+        t('checkin.error.title'),
+        t('checkin.error.body')
       );
       return;
     }
@@ -47,32 +55,28 @@ export default function CheckinScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
           <Pressable onPress={() => safeBack('/(tabs)')} style={s.back}>
-            <Text style={s.backTxt}>{'←  Retour'}</Text>
+            <Text style={s.backTxt}>{`←  ${t('checkin.back')}`}</Text>
           </Pressable>
 
-          <Text style={s.label}>CHECK-IN DU JOUR</Text>
-          <Text style={s.title}>Comment va ta peau ?</Text>
-          <Text style={s.subtitle}>
-            Un instant pour toi. Ce signal nous aide à affiner tes recommandations.
-          </Text>
+          <Text style={s.label}>{t('checkin.kicker')}</Text>
+          <Text style={s.title}>{t('checkin.title')}</Text>
+          <Text style={s.subtitle}>{t('checkin.subtitle')}</Text>
 
           {hasToday && (
             <View style={s.alreadyBox}>
-              <Text style={s.alreadyTxt}>
-                Tu as déjà fait ton check-in aujourd’hui. Tu peux en ajouter un autre si ton ressenti a changé.
-              </Text>
+              <Text style={s.alreadyTxt}>{t('checkin.alreadyToday')}</Text>
             </View>
           )}
 
           <View style={s.section}>
-            <EmojiScale value={emoji} onChange={setEmoji} disabled={submitting} />
+            <EmojiScale value={emoji} onChange={setEmoji} disabled={submitting} labelMap={emojiLabelMap} />
           </View>
 
-          <Text style={s.fieldLabel}>Une note (optionnel)</Text>
+          <Text style={s.fieldLabel}>{t('checkin.noteLabel')}</Text>
           <TextInput
             value={note}
             onChangeText={setNote}
-            placeholder="Hydratation, sommeil, événement…"
+            placeholder={t('checkin.notePlaceholder')}
             placeholderTextColor={C.textSoft}
             style={s.input}
             multiline
@@ -82,7 +86,7 @@ export default function CheckinScreen() {
           <Text style={s.counter}>{note.length} / 140</Text>
 
           <PillButton
-            label="Enregistrer"
+            label={t('checkin.save')}
             variant="primary"
             fullWidth
             disabled={!canSubmit}
