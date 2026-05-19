@@ -24,14 +24,13 @@ import PillButton from '../../components/ui/PillButton';
 import { supabase } from '../../lib/supabase';
 import { useMemory } from '../../hooks/useMemory';
 import { safeBack } from '../../utils/safeBack';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sh, Sp } from '../../theme';
 
-type Choice = { id: string; label: string };
+type Choice = { id: string };
 
 type Question = {
   id: keyof Answers;
-  label: string;
-  hint?: string;
   kind: 'single' | 'multi' | 'text';
   choices?: Choice[];
   maxPicks?: number;
@@ -49,75 +48,64 @@ type Answers = {
 const QUESTIONS: Question[] = [
   {
     id: 'skin_type',
-    label: 'Comment décrirais-tu ta peau au quotidien ?',
-    hint: 'Aucune réponse n\'est mauvaise.',
     kind: 'single',
     choices: [
-      { id: 'sec', label: 'Plutôt sèche' },
-      { id: 'mixte', label: 'Mixte' },
-      { id: 'gras', label: 'Plutôt grasse' },
-      { id: 'normal', label: 'Normale' },
-      { id: 'sensible', label: 'Sensible' },
-      { id: 'unknown', label: 'Je ne sais pas' },
+      { id: 'sec' },
+      { id: 'mixte' },
+      { id: 'gras' },
+      { id: 'normal' },
+      { id: 'sensible' },
+      { id: 'unknown' },
     ],
   },
   {
     id: 'concerns',
-    label: 'Qu\'est-ce qui retient ton attention en ce moment ?',
-    hint: 'Jusqu\'à 3 choix · Facultatif',
     kind: 'multi',
     maxPicks: 3,
     choices: [
-      { id: 'rougeurs', label: 'Rougeurs' },
-      { id: 'secheresse', label: 'Sécheresse' },
-      { id: 'brillance', label: 'Brillance' },
-      { id: 'imperfections', label: 'Imperfections' },
-      { id: 'taches', label: 'Taches' },
-      { id: 'sensibilite', label: 'Sensibilité' },
-      { id: 'fatigue', label: 'Fatigue' },
-      { id: 'unknown', label: 'Rien en particulier' },
+      { id: 'rougeurs' },
+      { id: 'secheresse' },
+      { id: 'brillance' },
+      { id: 'imperfections' },
+      { id: 'taches' },
+      { id: 'sensibilite' },
+      { id: 'fatigue' },
+      { id: 'unknown' },
     ],
   },
   {
     id: 'sensitivity',
-    label: 'Ta peau réagit-elle facilement ?',
-    hint: 'Aux changements de produit, climat, stress.',
     kind: 'single',
     choices: [
-      { id: 'souvent', label: 'Souvent' },
-      { id: 'parfois', label: 'Parfois' },
-      { id: 'rarement', label: 'Rarement' },
-      { id: 'unknown', label: 'Je ne sais pas' },
+      { id: 'souvent' },
+      { id: 'parfois' },
+      { id: 'rarement' },
+      { id: 'unknown' },
     ],
   },
   {
     id: 'routine_level',
-    label: 'À quoi ressemble ta routine actuelle ?',
     kind: 'single',
     choices: [
-      { id: 'basique', label: 'Simple — nettoyant + hydratant' },
-      { id: 'intermediaire', label: 'Intermédiaire — quelques actifs' },
-      { id: 'avancee', label: 'Riche — plusieurs étapes' },
-      { id: 'aucune', label: 'Pas vraiment de routine' },
+      { id: 'basique' },
+      { id: 'intermediaire' },
+      { id: 'avancee' },
+      { id: 'aucune' },
     ],
   },
   {
     id: 'goal',
-    label: 'Qu\'aimerais-tu offrir à ta peau ce mois-ci ?',
-    hint: 'Pas d\'objectif chiffré, juste une intention.',
     kind: 'single',
     choices: [
-      { id: 'hydratation', label: 'Plus d\'hydratation' },
-      { id: 'eclat', label: 'De l\'éclat' },
-      { id: 'apaisement', label: 'De l\'apaisement' },
-      { id: 'equilibre', label: 'De l\'équilibre' },
-      { id: 'aucun', label: 'Rien de particulier' },
+      { id: 'hydratation' },
+      { id: 'eclat' },
+      { id: 'apaisement' },
+      { id: 'equilibre' },
+      { id: 'aucun' },
     ],
   },
   {
     id: 'self_note',
-    label: 'Une note pour toi-même ?',
-    hint: 'Facultatif · 140 caractères',
     kind: 'text',
   },
 ];
@@ -125,6 +113,7 @@ const QUESTIONS: Question[] = [
 const MAX_NOTE = 140;
 
 export default function SkinQuizScreen() {
+  const { t } = useLanguage();
   const { memory, patch, loading: memLoading } = useMemory();
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -205,20 +194,18 @@ export default function SkinQuizScreen() {
     const items: { label: string; value: string }[] = [];
     const labelFor = (qid: keyof Answers, choiceId?: string): string => {
       if (!choiceId) return '—';
-      const q = QUESTIONS.find((x) => x.id === qid);
-      const c = q?.choices?.find((c) => c.id === choiceId);
-      return c?.label ?? choiceId;
+      return t(`skinQuiz.q.${qid}.choices.${choiceId}`);
     };
-    if (summary.skin_type) items.push({ label: 'Type de peau', value: labelFor('skin_type', summary.skin_type) });
+    if (summary.skin_type) items.push({ label: t('skinQuiz.summary.rowLabels.skin_type'), value: labelFor('skin_type', summary.skin_type) });
     if (summary.concerns && summary.concerns.length > 0) {
       items.push({
-        label: 'Attention',
+        label: t('skinQuiz.summary.rowLabels.concerns'),
         value: summary.concerns.map((c) => labelFor('concerns', c)).join(' · '),
       });
     }
-    if (summary.sensitivity) items.push({ label: 'Sensibilité', value: labelFor('sensitivity', summary.sensitivity) });
-    if (summary.routine_level) items.push({ label: 'Routine', value: labelFor('routine_level', summary.routine_level) });
-    if (summary.goal) items.push({ label: 'Intention', value: labelFor('goal', summary.goal) });
+    if (summary.sensitivity) items.push({ label: t('skinQuiz.summary.rowLabels.sensitivity'), value: labelFor('sensitivity', summary.sensitivity) });
+    if (summary.routine_level) items.push({ label: t('skinQuiz.summary.rowLabels.routine_level'), value: labelFor('routine_level', summary.routine_level) });
+    if (summary.goal) items.push({ label: t('skinQuiz.summary.rowLabels.goal'), value: labelFor('goal', summary.goal) });
 
     return (
       <SafeAreaView style={s.safe} edges={['top']}>
@@ -230,15 +217,15 @@ export default function SkinQuizScreen() {
         </View>
 
         <ScrollView contentContainerStyle={s.summaryScroll} showsVerticalScrollIndicator={false}>
-          <Text style={s.summaryKicker}>VOICI TON PROFIL</Text>
-          <Text style={s.summaryTitle}>Une note sur ta peau, telle qu\'elle est aujourd\'hui.</Text>
+          <Text style={s.summaryKicker}>{t('skinQuiz.summary.kicker')}</Text>
+          <Text style={s.summaryTitle}>{t('skinQuiz.summary.title')}</Text>
           <Text style={s.summarySub}>
             Rituel s\'en souvient pour t\'accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.
           </Text>
 
           <View style={s.summaryCard}>
             {items.length === 0 ? (
-              <Text style={s.summaryEmpty}>Tu as préféré passer toutes les questions. C\'est aussi un choix.</Text>
+              <Text style={s.summaryEmpty}>{t('skinQuiz.summary.empty')}</Text>
             ) : (
               items.map((it) => (
                 <View key={it.label} style={s.summaryRow}>
@@ -249,14 +236,14 @@ export default function SkinQuizScreen() {
             )}
             {summary.self_note ? (
               <View style={s.summaryNote}>
-                <Text style={s.summaryNoteLabel}>NOTE</Text>
+                <Text style={s.summaryNoteLabel}>{t('skinQuiz.summary.noteLabel')}</Text>
                 <Text style={s.summaryNoteValue}>"{summary.self_note}"</Text>
               </View>
             ) : null}
           </View>
 
           <PillButton
-            label={submitting ? 'Un instant…' : 'Sauvegarder'}
+            label={submitting ? t('skinQuiz.nav.saving') : t('skinQuiz.nav.save')}
             variant="primary"
             fullWidth
             disabled={submitting}
@@ -264,7 +251,7 @@ export default function SkinQuizScreen() {
             style={{ marginTop: Sp.lg }}
           />
           <Pressable onPress={handleExit} hitSlop={6} style={s.summaryCancel}>
-            <Text style={s.summaryCancelTxt}>Plus tard</Text>
+            <Text style={s.summaryCancelTxt}>{t('skinQuiz.nav.later')}</Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>
@@ -288,7 +275,7 @@ export default function SkinQuizScreen() {
           <View style={[s.progressFill, { width: `${progress * 100}%` }]} />
         </View>
         <Pressable onPress={handleSkip} hitSlop={10} style={s.skipBtn}>
-          <Text style={s.skipTxt}>Sauter</Text>
+          <Text style={s.skipTxt}>{t('skinQuiz.header.skip')}</Text>
         </Pressable>
       </View>
 
@@ -297,9 +284,9 @@ export default function SkinQuizScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={s.kicker}>Question {stepIdx + 1} / {totalSteps}</Text>
-        <Text style={s.questionTitle}>{current.label}</Text>
-        {current.hint ? <Text style={s.questionHint}>{current.hint}</Text> : null}
+        <Text style={s.kicker}>{t('skinQuiz.header.stepLabel').replace('{n}', String(stepIdx + 1)).replace('{total}', String(totalSteps))}</Text>
+        <Text style={s.questionTitle}>{t(`skinQuiz.q.${current.id}.label`)}</Text>
+        {(() => { const h = t(`skinQuiz.q.${current.id}.hint`); return h ? <Text style={s.questionHint}>{h}</Text> : null; })()}
 
         {current.kind === 'text' ? (
           <View style={s.textBox}>
@@ -308,7 +295,7 @@ export default function SkinQuizScreen() {
               onChangeText={(t) => {
                 if (t.length <= MAX_NOTE) handleAnswer(t);
               }}
-              placeholder="Optionnel, juste pour toi…"
+              placeholder={t('skinQuiz.text.placeholder')}
               placeholderTextColor="#A99583"
               multiline
               style={s.textInput}
@@ -328,7 +315,7 @@ export default function SkinQuizScreen() {
                   style={[s.choiceCard, active && s.choiceCardActive]}
                   hitSlop={4}
                 >
-                  <Text style={[s.choiceTxt, active && s.choiceTxtActive]}>{c.label}</Text>
+                  <Text style={[s.choiceTxt, active && s.choiceTxtActive]}>{t(`skinQuiz.q.${current.id}.choices.${c.id}`)}</Text>
                 </Pressable>
               );
             })}
@@ -355,7 +342,7 @@ export default function SkinQuizScreen() {
                   style={[s.choiceCard, active && s.choiceCardActive]}
                   hitSlop={4}
                 >
-                  <Text style={[s.choiceTxt, active && s.choiceTxtActive]}>{c.label}</Text>
+                  <Text style={[s.choiceTxt, active && s.choiceTxtActive]}>{t(`skinQuiz.q.${current.id}.choices.${c.id}`)}</Text>
                 </Pressable>
               );
             })}
@@ -363,7 +350,7 @@ export default function SkinQuizScreen() {
         )}
 
         <PillButton
-          label={stepIdx + 1 === totalSteps ? 'Terminer' : 'Continuer'}
+          label={stepIdx + 1 === totalSteps ? t('skinQuiz.nav.finish') : t('skinQuiz.nav.continue')}
           variant="primary"
           fullWidth
           onPress={handleNext}

@@ -48,6 +48,100 @@ export const en: LocaleDict = {
     backToHome: 'Back',
   },
 
+  skinQuiz: {
+    header: {
+      stepLabel: 'Question {n} / {total}',
+      skip: 'Skip',
+    },
+    nav: {
+      continue: 'Continue',
+      finish: 'Finish',
+      save: 'Save',
+      saving: 'One moment…',
+      later: 'Later',
+    },
+    text: {
+      placeholder: 'Optional, just for you…',
+    },
+    q: {
+      skin_type: {
+        label: 'How would you describe your skin day to day?',
+        hint: 'No wrong answer.',
+        choices: {
+          sec: 'Rather dry',
+          mixte: 'Combination',
+          gras: 'Rather oily',
+          normal: 'Normal',
+          sensible: 'Sensitive',
+          unknown: "I'm not sure",
+        },
+      },
+      concerns: {
+        label: "What's on your mind these days?",
+        hint: 'Up to 3 · Optional',
+        choices: {
+          rougeurs: 'Redness',
+          secheresse: 'Dryness',
+          brillance: 'Shine',
+          imperfections: 'Breakouts',
+          taches: 'Spots',
+          sensibilite: 'Sensitivity',
+          fatigue: 'Tiredness',
+          unknown: 'Nothing in particular',
+        },
+      },
+      sensitivity: {
+        label: 'Does your skin react easily?',
+        hint: 'To new products, weather, stress.',
+        choices: {
+          souvent: 'Often',
+          parfois: 'Sometimes',
+          rarement: 'Rarely',
+          unknown: "I'm not sure",
+        },
+      },
+      routine_level: {
+        label: 'What does your current routine look like?',
+        hint: '',
+        choices: {
+          basique: 'Simple — cleanser + moisturizer',
+          intermediaire: 'Intermediate — a few actives',
+          avancee: 'Rich — multiple steps',
+          aucune: 'No real routine',
+        },
+      },
+      goal: {
+        label: 'What would you like to offer your skin this month?',
+        hint: 'No metric goal, just an intention.',
+        choices: {
+          hydratation: 'More hydration',
+          eclat: 'Glow',
+          apaisement: 'Calm',
+          equilibre: 'Balance',
+          aucun: 'Nothing specific',
+        },
+      },
+      self_note: {
+        label: 'A note for yourself?',
+        hint: 'Optional · 140 characters',
+      },
+    },
+    summary: {
+      kicker: 'HERE IS YOUR PROFILE',
+      title: 'A note on your skin, as it is today.',
+      subtitle: 'Rituel remembers it so you are accompanied with more softness. You can update it whenever you want.',
+      empty: "You skipped every question. That's a choice too.",
+      noteLabel: 'NOTE',
+      rowLabels: {
+        skin_type: 'Skin type',
+        concerns: 'On your mind',
+        sensitivity: 'Sensitivity',
+        routine_level: 'Routine',
+        goal: 'Intention',
+      },
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

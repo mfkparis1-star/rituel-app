@@ -48,6 +48,100 @@ export const tr: LocaleDict = {
     backToHome: 'Geri',
   },
 
+  skinQuiz: {
+    header: {
+      stepLabel: 'Soru {n} / {total}',
+      skip: 'Atla',
+    },
+    nav: {
+      continue: 'Devam et',
+      finish: 'Bitir',
+      save: 'Kaydet',
+      saving: 'Bir an…',
+      later: 'Daha sonra',
+    },
+    text: {
+      placeholder: 'İsteğe bağlı, sadece sana özel…',
+    },
+    q: {
+      skin_type: {
+        label: 'Cildini günlük olarak nasıl tanımlarsın?',
+        hint: 'Yanlış cevap yok.',
+        choices: {
+          sec: 'Daha çok kuru',
+          mixte: 'Karma',
+          gras: 'Daha çok yağlı',
+          normal: 'Normal',
+          sensible: 'Hassas',
+          unknown: 'Emin değilim',
+        },
+      },
+      concerns: {
+        label: 'Bu aralar dikkatini ne çekiyor?',
+        hint: 'En fazla 3 · İsteğe bağlı',
+        choices: {
+          rougeurs: 'Kızarıklık',
+          secheresse: 'Kuruluk',
+          brillance: 'Parlama',
+          imperfections: 'Sivilceler',
+          taches: 'Lekeler',
+          sensibilite: 'Hassasiyet',
+          fatigue: 'Yorgunluk',
+          unknown: 'Özel bir şey yok',
+        },
+      },
+      sensitivity: {
+        label: 'Cildin kolay tepki veriyor mu?',
+        hint: 'Ürün değişikliği, hava, stres karşısında.',
+        choices: {
+          souvent: 'Sık sık',
+          parfois: 'Bazen',
+          rarement: 'Nadiren',
+          unknown: 'Emin değilim',
+        },
+      },
+      routine_level: {
+        label: 'Şu anki rutinin nasıl?',
+        hint: '',
+        choices: {
+          basique: 'Basit — temizleyici + nemlendirici',
+          intermediaire: 'Orta — birkaç aktif',
+          avancee: 'Zengin — birden fazla adım',
+          aucune: 'Belirli bir rutinim yok',
+        },
+      },
+      goal: {
+        label: 'Bu ay cildine ne sunmak istersin?',
+        hint: 'Sayısal hedef değil, sadece bir niyet.',
+        choices: {
+          hydratation: 'Daha fazla nem',
+          eclat: 'Işıltı',
+          apaisement: 'Yatışma',
+          equilibre: 'Denge',
+          aucun: 'Özel bir şey değil',
+        },
+      },
+      self_note: {
+        label: 'Kendine bir not?',
+        hint: 'İsteğe bağlı · 140 karakter',
+      },
+    },
+    summary: {
+      kicker: 'İŞTE PROFİLİN',
+      title: 'Cildine dair bir not, bugün olduğu gibi.',
+      subtitle: 'Rituel bunu hatırlar, sana daha yumuşak eşlik etmek için. İstediğin zaman güncelleyebilirsin.',
+      empty: 'Tüm soruları geçmeyi tercih ettin. Bu da bir seçim.',
+      noteLabel: 'NOT',
+      rowLabels: {
+        skin_type: 'Cilt tipi',
+        concerns: 'Dikkat',
+        sensitivity: 'Hassasiyet',
+        routine_level: 'Rutin',
+        goal: 'Niyet',
+      },
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

@@ -48,6 +48,101 @@ export const fr = {
     backToHome: 'Retour',
   },
 
+  // Skin profile quiz (Phase 17E)
+  skinQuiz: {
+    header: {
+      stepLabel: 'Question {n} / {total}',
+      skip: 'Sauter',
+    },
+    nav: {
+      continue: 'Continuer',
+      finish: 'Terminer',
+      save: 'Sauvegarder',
+      saving: 'Un instant…',
+      later: 'Plus tard',
+    },
+    text: {
+      placeholder: 'Optionnel, juste pour toi…',
+    },
+    q: {
+      skin_type: {
+        label: 'Comment décrirais-tu ta peau au quotidien ?',
+        hint: "Aucune réponse n'est mauvaise.",
+        choices: {
+          sec: 'Plutôt sèche',
+          mixte: 'Mixte',
+          gras: 'Plutôt grasse',
+          normal: 'Normale',
+          sensible: 'Sensible',
+          unknown: 'Je ne sais pas',
+        },
+      },
+      concerns: {
+        label: "Qu'est-ce qui retient ton attention en ce moment ?",
+        hint: "Jusqu'à 3 choix · Facultatif",
+        choices: {
+          rougeurs: 'Rougeurs',
+          secheresse: 'Sécheresse',
+          brillance: 'Brillance',
+          imperfections: 'Imperfections',
+          taches: 'Taches',
+          sensibilite: 'Sensibilité',
+          fatigue: 'Fatigue',
+          unknown: 'Rien en particulier',
+        },
+      },
+      sensitivity: {
+        label: 'Ta peau réagit-elle facilement ?',
+        hint: 'Aux changements de produit, climat, stress.',
+        choices: {
+          souvent: 'Souvent',
+          parfois: 'Parfois',
+          rarement: 'Rarement',
+          unknown: 'Je ne sais pas',
+        },
+      },
+      routine_level: {
+        label: 'À quoi ressemble ta routine actuelle ?',
+        hint: '',
+        choices: {
+          basique: 'Simple — nettoyant + hydratant',
+          intermediaire: 'Intermédiaire — quelques actifs',
+          avancee: 'Riche — plusieurs étapes',
+          aucune: 'Pas vraiment de routine',
+        },
+      },
+      goal: {
+        label: "Qu'aimerais-tu offrir à ta peau ce mois-ci ?",
+        hint: "Pas d'objectif chiffré, juste une intention.",
+        choices: {
+          hydratation: "Plus d'hydratation",
+          eclat: "De l'éclat",
+          apaisement: "De l'apaisement",
+          equilibre: "De l'équilibre",
+          aucun: 'Rien de particulier',
+        },
+      },
+      self_note: {
+        label: 'Une note pour toi-même ?',
+        hint: 'Facultatif · 140 caractères',
+      },
+    },
+    summary: {
+      kicker: 'VOICI TON PROFIL',
+      title: "Une note sur ta peau, telle qu'elle est aujourd'hui.",
+      subtitle: "Rituel s'en souvient pour t'accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.",
+      empty: "Tu as préféré passer toutes les questions. C'est aussi un choix.",
+      noteLabel: 'NOTE',
+      rowLabels: {
+        skin_type: 'Type de peau',
+        concerns: 'Attention',
+        sensitivity: 'Sensibilité',
+        routine_level: 'Routine',
+        goal: 'Intention',
+      },
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',
