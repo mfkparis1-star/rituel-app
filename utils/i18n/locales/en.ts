@@ -359,6 +359,15 @@ export const en: LocaleDict = {
     justNow: 'just now',
   },
 
+  productDiscovery: {
+    kicker: 'IN THE RITUALS',
+    titleFallback: 'Product',
+    emptyTitle: 'Not shared yet',
+    othersLabel: 'ALSO IN THIS RITUAL',
+    memberFallback: 'Member',
+    justNow: 'just now',
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

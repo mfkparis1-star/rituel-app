@@ -360,6 +360,15 @@ export const tr: LocaleDict = {
     justNow: 'az önce',
   },
 
+  productDiscovery: {
+    kicker: 'RİTÜELLERDE',
+    titleFallback: 'Ürün',
+    emptyTitle: 'Henüz paylaşılmadı',
+    othersLabel: 'BU RİTÜELDE AYRICA',
+    memberFallback: 'Üye',
+    justNow: 'az önce',
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

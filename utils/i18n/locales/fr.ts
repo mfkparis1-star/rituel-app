@@ -365,6 +365,16 @@ export const fr = {
     justNow: 'à l\u2019instant',
   },
 
+  // Product discovery — "Dans son rituel" (Phase 19.7)
+  productDiscovery: {
+    kicker: 'DANS LES RITUELS',
+    titleFallback: 'Produit',
+    emptyTitle: 'Pas encore partagé',
+    othersLabel: 'EGALEMENT DANS CE RITUEL',
+    memberFallback: 'Membre',
+    justNow: 'à l\u2019instant',
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

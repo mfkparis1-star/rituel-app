@@ -15,6 +15,7 @@
  *   - posts where product_names contains :name (newest first, capped 30)
  */
 import { type Session } from '@supabase/supabase-js';
+import { useLanguage } from '../../hooks/useLanguage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -24,24 +25,25 @@ import { fetchPostsByProduct, type FeedPost } from '../../utils/posts';
 import { safeBack } from '../../utils/safeBack';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
-function relativeTime(iso: string): string {
+function relativeTime(iso: string, justNowLabel: string = "à l’instant"): string {
   const d = new Date(iso);
   const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return "à l’instant";
+  if (sec < 60) return justNowLabel;
   if (sec < 3600) return `il y a ${Math.floor(sec / 60)} min`;
   if (sec < 86400) return `il y a ${Math.floor(sec / 3600)} h`;
   return `il y a ${Math.floor(sec / 86400)} j`;
 }
 
-function authorName(post: FeedPost): string {
+function authorName(post: FeedPost, memberLabel: string = "Membre"): string {
   const dn = (post as any).display_name as string | null | undefined;
   if (dn && dn.trim()) return dn.trim();
   const email = (post as any).user_email as string | null | undefined;
   if (email) return email.split('@')[0];
-  return 'Membre';
+  return memberLabel;
 }
 
 export default function ProductDiscoveryScreen() {
+  const { t } = useLanguage();
   const { name } = useLocalSearchParams<{ name: string }>();
   const productName = (() => {
     try {
@@ -77,8 +79,8 @@ export default function ProductDiscoveryScreen() {
           <Text style={s.backTxt}>‹</Text>
         </Pressable>
         <View style={s.headerCenter}>
-          <Text style={s.label}>DANS LES RITUELS</Text>
-          <Text style={s.title} numberOfLines={2}>{productName || 'Produit'}</Text>
+          <Text style={s.label}>{t('productDiscovery.kicker')}</Text>
+          <Text style={s.title} numberOfLines={2}>{productName || t('productDiscovery.titleFallback')}</Text>
         </View>
         <View style={s.backBtn} />
       </View>
@@ -89,7 +91,7 @@ export default function ProductDiscoveryScreen() {
         </View>
       ) : posts.length === 0 ? (
         <View style={s.emptyWrap}>
-          <Text style={s.emptyTitle}>Pas encore partagé</Text>
+          <Text style={s.emptyTitle}>{t('productDiscovery.emptyTitle')}</Text>
           <Text style={s.emptyBody}>
             Personne n'a encore partagé ce produit dans son rituel. Reviens un peu plus tard.
           </Text>
@@ -125,7 +127,7 @@ export default function ProductDiscoveryScreen() {
 
               {Array.isArray(post.product_names) && post.product_names.length > 1 ? (
                 <View style={s.othersWrap}>
-                  <Text style={s.othersLabel}>EGALEMENT DANS CE RITUEL</Text>
+                  <Text style={s.othersLabel}>{t('productDiscovery.othersLabel')}</Text>
                   <View style={s.othersRow}>
                     {post.product_names
                       .filter((n) => n.trim().toLowerCase() !== productName.toLowerCase())
