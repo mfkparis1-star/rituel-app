@@ -582,6 +582,39 @@ export const fr = {
     },
   },
 
+  community: {
+    title: 'Communauté',
+    subtitle: 'Découvrez les routines des femmes comme vous',
+    discovery: {
+      pourToi: 'Pour toi',
+      recents: 'Récents',
+    },
+    fallbackHint: 'On affine tes inspirations à mesure que la communauté grandit.',
+    filters: {
+      all: 'Tous',
+      dry: 'Sèche',
+      oily: 'Grasse',
+      combination: 'Mixte',
+      normal: 'Normale',
+    },
+    skinLabel: {
+      dry: 'Peau sèche',
+      oily: 'Peau grasse',
+      combination: 'Peau mixte',
+      normal: 'Peau normale',
+    },
+    empty: {
+      title: 'Pas encore de routines',
+      subtitle: 'Les routines partagées par la communauté apparaîtront ici.',
+    },
+    productsUsed: 'PRODUITS UTILISÉS',
+    likes: 'j\'aime',
+    translate: {
+      action: 'Traduire',
+      loading: 'Traduction...',
+      original: 'Original',
+    },
+  },
   common: {
     back: 'Retour',
     cancel: 'Annuler',

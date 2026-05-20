@@ -563,6 +563,39 @@ export const en: LocaleDict = {
     },
   },
 
+  community: {
+    title: 'Community',
+    subtitle: 'Discover routines from women like you',
+    discovery: {
+      pourToi: 'For you',
+      recents: 'Recent',
+    },
+    fallbackHint: 'We refine your inspirations as the community grows.',
+    filters: {
+      all: 'All',
+      dry: 'Dry',
+      oily: 'Oily',
+      combination: 'Combination',
+      normal: 'Normal',
+    },
+    skinLabel: {
+      dry: 'Dry skin',
+      oily: 'Oily skin',
+      combination: 'Combination skin',
+      normal: 'Normal skin',
+    },
+    empty: {
+      title: 'No routines yet',
+      subtitle: 'Routines shared by the community will appear here.',
+    },
+    productsUsed: 'PRODUCTS USED',
+    likes: 'likes',
+    translate: {
+      action: 'Translate',
+      loading: 'Translating...',
+      original: 'Original',
+    },
+  },
   common: {
     back: 'Back',
     cancel: 'Cancel',

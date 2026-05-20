@@ -564,6 +564,39 @@ export const tr: LocaleDict = {
     },
   },
 
+  community: {
+    title: 'Topluluk',
+    subtitle: 'Senin gibi kadınların rutinlerini keşfet',
+    discovery: {
+      pourToi: 'Senin için',
+      recents: 'Son eklenenler',
+    },
+    fallbackHint: 'Topluluk büyüdükçe sana özel önerileri inceltiyoruz.',
+    filters: {
+      all: 'Tümü',
+      dry: 'Kuru',
+      oily: 'Yağlı',
+      combination: 'Karma',
+      normal: 'Normal',
+    },
+    skinLabel: {
+      dry: 'Kuru cilt',
+      oily: 'Yağlı cilt',
+      combination: 'Karma cilt',
+      normal: 'Normal cilt',
+    },
+    empty: {
+      title: 'Henüz rutin yok',
+      subtitle: 'Topluluğun paylaştığı rutinler burada görünecek.',
+    },
+    productsUsed: 'KULLANILAN ÜRÜNLER',
+    likes: 'beğeni',
+    translate: {
+      action: 'Çevir',
+      loading: 'Çevriliyor...',
+      original: 'Orijinal',
+    },
+  },
   common: {
     back: 'Geri',
     cancel: 'İptal',
