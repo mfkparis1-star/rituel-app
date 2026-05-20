@@ -1,4 +1,5 @@
 import { type Session } from '@supabase/supabase-js';
+import { useLanguage } from '../../hooks/useLanguage';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -22,6 +23,7 @@ type Product = {
 };
 
 export default function ArchiveScreen() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState<FilterId>('all');
   const [search, setSearch] = useState('');
@@ -80,12 +82,12 @@ export default function ArchiveScreen() {
 
   const handleDelete = (id: string, name: string) => {
     Alert.alert(
-      'Supprimer le produit',
+      t('archive.deleteAlert.title'),
       `Voulez-vous supprimer "${name}" de votre archive ?`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('archive.deleteAlert.cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('archive.deleteAlert.confirm'),
           style: 'destructive',
           onPress: async () => {
             if (!session) return;
@@ -95,7 +97,7 @@ export default function ArchiveScreen() {
               .eq('id', id)
               .eq('user_id', session.user.id);
             if (err) {
-              Alert.alert('Erreur', 'Suppression impossible.');
+              Alert.alert(t('archive.deleteAlert.errorTitle'), t('archive.deleteAlert.errorBody'));
               return;
             }
             loadProducts(session.user.id);
@@ -128,22 +130,22 @@ export default function ArchiveScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.header}>
-          <Text style={s.title}>Mon Archive</Text>
-          <Text style={s.subtitle}>Organise, suis, utilise au bon moment</Text>
+          <Text style={s.title}>{t('archive.title')}</Text>
+          <Text style={s.subtitle}>{t('archive.subtitle')}</Text>
         </View>
 
         <View style={s.statsRow}>
-          <StatCard label="Total" value={stats.total} />
+          <StatCard label={t('archive.stats.total')} value={stats.total} />
           <View style={s.gap} />
-          <StatCard label="Actifs" value={stats.active} />
+          <StatCard label={t('archive.stats.active')} value={stats.active} />
           <View style={s.gap} />
-          <StatCard label="Terminés" value={stats.finished} />
+          <StatCard label={t('archive.stats.finished')} value={stats.finished} />
         </View>
 
         <View style={s.searchBox}>
           <TextInput
             style={s.search}
-            placeholder="Rechercher un produit"
+            placeholder={t('archive.searchPlaceholder')}
             placeholderTextColor={C.textSoft}
             value={search}
             onChangeText={setSearch}
@@ -152,10 +154,10 @@ export default function ArchiveScreen() {
         </View>
 
         <View style={s.filtersRow}>
-          <Chip label="Tous" active={filter === 'all'} onPress={() => setFilter('all')} />
-          <Chip label="En cours" active={filter === 'active'} onPress={() => setFilter('active')} />
-          <Chip label="Terminé" active={filter === 'finished'} onPress={() => setFilter('finished')} />
-          <Chip label="En stock" active={filter === 'stocked'} onPress={() => setFilter('stocked')} />
+          <Chip label={t('archive.filters.all')} active={filter === 'all'} onPress={() => setFilter('all')} />
+          <Chip label={t('archive.filters.active')} active={filter === 'active'} onPress={() => setFilter('active')} />
+          <Chip label={t('archive.filters.finished')} active={filter === 'finished'} onPress={() => setFilter('finished')} />
+          <Chip label={t('archive.filters.stocked')} active={filter === 'stocked'} onPress={() => setFilter('stocked')} />
         </View>
 
         <Text style={s.limit}>
@@ -166,8 +168,8 @@ export default function ArchiveScreen() {
 
         {isEmpty ? (
           <EmptyState
-            title="Ton archive est vide"
-            subtitle="Ajoute tes soins pour suivre leur utilisation."
+            title={t('archive.emptyTitle')}
+            subtitle={t('archive.emptySubtitle')}
             action={
               <View style={s.emptyActions}>
                 <PillButton
@@ -192,7 +194,7 @@ export default function ArchiveScreen() {
                     onPress={() => handleDelete(p.id, p.name)}
                     style={s.swipeDeleteAction}
                   >
-                    <Text style={s.swipeDeleteText}>Supprimer</Text>
+                    <Text style={s.swipeDeleteText}>{t('archive.swipeDelete')}</Text>
                   </Pressable>
                 )}
               >
