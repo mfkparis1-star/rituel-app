@@ -10,6 +10,7 @@ import { useAIUnlock } from '../../hooks/useAIUnlock';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import { useLanguage } from '../../hooks/useLanguage';
 import {
   generateMakeupLooks,
   MAKEUP_OCCASIONS,
@@ -55,6 +56,7 @@ function BackArrow({ color }: { color: string }) {
 }
 
 export default function MakeupScreen() {
+  const { t, lang } = useLanguage();
   const [step, setStep] = useState<Step>('pick_occasion');
   const [occasion, setOccasion] = useState<OccasionId | null>(null);
   const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
@@ -82,8 +84,8 @@ export default function MakeupScreen() {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
-        'Autorisation requise',
-        'Veuillez autoriser l\'accès à la caméra.'
+        t('makeup.alerts.permissionTitle'),
+        t('makeup.alerts.cameraPermission')
       );
       return;
     }
@@ -102,8 +104,8 @@ export default function MakeupScreen() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
-        'Autorisation requise',
-        'Veuillez autoriser l\'accès à la photothèque.'
+        t('makeup.alerts.permissionTitle'),
+        t('makeup.alerts.galleryPermission')
       );
       return;
     }
@@ -121,12 +123,12 @@ export default function MakeupScreen() {
 
   const pickSelfie = () => {
     Alert.alert(
-      'Ajouter un selfie',
-      'Choisis comment tu veux ajouter ta photo.',
+      t('makeup.alerts.addSelfieTitle'),
+      t('makeup.alerts.addSelfieBody'),
       [
-        { text: 'Prendre un selfie', onPress: openCamera },
-        { text: 'Choisir depuis la galerie', onPress: openGallery },
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('makeup.alerts.takeSelfie'), onPress: openCamera },
+        { text: t('makeup.alerts.chooseGallery'), onPress: openGallery },
+        { text: t('makeup.alerts.cancel'), style: 'cancel' },
       ]
     );
   };
@@ -169,7 +171,7 @@ export default function MakeupScreen() {
   const handleHeroCta = () => {
     if (!occasion) {
       Alert.alert(
-        'Choisis un événement',
+        t('makeup.alerts.chooseOccasionTitle'),
         'Sélectionne d\'abord une occasion ci-dessous.'
       );
       return;
@@ -195,7 +197,7 @@ export default function MakeupScreen() {
           </View>
 
           <Text style={s.label}>{occLabel.toUpperCase()}</Text>
-          <Text style={s.title}>Ajoute un selfie</Text>
+          <Text style={s.title}>{t('makeup.selfie.title')}</Text>
           <Text style={s.subtitle}>
             Optionnel. Améliore la précision en analysant ton visage.
           </Text>
@@ -212,7 +214,7 @@ export default function MakeupScreen() {
                   style={s.selfieRemove}
                   hitSlop={8}
                 >
-                  <Text style={s.selfieRemoveTxt}>Retirer</Text>
+                  <Text style={s.selfieRemoveTxt}>{t('makeup.selfie.remove')}</Text>
                 </Pressable>
               </View>
             ) : (
@@ -223,7 +225,7 @@ export default function MakeupScreen() {
           </View>
 
           <PillButton
-            label="Générer mes looks"
+            label={t('makeup.selfie.generate')}
             variant="primary"
             fullWidth
             onPress={() => runGeneration(false)}
@@ -234,7 +236,7 @@ export default function MakeupScreen() {
             onPress={() => runGeneration(true)}
             style={s.skipBtn}
           >
-            <Text style={s.skipTxt}>Continuer sans selfie</Text>
+            <Text style={s.skipTxt}>{t('makeup.selfie.skip')}</Text>
           </Pressable>
 
           <View style={{ height: Sp.huge }} />
@@ -249,7 +251,7 @@ export default function MakeupScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <View style={s.centerWrap}>
           <ActivityIndicator color={C.copper} size="large" />
-          <Text style={s.generatingTxt}>Création de tes looks...</Text>
+          <Text style={s.generatingTxt}>{t('makeup.generating')}</Text>
           <Text style={s.generatingSub}>
             L\'IA analyse ton occasion et compose 3 propositions.
           </Text>
@@ -272,7 +274,7 @@ export default function MakeupScreen() {
           </View>
 
           <Text style={s.label}>{occLabel.toUpperCase()}</Text>
-          <Text style={s.title}>Tes 3 looks</Text>
+          <Text style={s.title}>{t('makeup.result.title')}</Text>
 
           {result.styles.map((look, i) => {
             if (i > 0 && !unlocked && !isPremium) {
@@ -280,11 +282,11 @@ export default function MakeupScreen() {
             }
             return (
             <View key={i} style={[s.lookCard, Sh.soft]}>
-              <Text style={s.lookNumber}>LOOK {i + 1}</Text>
+              <Text style={s.lookNumber}>{t('makeup.result.lookPrefix')} {i + 1}</Text>
               <Text style={s.lookName}>{look.name}</Text>
               <Text style={s.lookDescription}>{look.description}</Text>
 
-              <Text style={s.lookSectionLabel}>ÉTAPES</Text>
+              <Text style={s.lookSectionLabel}>{t('makeup.result.steps')}</Text>
               {look.steps.map((stepTxt, j) => (
                 <View key={j} style={s.lookStepRow}>
                   <Text style={s.lookStepNum}>{j + 1}</Text>
@@ -294,7 +296,7 @@ export default function MakeupScreen() {
 
               {look.productsNeeded.length > 0 && (
                 <>
-                  <Text style={s.lookSectionLabel}>PRODUITS</Text>
+                  <Text style={s.lookSectionLabel}>{t('makeup.result.products')}</Text>
                   <View style={s.chipRow}>
                     {look.productsNeeded.map((p, k) => (
                       <View key={k} style={s.lookChip}>
@@ -307,7 +309,7 @@ export default function MakeupScreen() {
 
               {look.missingCategories.length > 0 && (
                 <>
-                  <Text style={s.lookMissingLabel}>À COMPLÉTER</Text>
+                  <Text style={s.lookMissingLabel}>{t('makeup.result.toComplete')}</Text>
                   <View style={s.chipRow}>
                     {look.missingCategories.map((p, k) => (
                       <View key={k} style={s.lookMissingChip}>
@@ -329,16 +331,16 @@ export default function MakeupScreen() {
           )}
 
           <PillButton
-            label="Recommencer"
+            label={t('makeup.result.restart')}
             variant="outline"
             fullWidth
             onPress={reset}
             style={{ marginTop: Sp.md }}
           />
 
-          <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+          <Text style={s.disclaimer}>{AI_DISCLAIMER[lang]}</Text>
           <View style={{ height: Sp.xs }} />
-          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
 
           <View style={{ height: Sp.huge }} />
         </ScrollView>
@@ -357,10 +359,10 @@ export default function MakeupScreen() {
             </Pressable>
           </View>
           <View style={s.errorWrap}>
-            <Text style={s.errorTitle}>Oups</Text>
+            <Text style={s.errorTitle}>{t('makeup.errorTitle')}</Text>
             <Text style={s.errorTxt}>{errorMsg}</Text>
             <PillButton
-              label="Réessayer"
+              label={t('makeup.retry')}
               variant="primary"
               onPress={reset}
               style={{ marginTop: Sp.lg }}
@@ -382,16 +384,16 @@ export default function MakeupScreen() {
         </View>
 
         <HeroCard
-          label="STUDIO MAQUILLAGE"
-          title="Découvre ton maquillage parfait"
+          label={t('makeup.hero.kicker')}
+          title={t('makeup.hero.title')}
           subtitle="Une routine adaptée à ton événement, ton style et ta peau."
-          ctaLabel={occasion ? 'Continuer' : "Choisis un événement"}
+          ctaLabel={occasion ? t('makeup.hero.ctaContinue') : t('makeup.hero.ctaChoose')}
           variant="espresso"
           onPress={handleHeroCta}
           style={{ marginBottom: Sp.xl }}
         />
 
-        <Text style={s.sectionTitle}>Choisis l'événement</Text>
+        <Text style={s.sectionTitle}>{t('makeup.occasionSection')}</Text>
 
         <View style={s.occasionGrid}>
           {MAKEUP_OCCASIONS.map((o) => {
@@ -408,7 +410,7 @@ export default function MakeupScreen() {
                 ]}
               >
                 <Text style={[s.occasionLabel, active && s.occasionLabelActive]}>
-                  {o.labels.fr}
+                  {o.labels[lang]}
                 </Text>
               </Pressable>
             );
@@ -417,7 +419,7 @@ export default function MakeupScreen() {
 
         {occasion && (
           <PillButton
-            label="Continuer"
+            label={t('makeup.continueBtn')}
             variant="primary"
             fullWidth
             onPress={() => setStep('selfie')}
@@ -425,7 +427,7 @@ export default function MakeupScreen() {
           />
         )}
 
-        <Text style={s.sectionTitle}>Comment ça marche</Text>
+        <Text style={s.sectionTitle}>{t('makeup.howItWorks')}</Text>
 
         {FEATURES.map((f, i) => (
           <View key={i} style={[s.featureRow, Sh.soft]}>
@@ -433,16 +435,16 @@ export default function MakeupScreen() {
               <Text style={s.featureNumberTxt}>{i + 1}</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={s.featureLabel}>{f.label}</Text>
-              <Text style={s.featureTitle}>{f.title}</Text>
-              <Text style={s.featureDesc}>{f.description}</Text>
+              <Text style={s.featureLabel}>{t(`makeup.features.${i}.label`)}</Text>
+              <Text style={s.featureTitle}>{t(`makeup.features.${i}.title`)}</Text>
+              <Text style={s.featureDesc}>{t(`makeup.features.${i}.description`)}</Text>
             </View>
           </View>
         ))}
 
-        <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+        <Text style={s.disclaimer}>{AI_DISCLAIMER[lang]}</Text>
         <View style={{ height: Sp.xs }} />
-        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>
