@@ -10,6 +10,7 @@ import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
+import { useLanguage } from '../../hooks/useLanguage';
 import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
@@ -22,7 +23,7 @@ type SkinResult = {
   missingCategories?: string[];
 };
 
-const TIPS = ['Lumière naturelle', 'Sans maquillage', 'Visage centré'];
+const TIP_KEYS = ['light', 'noMakeup', 'centered'] as const;
 
 function BackArrow({ color }: { color: string }) {
   return (
@@ -43,6 +44,7 @@ function Sparkle({ color }: { color: string }) {
 }
 
 export default function SkinAnalysisScreen() {
+  const { t, lang } = useLanguage();
   const [step, setStep] = useState<Step>('intro');
   const [result, setResult] = useState<SkinResult | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export default function SkinAnalysisScreen() {
   const pickFromCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission requise', 'Veuillez autoriser l\'accès à la caméra.');
+      Alert.alert(t('skinAnalysis.permission.title'), t('skinAnalysis.permission.camera'));
       return;
     }
     const r = await ImagePicker.launchCameraAsync({
@@ -113,7 +115,7 @@ export default function SkinAnalysisScreen() {
   const pickFromGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission requise', 'Veuillez autoriser l\'accès aux photos.');
+      Alert.alert(t('skinAnalysis.permission.title'), t('skinAnalysis.permission.photos'));
       return;
     }
     const r = await ImagePicker.launchImageLibraryAsync({
@@ -133,9 +135,9 @@ export default function SkinAnalysisScreen() {
     setPreviewImage(`data:image/jpeg;base64,${base64}`);
     setErrorMsg('');
     try {
-      const parsed = await analyzeSkin(base64, 'fr');
+      const parsed = await analyzeSkin(base64, lang);
       setResult({
-        skinType: getSkinTypeLabel(parsed.skinType, 'fr'),
+        skinType: getSkinTypeLabel(parsed.skinType, lang),
         issues: parsed.issues,
         recommendations: parsed.recommendations,
         missingCategories: parsed.missingCategories,
@@ -146,7 +148,7 @@ export default function SkinAnalysisScreen() {
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
-      const msg = e?.message || 'Une erreur est survenue. Réessayez.';
+      const msg = e?.message || t('skinAnalysis.errorFallback');
       setErrorMsg(msg);
       setStep('error');
     }
@@ -182,32 +184,32 @@ export default function SkinAnalysisScreen() {
             <View style={s.sparkleBox}>
               <Sparkle color={C.copper} />
             </View>
-            <Text style={s.title}>Analyse IA de votre peau</Text>
+            <Text style={s.title}>{t('skinAnalysis.title')}</Text>
             <Text style={s.subtitle}>
               Une photo suffit pour personnaliser votre routine
             </Text>
           </View>
 
           <PremiumCard variant="white" style={s.tipsCard}>
-            <Text style={s.tipsLabel}>POUR UN MEILLEUR RÉSULTAT</Text>
-            {TIPS.map((tip) => (
+            <Text style={s.tipsLabel}>{t('skinAnalysis.tipsLabel')}</Text>
+            {TIP_KEYS.map((tip) => (
               <View key={tip} style={s.tipRow}>
                 <View style={s.tipDot} />
-                <Text style={s.tipText}>{tip}</Text>
+                <Text style={s.tipText}>{t(`skinAnalysis.tips.${tip}`)}</Text>
               </View>
             ))}
           </PremiumCard>
 
           <View style={s.actions}>
             <PillButton
-              label="Prendre une photo"
+              label={t('skinAnalysis.takePhoto')}
               variant="primary"
               fullWidth
               onPress={pickFromCamera}
             />
             <View style={{ height: Sp.sm }} />
             <PillButton
-              label="Choisir depuis la galerie"
+              label={t('skinAnalysis.fromGallery')}
               variant="outline"
               fullWidth
               onPress={pickFromGallery}
@@ -228,8 +230,8 @@ export default function SkinAnalysisScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <View style={s.centerWrap}>
           <Animated.View style={[s.spinner, { transform: [{ rotate: spin }] }]} />
-          <Text style={s.loadingTitle}>Analyse en cours…</Text>
-          <Text style={s.loadingSub}>Notre IA examine votre peau</Text>
+          <Text style={s.loadingTitle}>{t('skinAnalysis.loadingTitle')}</Text>
+          <Text style={s.loadingSub}>{t('skinAnalysis.loadingSub')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -240,9 +242,9 @@ export default function SkinAnalysisScreen() {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
         <View style={s.centerWrap}>
-          <Text style={s.errorTitle}>Analyse impossible</Text>
+          <Text style={s.errorTitle}>{t('skinAnalysis.errorTitle')}</Text>
           <Text style={s.errorMsg}>{errorMsg}</Text>
-          <PillButton label="Réessayer" variant="primary" onPress={reset} />
+          <PillButton label={t('skinAnalysis.retry')} variant="primary" onPress={reset} />
         </View>
       </SafeAreaView>
     );
@@ -267,10 +269,10 @@ export default function SkinAnalysisScreen() {
             )}
 
             <View style={s.skinTypeBadge}>
-              <Text style={s.skinTypeBadgeTxt}>Peau {result.skinType}</Text>
+              <Text style={s.skinTypeBadgeTxt}>{t('skinAnalysis.skinTypePrefix')}{result.skinType}</Text>
             </View>
 
-            <Text style={s.sectionTitle}>Problèmes détectés</Text>
+            <Text style={s.sectionTitle}>{t('skinAnalysis.sections.issues')}</Text>
             {result.issues.map((issue, i) => (
               <View key={i} style={s.issueRow}>
                 <View style={s.bullet} />
@@ -279,7 +281,7 @@ export default function SkinAnalysisScreen() {
             ))}
             {(unlocked || isPremium) ? (
               <>
-                <Text style={s.sectionTitle}>Recommandations</Text>
+                <Text style={s.sectionTitle}>{t('skinAnalysis.sections.recommendations')}</Text>
                 {result.recommendations.map((rec, i) => (
                   <PremiumCard key={i} variant="white" style={s.recoCard}>
                     <Text style={s.recoText}>{rec}</Text>
@@ -287,7 +289,7 @@ export default function SkinAnalysisScreen() {
                 ))}
                 {result.missingCategories && result.missingCategories.length > 0 && (
                   <>
-                    <Text style={s.sectionTitle}>Produits manquants</Text>
+                    <Text style={s.sectionTitle}>{t('skinAnalysis.sections.missing')}</Text>
                     {result.missingCategories.map((cat, i) => (
                       <View key={i} style={s.missingRow}>
                         <Text style={s.missingCat}>{cat}</Text>
@@ -307,7 +309,7 @@ export default function SkinAnalysisScreen() {
             )}
 
             <PillButton
-              label="Nouvelle analyse"
+              label={t('skinAnalysis.newAnalysis')}
               variant="ghost"
               fullWidth
               onPress={reset}

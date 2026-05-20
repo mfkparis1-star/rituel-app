@@ -512,6 +512,27 @@ export const tr: LocaleDict = {
     },
 },
 
+  skinAnalysis: {
+    title: 'Cildinin AI analizi',
+    tipsLabel: 'DAHA İYİ SONUÇ İÇİN',
+    tips: { light: 'Doğal ışık', noMakeup: 'Makyajsız', centered: 'Yüz ortada' },
+    takePhoto: 'Fotoğraf çek',
+    fromGallery: 'Galeriden seç',
+    loadingTitle: 'Analiz ediliyor…',
+    loadingSub: 'AI cildini inceliyor',
+    errorTitle: 'Analiz tamamlanamadı',
+    errorFallback: 'Bir hata oluştu. Lütfen tekrar dene.',
+    retry: 'Tekrar dene',
+    skinTypePrefix: 'Cilt: ',
+    sections: { issues: 'Tespit edilen noktalar', recommendations: 'Öneriler', missing: 'Eksik ürünler' },
+    newAnalysis: 'Yeni analiz',
+    permission: {
+      title: 'İzin gerekli',
+      camera: 'Lütfen kamera erişimine izin ver.',
+      photos: 'Lütfen fotoğraf erişimine izin ver.',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

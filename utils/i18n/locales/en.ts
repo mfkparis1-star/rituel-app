@@ -511,6 +511,27 @@ export const en: LocaleDict = {
     },
 },
 
+  skinAnalysis: {
+    title: 'AI analysis of your skin',
+    tipsLabel: 'FOR A BETTER RESULT',
+    tips: { light: 'Natural light', noMakeup: 'No makeup', centered: 'Face centered' },
+    takePhoto: 'Take a photo',
+    fromGallery: 'Choose from gallery',
+    loadingTitle: 'Analyzing…',
+    loadingSub: 'Our AI is examining your skin',
+    errorTitle: "Analysis couldn't complete",
+    errorFallback: 'Something went wrong. Please try again.',
+    retry: 'Try again',
+    skinTypePrefix: 'Skin: ',
+    sections: { issues: 'Detected concerns', recommendations: 'Recommendations', missing: 'Missing products' },
+    newAnalysis: 'New analysis',
+    permission: {
+      title: 'Permission required',
+      camera: 'Please allow camera access.',
+      photos: 'Please allow photo access.',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

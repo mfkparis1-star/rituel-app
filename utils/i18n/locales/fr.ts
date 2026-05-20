@@ -524,6 +524,30 @@ export const fr = {
     },
 },
 
+  // Skin analysis AI flow (Phase 19.11) — UI only.
+  // AI result content + skin-type label come from utils/skinAnalysis.ts
+  // (already FR/EN/TR aware via the lang param).
+  skinAnalysis: {
+    title: 'Analyse IA de votre peau',
+    tipsLabel: 'POUR UN MEILLEUR RÉSULTAT',
+    tips: { light: 'Lumière naturelle', noMakeup: 'Sans maquillage', centered: 'Visage centré' },
+    takePhoto: 'Prendre une photo',
+    fromGallery: 'Choisir depuis la galerie',
+    loadingTitle: 'Analyse en cours…',
+    loadingSub: 'Notre IA examine votre peau',
+    errorTitle: 'Analyse impossible',
+    errorFallback: 'Une erreur est survenue. Réessayez.',
+    retry: 'Réessayer',
+    skinTypePrefix: 'Peau ',
+    sections: { issues: 'Problèmes détectés', recommendations: 'Recommandations', missing: 'Produits manquants' },
+    newAnalysis: 'Nouvelle analyse',
+    permission: {
+      title: 'Permission requise',
+      camera: "Veuillez autoriser l'accès à la caméra.",
+      photos: "Veuillez autoriser l'accès aux photos.",
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',
