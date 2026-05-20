@@ -375,6 +375,34 @@ export const fr = {
     justNow: 'à l\u2019instant',
   },
 
+  // Add product screen (Phase 19.7)
+  // categories.* keys are the FR canonical DB values (no migration);
+  // only the displayed label is translated.
+  addProduct: {
+    kicker: 'ARCHIVE',
+    title: 'Ajouter un produit',
+    methodManual: 'Saisie manuelle',
+    brandLabel: 'MARQUE',
+    nameLabel: 'NOM DU PRODUIT',
+    categoryLabel: 'CATÉGORIE',
+    statusLabel: 'STATUT',
+    save: 'Enregistrer',
+    errorSignIn: 'Connectez-vous pour enregistrer.',
+    errorEmpty: 'Veuillez remplir tous les champs.',
+    authAlert: {
+      title: 'Connexion requise',
+      body: 'Connectez-vous pour ajouter un produit à votre archive.',
+      cancel: 'Annuler',
+      signIn: 'Se connecter',
+    },
+    statuses: { active: 'En cours', stocked: 'En stock', finished: 'Terminé' },
+    categories: {
+      Nettoyant: 'Nettoyant', Hydratant: 'Hydratant', 'Sérum': 'Sérum',
+      SPF: 'SPF', Tonique: 'Tonique', Masque: 'Masque',
+      Maquillage: 'Maquillage', Parfum: 'Parfum', Corps: 'Corps', Cheveux: 'Cheveux',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

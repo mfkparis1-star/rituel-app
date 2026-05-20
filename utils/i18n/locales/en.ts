@@ -368,6 +368,31 @@ export const en: LocaleDict = {
     justNow: 'just now',
   },
 
+  addProduct: {
+    kicker: 'ARCHIVE',
+    title: 'Add a product',
+    methodManual: 'Manual entry',
+    brandLabel: 'BRAND',
+    nameLabel: 'PRODUCT NAME',
+    categoryLabel: 'CATEGORY',
+    statusLabel: 'STATUS',
+    save: 'Save',
+    errorSignIn: 'Sign in to save.',
+    errorEmpty: 'Please fill in all fields.',
+    authAlert: {
+      title: 'Sign in required',
+      body: 'Sign in to add a product to your archive.',
+      cancel: 'Cancel',
+      signIn: 'Sign in',
+    },
+    statuses: { active: 'In use', stocked: 'In stock', finished: 'Finished' },
+    categories: {
+      Nettoyant: 'Cleanser', Hydratant: 'Moisturizer', 'Sérum': 'Serum',
+      SPF: 'SPF', Tonique: 'Toner', Masque: 'Mask',
+      Maquillage: 'Makeup', Parfum: 'Fragrance', Corps: 'Body', Cheveux: 'Hair',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

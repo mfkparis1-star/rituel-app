@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../theme';
 import { mapAuthError } from '../utils/authErrors';
 import { safeBack } from '../utils/safeBack';
+import { useLanguage } from '../hooks/useLanguage';
 
 type Mode = 'menu' | 'manual';
 type ProductStatus = 'active' | 'finished' | 'stocked';
@@ -52,6 +53,7 @@ function PencilIcon({ color }: { color: string }) {
 }
 
 export default function AddProductScreen() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<Mode>('menu');
   const [session, setSession] = useState<Session | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -75,16 +77,16 @@ export default function AddProductScreen() {
       // Logged-out guard with explanation, then redirect to profile tab
       if (!data.session) {
         Alert.alert(
-          'Connexion requise',
-          'Connectez-vous pour ajouter un produit à votre archive.',
+          t('addProduct.authAlert.title'),
+          t('addProduct.authAlert.body'),
           [
             {
-              text: 'Annuler',
+              text: t('addProduct.authAlert.cancel'),
               style: 'cancel',
               onPress: () => safeBack('/(tabs)/archive'),
             },
             {
-              text: 'Se connecter',
+              text: t('addProduct.authAlert.signIn'),
               onPress: () => {
                 router.replace('/(tabs)/auth' as any);
               },
@@ -108,11 +110,11 @@ export default function AddProductScreen() {
   const handleSave = async () => {
     setError(null);
     if (!session) {
-      setError('Connectez-vous pour enregistrer.');
+      setError(t('addProduct.errorSignIn'));
       return;
     }
     if (!canSubmit) {
-      setError('Veuillez remplir tous les champs.');
+      setError(t('addProduct.errorEmpty'));
       return;
     }
 
@@ -159,8 +161,8 @@ export default function AddProductScreen() {
           </View>
 
           <View style={s.header}>
-            <Text style={s.label}>ARCHIVE</Text>
-            <Text style={s.title}>Ajouter un produit</Text>
+            <Text style={s.label}>{t('addProduct.kicker')}</Text>
+            <Text style={s.title}>{t('addProduct.title')}</Text>
             <Text style={s.subtitle}>
               Choisissez la méthode qui vous convient.
             </Text>
@@ -180,7 +182,7 @@ export default function AddProductScreen() {
                   <PencilIcon color={C.espresso} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={s.methodTitle}>Saisie manuelle</Text>
+                  <Text style={s.methodTitle}>{t('addProduct.methodManual')}</Text>
                   <Text style={s.methodDesc}>
                     Renseignez les informations vous-même.
                   </Text>
@@ -193,7 +195,7 @@ export default function AddProductScreen() {
           {mode === 'manual' && (
             <View>
               <PremiumCard variant="white" style={s.formCard}>
-                <Text style={s.fieldLabel}>MARQUE</Text>
+                <Text style={s.fieldLabel}>{t('addProduct.brandLabel')}</Text>
                 <TextInput
                   style={s.input}
                   placeholder="ex: Caudalie"
@@ -207,7 +209,7 @@ export default function AddProductScreen() {
                   editable={!submitting}
                 />
 
-                <Text style={s.fieldLabel}>NOM DU PRODUIT</Text>
+                <Text style={s.fieldLabel}>{t('addProduct.nameLabel')}</Text>
                 <TextInput
                   style={s.input}
                   placeholder="ex: Vinoperfect Sérum"
@@ -221,7 +223,7 @@ export default function AddProductScreen() {
                   editable={!submitting}
                 />
 
-                <Text style={s.fieldLabel}>CATÉGORIE</Text>
+                <Text style={s.fieldLabel}>{t('addProduct.categoryLabel')}</Text>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -245,14 +247,14 @@ export default function AddProductScreen() {
                             active && s.catChipTxtActive,
                           ]}
                         >
-                          {cat}
+                          {t(`addProduct.categories.${cat}`)}
                         </Text>
                       </Pressable>
                     );
                   })}
                 </ScrollView>
 
-                <Text style={s.fieldLabel}>STATUT</Text>
+                <Text style={s.fieldLabel}>{t('addProduct.statusLabel')}</Text>
                 <View style={s.statusRow}>
                   {STATUSES.map((st) => {
                     const active = status === st.id;
@@ -272,7 +274,7 @@ export default function AddProductScreen() {
                             active && s.statusTxtActive,
                           ]}
                         >
-                          {st.label}
+                          {t(`addProduct.statuses.${st.id}`)}
                         </Text>
                       </Pressable>
                     );
@@ -286,7 +288,7 @@ export default function AddProductScreen() {
                 )}
 
                 <PillButton
-                  label="Enregistrer"
+                  label={t('addProduct.save')}
                   variant="primary"
                   fullWidth
                   loading={submitting}

@@ -369,6 +369,31 @@ export const tr: LocaleDict = {
     justNow: 'az önce',
   },
 
+  addProduct: {
+    kicker: 'ARŞİV',
+    title: 'Ürün ekle',
+    methodManual: 'Manuel giriş',
+    brandLabel: 'MARKA',
+    nameLabel: 'ÜRÜN ADI',
+    categoryLabel: 'KATEGORİ',
+    statusLabel: 'DURUM',
+    save: 'Kaydet',
+    errorSignIn: 'Kaydetmek için giriş yap.',
+    errorEmpty: 'Lütfen tüm alanları doldur.',
+    authAlert: {
+      title: 'Giriş gerekli',
+      body: 'Arşivine ürün eklemek için giriş yap.',
+      cancel: 'İptal',
+      signIn: 'Giriş yap',
+    },
+    statuses: { active: 'Kullanımda', stocked: 'Stokta', finished: 'Bitti' },
+    categories: {
+      Nettoyant: 'Temizleyici', Hydratant: 'Nemlendirici', 'Sérum': 'Serum',
+      SPF: 'SPF', Tonique: 'Tonik', Masque: 'Maske',
+      Maquillage: 'Makyaj', Parfum: 'Parfüm', Corps: 'Vücut', Cheveux: 'Saç',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',
