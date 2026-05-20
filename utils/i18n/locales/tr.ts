@@ -459,6 +459,25 @@ export const tr: LocaleDict = {
     },
   },
 
+  home: {
+    greeting: { morning: 'Günaydın', afternoon: 'İyi öğlenler', evening: 'İyi akşamlar' },
+    subtitle: 'Güzellik ritüeline hazır mısın?',
+    checkin: { label: 'GÜNÜN CHECK-IN\'İ', title: 'Cildin bugün nasıl?' },
+    sections: {
+      today: 'Bugün',
+      thisWeek: 'Bu hafta',
+      aboutYou: 'Senin hakkında',
+      selectedForYou: 'Senin için seçildi',
+      seeAll: 'Tümünü gör →',
+    },
+    analysisHero: {
+      label: 'AI ANALİZ',
+      title: 'Analizini yenile',
+      subtitle: 'İhtiyaçların değişir. Yeni bir fotoğraf, güncel tavsiyeler.',
+      cta: 'Analizi başlat',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

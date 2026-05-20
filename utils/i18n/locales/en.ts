@@ -458,6 +458,25 @@ export const en: LocaleDict = {
     },
   },
 
+  home: {
+    greeting: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' },
+    subtitle: 'Ready for your beauty ritual?',
+    checkin: { label: "TODAY'S CHECK-IN", title: 'How is your skin today?' },
+    sections: {
+      today: 'Today',
+      thisWeek: 'This week',
+      aboutYou: 'About you',
+      selectedForYou: 'Selected for you',
+      seeAll: 'See all →',
+    },
+    analysisHero: {
+      label: 'AI ANALYSIS',
+      title: 'Redo your analysis',
+      subtitle: 'Your needs evolve. A new photo, updated advice.',
+      cta: 'Start the analysis',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

@@ -470,6 +470,26 @@ export const fr = {
     },
   },
 
+  // Home / dashboard (Phase 19.10) — built across 3 slices.
+  home: {
+    greeting: { morning: 'Bonjour', afternoon: 'Bel après-midi', evening: 'Bonsoir' },
+    subtitle: 'Prête pour ton rituel beauté ?',
+    checkin: { label: 'CHECK-IN DU JOUR', title: 'Comment va ta peau aujourd\u2019hui ?' },
+    sections: {
+      today: 'Aujourd\u2019hui',
+      thisWeek: 'Cette semaine',
+      aboutYou: 'À propos de toi',
+      selectedForYou: 'Sélectionné pour toi',
+      seeAll: 'Voir tout →',
+    },
+    analysisHero: {
+      label: 'ANALYSE IA',
+      title: 'Refais ton analyse',
+      subtitle: 'Tes besoins évoluent. Une nouvelle photo, des conseils mis à jour.',
+      cta: 'Lancer l\u2019analyse',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

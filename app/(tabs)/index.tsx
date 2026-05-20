@@ -29,16 +29,17 @@ import { useRoutineCount } from '../../hooks/useRoutineCount';
 import { useMemory } from '../../hooks/useMemory';
 import { useCheckins } from '../../hooks/useCheckins';
 import { generateReflection, getCachedReflection, getQuotaRemaining, REFLECTION_FALLBACK } from '../../utils/reflection';
+import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import { supabase } from '../../lib/supabase';
 import { CHECKIN_EMOJIS, CheckinEmoji } from '../../utils/checkins';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
-function getGreeting(): string {
+function getGreeting(greetingLabels: { morning: string; afternoon: string; evening: string }): string {
   const h = new Date().getHours();
-  if (h < 12) return 'Bonjour';
-  if (h < 18) return 'Bel après-midi';
-  return 'Bonsoir';
+  if (h < 12) return greetingLabels.morning;
+  if (h < 18) return greetingLabels.afternoon;
+  return greetingLabels.evening;
 }
 
 function emojiSymbol(id: CheckinEmoji): string {
@@ -67,7 +68,8 @@ function weekSummary(emojis: CheckinEmoji[]): string {
 }
 
 export default function IndexScreen() {
-  const greeting = getGreeting();
+  const { t } = useLanguage();
+  const greeting = getGreeting({ morning: t('home.greeting.morning'), afternoon: t('home.greeting.afternoon'), evening: t('home.greeting.evening') });
   const { count: routineCount } = useRoutineCount();
   const { memory } = useMemory();
   const { recent, hasToday } = useCheckins(7);
@@ -145,9 +147,9 @@ export default function IndexScreen() {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={s.header}>
-          <Text style={s.brand}>RITUEL</Text>
+          <Text style={s.brand}>{t('auth.brand')}</Text>
           <Text style={s.greeting}>{greeting}</Text>
-          <Text style={s.subtitle}>Prête pour ton rituel beauté ?</Text>
+          <Text style={s.subtitle}>{t('home.subtitle')}</Text>
         </View>
 
         {/* Phase 17D — Soft AI Reflection (Home top) */}
@@ -198,14 +200,14 @@ export default function IndexScreen() {
             onPress={() => router.push('/check-in' as any)}
             style={s.checkinCard}
           >
-            <Text style={s.checkinLabel}>CHECK-IN DU JOUR</Text>
-            <Text style={s.checkinTitle}>Comment va ta peau aujourd’hui ?</Text>
+            <Text style={s.checkinLabel}>{t('home.checkin.label')}</Text>
+            <Text style={s.checkinTitle}>{t('home.checkin.title')}</Text>
             <Text style={s.checkinSub}>10 secondes pour ajuster ton rituel du jour.</Text>
           </Pressable>
         )}
 
         {/* Aujourd'hui block */}
-        <Text style={s.sectionTitle}>Aujourd’hui</Text>
+        <Text style={s.sectionTitle}>{t('home.sections.today')}</Text>
         <PremiumCard variant="cream" style={s.block}>
           <View style={s.blockRow}>
             <Text style={s.bigEmoji}>{latestCheckin ? emojiSymbol(latestCheckin) : '·'}</Text>
@@ -222,9 +224,9 @@ export default function IndexScreen() {
 
         {/* Cette semaine block */}
         <View style={s.sectionTitleRow}>
-          <Text style={s.sectionTitle}>Cette semaine</Text>
+          <Text style={s.sectionTitle}>{t('home.sections.thisWeek')}</Text>
           <Pressable onPress={() => router.push('/glow-timeline' as any)} hitSlop={6}>
-            <Text style={s.sectionLink}>Voir tout →</Text>
+            <Text style={s.sectionLink}>{t('home.sections.seeAll')}</Text>
           </Pressable>
         </View>
         <PremiumCard variant="espresso" style={s.blockWeek}>
@@ -248,7 +250,7 @@ export default function IndexScreen() {
         </PremiumCard>
 
         {/* À propos de toi block */}
-        <Text style={s.sectionTitle}>À propos de toi</Text>
+        <Text style={s.sectionTitle}>{t('home.sections.aboutYou')}</Text>
         <PremiumCard variant="cream" style={s.block}>
           {lastSummary?.skinType ? (
             <>
@@ -284,10 +286,10 @@ export default function IndexScreen() {
         {/* Skin Analysis CTA — always visible, complementary */}
         {lastSummary?.skinType && (
           <HeroCard
-            label="ANALYSE IA"
-            title="Refais ton analyse"
-            subtitle="Tes besoins évoluent. Une nouvelle photo, des conseils mis à jour."
-            ctaLabel="Lancer l’analyse"
+            label={t('home.analysisHero.label')}
+            title={t('home.analysisHero.title')}
+            subtitle={t('home.analysisHero.subtitle')}
+            ctaLabel={t('home.analysisHero.cta')}
             variant="espresso"
             onPress={() => router.push('/(tabs)/skin-analysis' as any)}
             style={{ marginBottom: Sp.lg }}
@@ -297,7 +299,7 @@ export default function IndexScreen() {
         {/* Pour toi — affiliate recommendations */}
         {recommendations.length > 0 && (
           <View style={s.selectedWrap}>
-            <Text style={s.sectionTitle}>Sélectionné pour toi</Text>
+            <Text style={s.sectionTitle}>{t('home.sections.selectedForYou')}</Text>
             <Text style={s.selectedSubtitle}>
               Des soins choisis pour accompagner ton rituel.
             </Text>
