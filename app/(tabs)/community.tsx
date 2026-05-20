@@ -14,6 +14,7 @@ import { useProfile } from '../../hooks/useProfile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import { useLanguage } from '../../hooks/useLanguage';
 
 type SkinFilter = 'all' | 'dry' | 'oily' | 'combination' | 'normal';
 
@@ -64,6 +65,7 @@ const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
 };
 
 export default function CommunityScreen() {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<SkinFilter>('all');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -320,14 +322,14 @@ export default function CommunityScreen() {
         }
       >
         <View style={s.header}>
-          <Text style={s.title}>Communauté</Text>
-          <Text style={s.subtitle}>Découvrez les routines des femmes comme vous</Text>
+          <Text style={s.title}>{t('community.title')}</Text>
+          <Text style={s.subtitle}>{t('community.subtitle')}</Text>
         </View>
 
         <View style={discoS.segmentRow}>
           {[
-            { id: 'pour_toi' as const, label: 'Pour toi' },
-            { id: 'recents' as const, label: 'Récents' },
+            { id: 'pour_toi' as const, label: t('community.discovery.pourToi') },
+            { id: 'recents' as const, label: t('community.discovery.recents') },
           ].map((tab) => {
             const active = discoveryTab === tab.id;
             return (
@@ -345,7 +347,7 @@ export default function CommunityScreen() {
         </View>
         {showFallbackHint && (
           <Text style={discoS.fallbackHint}>
-            On affine tes inspirations à mesure que la communauté grandit.
+            {t('community.fallbackHint')}
           </Text>
         )}
 
@@ -354,11 +356,11 @@ export default function CommunityScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={s.filtersScroll}
         >
-          <Chip label="Tous" active={filter === 'all'} onPress={() => setFilter('all')} />
-          <Chip label="Sèche" active={filter === 'dry'} onPress={() => setFilter('dry')} />
-          <Chip label="Grasse" active={filter === 'oily'} onPress={() => setFilter('oily')} />
-          <Chip label="Mixte" active={filter === 'combination'} onPress={() => setFilter('combination')} />
-          <Chip label="Normale" active={filter === 'normal'} onPress={() => setFilter('normal')} />
+          <Chip label={t('community.filters.all')} active={filter === 'all'} onPress={() => setFilter('all')} />
+          <Chip label={t('community.filters.dry')} active={filter === 'dry'} onPress={() => setFilter('dry')} />
+          <Chip label={t('community.filters.oily')} active={filter === 'oily'} onPress={() => setFilter('oily')} />
+          <Chip label={t('community.filters.combination')} active={filter === 'combination'} onPress={() => setFilter('combination')} />
+          <Chip label={t('community.filters.normal')} active={filter === 'normal'} onPress={() => setFilter('normal')} />
         </ScrollView>
 
         {loading ? (
@@ -367,8 +369,8 @@ export default function CommunityScreen() {
           </View>
         ) : isEmpty ? (
           <EmptyState
-            title="Pas encore de routines"
-            subtitle="Les routines partagées par la communauté apparaîtront ici."
+            title={t('community.empty.title')}
+            subtitle={t('community.empty.subtitle')}
           />
         ) : (
           <View style={s.list}>
@@ -420,8 +422,9 @@ type PostCardProps = {
 };
 
 function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress, onAuthorPress, isOwn, onMenuPress }: PostCardProps) {
+  const { t } = useLanguage();
   const skinType = mapSkinType(post.skin_type);
-  const skinLabel = SKIN_LABEL[skinType];
+  const skinLabel = t(`community.skinLabel.${skinType}`);
   const username = displayName(post);
   const meta = relativeTime(post.created_at);
   const showTranslated = !!translatedCaption;
