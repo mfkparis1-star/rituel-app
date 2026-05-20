@@ -203,22 +203,22 @@ export default function CommunityScreen() {
     Alert.alert(
       name,
       `${ownPostsCount} publication${ownPostsCount > 1 ? 's' : ''} · ${totalLikes} mention${totalLikes > 1 ? 's' : ''} J\u2019aime${skin}`,
-      [{ text: 'Fermer', style: 'cancel' }]
+      [{ text: t('community.alerts.close'), style: 'cancel' }]
     );
   };
 
   const handleEditCaption = (post: Post) => {
     Alert.prompt(
-      'Modifier la légende',
+      t('community.alerts.editCaption'),
       undefined,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('community.alerts.cancel'), style: 'cancel' },
         {
-          text: 'Enregistrer',
+          text: t('community.alerts.save'),
           onPress: async (text?: string) => {
             const next = (text ?? '').trim();
             if (next.length < 4 || next.length > 280) {
-              Alert.alert('Légende invalide', 'La légende doit faire entre 4 et 280 caractères.');
+              Alert.alert(t('community.alerts.invalidCaptionTitle'), t('community.alerts.invalidCaptionBody'));
               return;
             }
             // Optimistic update
@@ -227,7 +227,7 @@ export default function CommunityScreen() {
             if (!ok) {
               // Revert
               setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, caption: post.caption } : p)));
-              Alert.alert('Erreur', 'Modification impossible. Réessaye dans un instant.');
+              Alert.alert(t('community.alerts.errorTitle'), t('community.alerts.editError'));
             }
           },
         },
@@ -239,12 +239,12 @@ export default function CommunityScreen() {
 
   const handleDeletePost = (post: Post) => {
     Alert.alert(
-      'Supprimer cette publication ?',
-      'Elle disparaîtra de la communauté.',
+      t('community.alerts.deleteConfirmTitle'),
+      t('community.alerts.deleteConfirmBody'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('community.alerts.cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('community.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             // Optimistic removal
@@ -253,7 +253,7 @@ export default function CommunityScreen() {
             if (!ok) {
               // Refetch to restore
               await loadFeed(true);
-              Alert.alert('Erreur', 'Suppression impossible. Réessaye dans un instant.');
+              Alert.alert(t('community.alerts.errorTitle'), t('community.alerts.deleteError'));
             }
           },
         },
@@ -263,11 +263,11 @@ export default function CommunityScreen() {
 
   const handleMenuPress = (post: Post) => {
     Alert.alert(
-      'Publication',
+      t('community.alerts.menuTitle'),
       undefined,
       [
-        { text: 'Modifier la légende', onPress: () => handleEditCaption(post) },
-        { text: 'Supprimer', style: 'destructive', onPress: () => handleDeletePost(post) },
+        { text: t('community.alerts.editCaption'), onPress: () => handleEditCaption(post) },
+        { text: t('community.alerts.delete'), style: 'destructive', onPress: () => handleDeletePost(post) },
         { text: 'Annuler', style: 'cancel' },
       ]
     );
@@ -425,15 +425,19 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
   const { t } = useLanguage();
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = t(`community.skinLabel.${skinType}`);
+  const emotionKey = post.emotion ? `postNew.emotions.${post.emotion}` : null;
+  const emotionLabel = post.emotion
+    ? (emotionKey && t(emotionKey) !== emotionKey ? t(emotionKey) : post.emotion)
+    : null;
   const username = displayName(post);
   const meta = relativeTime(post.created_at);
   const showTranslated = !!translatedCaption;
   const captionToShow = showTranslated ? translatedCaption : post.caption;
   const productNames = post.product_names || [];
 
-  let translateLabel = 'Traduire';
-  if (isTranslating) translateLabel = 'Traduction...';
-  else if (showTranslated) translateLabel = 'Original';
+  let translateLabel = t('community.translate.action');
+  if (isTranslating) translateLabel = t('community.translate.loading');
+  else if (showTranslated) translateLabel = t('community.translate.original');
 
   return (
     <View style={[s.postCard, Sh.soft]}>
@@ -460,9 +464,9 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
         </View>
       </View>
 
-      {post.emotion ? (
+      {emotionLabel ? (
         <View style={s.emotionPill}>
-          <Text style={s.emotionPillTxt}>{post.emotion}</Text>
+          <Text style={s.emotionPillTxt}>{emotionLabel}</Text>
         </View>
       ) : null}
       {captionToShow ? (
@@ -471,7 +475,7 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
 
       {productNames.length > 0 && (
         <>
-          <Text style={s.productsLabel}>PRODUITS UTILISÉS</Text>
+          <Text style={s.productsLabel}>{t('community.productsUsed')}</Text>
           <View style={s.productChipsBox}>
             {productNames.map((name, i) => (
               <Pressable
@@ -489,7 +493,7 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
 
       <View style={s.footerRow}>
         <Text style={s.likesTxt}>
-          {post.likes_count || 0} {(post.likes_count || 0) === 1 ? "j'aime" : "j'aime"}
+          {post.likes_count || 0} {t('community.likes')}
         </Text>
         <Pressable
           onPress={onTranslatePress}
