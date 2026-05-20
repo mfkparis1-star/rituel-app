@@ -12,6 +12,7 @@ import {
   INGREDIENT_KEYS,
   INGREDIENT_LABELS,
 } from '../../utils/compatibility';
+import { useLanguage } from '../../hooks/useLanguage';
 import { COSMETIC_DISCLAIMER } from '../../utils/legal';
 import CompatibilityShareCard, { CompatStatus as ShareCompatStatus } from '../../components/share/CompatibilityShareCard';
 import { captureAndShare } from '../../utils/shareCard';
@@ -35,6 +36,7 @@ function BackArrow({ color }: { color: string }) {
 }
 
 export default function CompatibilityScreen() {
+  const { t, lang } = useLanguage();
   const [pickStep, setPickStep] = useState<1 | 2>(1);
   const [key1, setKey1] = useState<IngredientKey | null>(null);
   const [key2, setKey2] = useState<IngredientKey | null>(null);
@@ -43,7 +45,7 @@ export default function CompatibilityScreen() {
   const [resultExplanation, setResultExplanation] = useState<string>('');
   const [resultTip, setResultTip] = useState<string>('');
 
-  const labels = INGREDIENT_LABELS.fr;
+  const labels = INGREDIENT_LABELS[lang];
 
   const labelOf = (k: IngredientKey | null): string => {
     if (!k) return '';
@@ -63,7 +65,7 @@ export default function CompatibilityScreen() {
   };
 
   const runCheck = (k1: IngredientKey, k2: IngredientKey) => {
-    const r = checkPair(k1, k2, 'fr');
+    const r = checkPair(k1, k2, lang);
     setResult(statusToCompat(r.status));
     setResultTitle(r.title);
     setResultExplanation(r.explanation);
@@ -104,7 +106,7 @@ export default function CompatibilityScreen() {
         </View>
 
         <View style={s.header}>
-          <Text style={s.title}>Compatibilité ingrédients</Text>
+          <Text style={s.title}>{t('compatibility.title')}</Text>
           <Text style={s.subtitle}>
             Vérifiez si deux actifs peuvent être utilisés ensemble.
           </Text>
@@ -114,24 +116,24 @@ export default function CompatibilityScreen() {
           <>
             <View style={s.selectionRow}>
               <View style={[s.selectionBox, key1 && s.selectionBoxFilled]}>
-                <Text style={s.selectionBoxLabel}>INGRÉDIENT 1</Text>
+                <Text style={s.selectionBoxLabel}>{t('compatibility.slot1Label')}</Text>
                 <Text style={key1 ? s.selectionBoxValue : s.selectionBoxPlaceholder}>
-                  {key1 ? labelOf(key1) : 'À choisir'}
+                  {key1 ? labelOf(key1) : t('compatibility.slotEmpty')}
                 </Text>
               </View>
               <Text style={s.plus}>+</Text>
               <View style={[s.selectionBox, key2 && s.selectionBoxFilled]}>
-                <Text style={s.selectionBoxLabel}>INGRÉDIENT 2</Text>
+                <Text style={s.selectionBoxLabel}>{t('compatibility.slot2Label')}</Text>
                 <Text style={key2 ? s.selectionBoxValue : s.selectionBoxPlaceholder}>
-                  {key2 ? labelOf(key2) : 'À choisir'}
+                  {key2 ? labelOf(key2) : t('compatibility.slotEmpty')}
                 </Text>
               </View>
             </View>
 
             <Text style={s.stepHint}>
               {pickStep === 1
-                ? 'Choisissez le premier ingrédient'
-                : 'Choisissez le second ingrédient'}
+                ? t('compatibility.choosePrompt1')
+                : t('compatibility.choosePrompt2')}
             </Text>
 
             <View style={s.chipsBox}>
@@ -166,7 +168,7 @@ export default function CompatibilityScreen() {
 
             {(key1 || key2) && (
               <Pressable onPress={reset} style={s.resetLinkBtn}>
-                <Text style={s.resetLinkTxt}>Recommencer</Text>
+                <Text style={s.resetLinkTxt}>{t('compatibility.reset')}</Text>
               </Pressable>
             )}
           </>
@@ -175,7 +177,7 @@ export default function CompatibilityScreen() {
         {result && (
           <View style={[s.resultCard, Sh.soft, resultStyle(result)]}>
             <Text style={[s.resultLabel, resultLabelStyle(result)]}>
-              {resultText(result)}
+              {resultText(result, { compatible: t('compatibility.verdict.compatible'), caution: t('compatibility.verdict.caution'), avoid: t('compatibility.verdict.avoid') })}
             </Text>
             <Text style={s.resultPair}>
               {labelOf(key1)} + {labelOf(key2)}
@@ -183,12 +185,12 @@ export default function CompatibilityScreen() {
             <Text style={s.resultTitle}>{resultTitle}</Text>
             <Text style={s.resultReason}>{resultExplanation}</Text>
             <View style={s.tipBox}>
-              <Text style={s.tipLabel}>CONSEIL</Text>
+              <Text style={s.tipLabel}>{t('compatibility.tipLabel')}</Text>
               <Text style={s.tipTxt}>{resultTip}</Text>
             </View>
 
             <PillButton
-              label="Partager la carte"
+              label={t('compatibility.share')}
               variant="primary"
               fullWidth
               onPress={handleShare}
@@ -199,14 +201,14 @@ export default function CompatibilityScreen() {
               <CompatibilityShareCard
                 ref={shareCardRef}
                 status={compatToShareStatus(result)}
-                productA={key1 ?? 'Ingrédient 1'}
-                productB={key2 ?? 'Ingrédient 2'}
+                productA={key1 ?? t('compatibility.shareFallback1')}
+                productB={key2 ?? t('compatibility.shareFallback2')}
                 title={resultTitle}
                 explanation={resultExplanation}
               />
             </View>
             <PillButton
-              label="Nouvelle vérification"
+              label={t('compatibility.newCheck')}
               variant="ghost"
               size="sm"
               onPress={reset}
@@ -223,10 +225,10 @@ export default function CompatibilityScreen() {
   );
 }
 
-function resultText(r: Compat): string {
-  if (r === 'compatible') return 'COMPATIBLE';
-  if (r === 'caution') return 'À UTILISER AVEC PRÉCAUTION';
-  if (r === 'avoid') return 'À ÉVITER ENSEMBLE';
+function resultText(r: Compat, verdictLabels: { compatible: string; caution: string; avoid: string }): string {
+  if (r === 'compatible') return verdictLabels.compatible;
+  if (r === 'caution') return verdictLabels.caution;
+  if (r === 'avoid') return verdictLabels.avoid;
   return '';
 }
 
