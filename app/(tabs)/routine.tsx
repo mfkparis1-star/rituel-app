@@ -15,6 +15,7 @@ import { useAIUnlock } from '../../hooks/useAIUnlock';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
+import { useLanguage } from '../../hooks/useLanguage';
 import RoutineShareCard, { RoutineSlot, RoutineStepLite } from '../../components/share/RoutineShareCard';
 import { captureAndShare } from '../../utils/shareCard';
 
@@ -49,6 +50,7 @@ function CloseIcon({ color }: { color: string }) {
 }
 
 export default function RoutineScreen() {
+  const { t } = useLanguage();
   const [slot, setSlot] = useState<Slot>('matin');
   const [steps, setSteps] = useState<RoutineStep[]>([]);
 
@@ -97,11 +99,11 @@ export default function RoutineScreen() {
       setAuthChecked(true);
       if (!data.session) {
         Alert.alert(
-          'Connexion requise',
-          'Connectez-vous pour gérer votre routine.',
+          t('routine.alerts.signInTitle'),
+          t('routine.alerts.signInManageBody'),
           [
-            { text: 'Annuler', style: 'cancel', onPress: () => router.replace('/(tabs)/ai-studio' as any) },
-            { text: 'Se connecter', onPress: () => router.replace('/(tabs)/auth' as any) },
+            { text: t('routine.alerts.cancel'), style: 'cancel', onPress: () => router.replace('/(tabs)/ai-studio' as any) },
+            { text: t('routine.alerts.signInAction'), onPress: () => router.replace('/(tabs)/auth' as any) },
           ]
         );
       }
@@ -133,7 +135,7 @@ export default function RoutineScreen() {
   // ----- Add step -----
   const openAddModal = () => {
     if (!session) {
-      Alert.alert('Connexion requise', 'Connectez-vous pour ajouter une étape.');
+      Alert.alert(t('routine.alerts.signInTitle'), t('routine.alerts.signInAddBody'));
       return;
     }
     setProductName('');
@@ -171,17 +173,17 @@ export default function RoutineScreen() {
   // ----- Delete step -----
   const handleDelete = (id: string, name: string) => {
     Alert.alert(
-      'Supprimer l\'étape',
-      `Voulez-vous supprimer "${name}" ?`,
+      t('routine.alerts.deleteStepTitle'),
+      t('routine.alerts.deleteStepBody').replace('{name}', name),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('routine.alerts.cancel'), style: 'cancel' },
         {
-          text: 'Supprimer',
+          text: t('routine.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             const { error: err } = await supabase.from('routine_steps').delete().eq('id', id);
             if (err) {
-              Alert.alert('Erreur', 'Suppression impossible.');
+              Alert.alert(t('routine.alerts.errorTitle'), t('routine.alerts.deleteError'));
               return;
             }
             if (session) loadSteps(session.user.id, slot);
@@ -202,8 +204,8 @@ export default function RoutineScreen() {
           setCreditPacksVisible(true);
         } else {
           Alert.alert(
-            'Erreur',
-            "Impossible de débloquer l'optimisation. Réessaye dans un instant."
+            t('routine.alerts.errorTitle'),
+            t('routine.alerts.unlockError')
           );
         }
         return;
@@ -267,16 +269,16 @@ export default function RoutineScreen() {
         </View>
 
         <View style={s.header}>
-          <Text style={s.title}>Ma Routine</Text>
-          <Text style={s.subtitle}>Construisez une routine simple et cohérente.</Text>
+          <Text style={s.title}>{t('routine.title')}</Text>
+          <Text style={s.subtitle}>{t('routine.subtitle')}</Text>
         </View>
 
         <View style={s.segmented}>
           <Pressable onPress={() => setSlot('matin')} style={[s.segBtn, slot === 'matin' && s.segBtnActive]}>
-            <Text style={[s.segTxt, slot === 'matin' && s.segTxtActive]}>Matin</Text>
+            <Text style={[s.segTxt, slot === 'matin' && s.segTxtActive]}>{t('routine.segment.morning')}</Text>
           </Pressable>
           <Pressable onPress={() => setSlot('soir')} style={[s.segBtn, slot === 'soir' && s.segBtnActive]}>
-            <Text style={[s.segTxt, slot === 'soir' && s.segTxtActive]}>Soir</Text>
+            <Text style={[s.segTxt, slot === 'soir' && s.segTxtActive]}>{t('routine.segment.evening')}</Text>
           </Pressable>
         </View>
 
@@ -285,9 +287,9 @@ export default function RoutineScreen() {
         ) : steps.length === 0 ? (
           <View style={s.emptyCard}>
             <EmptyState
-              title="Votre routine est prête à être construite"
+              title={t('routine.empty.title')}
               subtitle="Ajoutez vos étapes pour mieux suivre vos soins."
-              action={<PillButton label="+ Ajouter une étape" variant="primary" onPress={openAddModal} />}
+              action={<PillButton label={t('routine.empty.addStep')} variant="primary" onPress={openAddModal} />}
             />
           </View>
         ) : (
@@ -303,7 +305,7 @@ export default function RoutineScreen() {
                     onPress={() => handleDelete(step.id, step.product_name)}
                     style={s.swipeDeleteAction}
                   >
-                    <Text style={s.swipeDeleteText}>Supprimer</Text>
+                    <Text style={s.swipeDeleteText}>{t('routine.swipeDelete')}</Text>
                   </Pressable>
                 )}
               >
@@ -320,14 +322,14 @@ export default function RoutineScreen() {
               </ReanimatedSwipeable>
             ))}
             <PillButton
-              label="Optimiser avec l'IA"
+              label={t('routine.optimizeCta')}
               variant="primary"
               fullWidth
               onPress={handleOptimize}
               style={{ marginTop: Sp.md }}
             />
             <PillButton
-              label="+ Ajouter une étape"
+              label={t('routine.empty.addStep')}
               variant="outline"
               fullWidth
               onPress={openAddModal}
@@ -349,8 +351,8 @@ export default function RoutineScreen() {
             </View>
 
             <View style={s.header}>
-              <Text style={s.label}>OPTIMISATION IA</Text>
-              <Text style={s.title}>Ta routine, mieux pensée</Text>
+              <Text style={s.label}>{t('routine.optimizeModal.kicker')}</Text>
+              <Text style={s.title}>{t('routine.optimizeModal.title')}</Text>
               <Text style={s.subtitle}>
                 Suggestions personnalisées selon ton type de peau et tes étapes actuelles.
               </Text>
@@ -359,16 +361,16 @@ export default function RoutineScreen() {
             {optimizing && (
               <View style={s.optimizeLoadingBox}>
                 <ActivityIndicator color={C.copper} size="large" />
-                <Text style={s.optimizeLoadingTxt}>Analyse en cours...</Text>
+                <Text style={s.optimizeLoadingTxt}>{t('routine.optimizeModal.loading')}</Text>
               </View>
             )}
 
             {!optimizing && optimizeError && (
               <View style={s.optimizeErrorBox}>
-                <Text style={s.optimizeErrorTitle}>Oups</Text>
+                <Text style={s.optimizeErrorTitle}>{t('routine.optimizeModal.errorTitle')}</Text>
                 <Text style={s.optimizeErrorTxt}>{optimizeError}</Text>
                 <PillButton
-                  label="Réessayer"
+                  label={t('routine.optimizeModal.retry')}
                   variant="primary"
                   fullWidth
                   onPress={handleOptimize}
@@ -381,7 +383,7 @@ export default function RoutineScreen() {
               <View>
                 {optimizeResult.improvements.length > 0 && (
                   <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
-                    <Text style={s.optimizeSectionLabel}>AMÉLIORATIONS</Text>
+                    <Text style={s.optimizeSectionLabel}>{t('routine.optimizeModal.sectionImprovements')}</Text>
                     {optimizeResult.improvements.map((imp, i) => (
                       <View key={`imp-${i}`} style={s.optimizeBulletRow}>
                         <Text style={s.optimizeBulletNum}>{i + 1}</Text>
@@ -393,7 +395,7 @@ export default function RoutineScreen() {
 
                 {optimizeResult.missingCategories.length > 0 && (
                   <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
-                    <Text style={s.optimizeSectionLabel}>CATÉGORIES MANQUANTES</Text>
+                    <Text style={s.optimizeSectionLabel}>{t('routine.optimizeModal.sectionMissing')}</Text>
                     <View style={s.optimizeChipsRow}>
                       {optimizeResult.missingCategories.map((cat, i) => (
                         <View key={`miss-${i}`} style={s.optimizeMissingChip}>
@@ -406,7 +408,7 @@ export default function RoutineScreen() {
 
                 {optimizeResult.recommendations.length > 0 && (
                   <PremiumCard variant="white" style={{ marginBottom: Sp.sm }}>
-                    <Text style={s.optimizeSectionLabel}>RECOMMANDATIONS</Text>
+                    <Text style={s.optimizeSectionLabel}>{t('routine.optimizeModal.sectionRecommendations')}</Text>
                     {optimizeResult.recommendations.map((rec, i) => (
                       <View key={`rec-${i}`} style={s.optimizeBulletRow}>
                         <Text style={s.optimizeBulletNum}>{i + 1}</Text>
@@ -421,7 +423,7 @@ export default function RoutineScreen() {
                 <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
 
                 <PillButton
-                  label="Fermer"
+                  label={t('routine.optimizeModal.close')}
                   variant="outline"
                   fullWidth
                   onPress={closeOptimize}
@@ -445,12 +447,12 @@ export default function RoutineScreen() {
             </View>
 
             <View style={s.header}>
-              <Text style={s.label}>{slot === 'matin' ? 'ROUTINE MATIN' : 'ROUTINE SOIR'}</Text>
-              <Text style={s.title}>Nouvelle étape</Text>
+              <Text style={s.label}>{slot === 'matin' ? t('routine.addModal.kickerMorning') : t('routine.addModal.kickerEvening')}</Text>
+              <Text style={s.title}>{t('routine.addModal.title')}</Text>
             </View>
 
             <PremiumCard variant="white" style={{ marginBottom: Sp.md }}>
-              <Text style={s.fieldLabel}>NOM DU PRODUIT</Text>
+              <Text style={s.fieldLabel}>{t('routine.addModal.productLabel')}</Text>
               <TextInput
                 style={s.input}
                 placeholder="ex: Sérum hydratant"
@@ -461,7 +463,7 @@ export default function RoutineScreen() {
                 autoCorrect={false}
               />
 
-              <Text style={s.fieldLabel}>MARQUE (optionnel)</Text>
+              <Text style={s.fieldLabel}>{t('routine.addModal.brandLabel')}</Text>
               <TextInput
                 style={s.input}
                 placeholder="ex: Caudalie"
@@ -479,7 +481,7 @@ export default function RoutineScreen() {
               )}
 
               <PillButton
-                label="Enregistrer"
+                label={t('routine.addModal.save')}
                 variant="primary"
                 fullWidth
                 loading={saving}
@@ -499,7 +501,7 @@ export default function RoutineScreen() {
             {steps.length > 0 && (
           <View style={{ paddingHorizontal: 20, paddingBottom: 12 }}>
             <PillButton
-              label="Partager ma routine"
+              label={t('routine.shareCta')}
               variant="ghost"
               fullWidth
               onPress={handleShareRoutine}
