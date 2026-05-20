@@ -488,7 +488,15 @@ export const fr = {
       subtitle: 'Tes besoins évoluent. Une nouvelle photo, des conseils mis à jour.',
       cta: 'Lancer l\u2019analyse',
     },
-  },
+      reflection: {
+      label: 'RÉFLEXION DU JOUR',
+      prompt: 'Recevez une réflexion personnelle sur votre peau et votre rituel.',
+      receive: 'Recevoir ma réflexion',
+      another: 'Une autre réflexion',
+      loading: 'Un instant…',
+      tomorrow: 'Une nouvelle réflexion demain.',
+    },
+},
 
   common: {
     back: 'Retour',

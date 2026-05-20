@@ -155,13 +155,11 @@ export default function IndexScreen() {
         {/* Phase 17D — Soft AI Reflection (Home top) */}
         {reflectionUserId ? (
           <View style={[s.reflectionCard, Sh.soft]}>
-            <Text style={s.reflectionLabel}>RÉFLEXION DU JOUR</Text>
+            <Text style={s.reflectionLabel}>{t('home.reflection.label')}</Text>
             {reflectionText ? (
               <Text style={s.reflectionText}>{reflectionText}</Text>
             ) : (
-              <Text style={s.reflectionPrompt}>
-                Recevez une réflexion personnelle sur votre peau et votre rituel.
-              </Text>
+              <Text style={s.reflectionPrompt}>{t('home.reflection.prompt')}</Text>
             )}
             {!reflectionText ? (
               <Pressable
@@ -174,7 +172,7 @@ export default function IndexScreen() {
                 hitSlop={6}
               >
                 <Text style={s.reflectionBtnTxt}>
-                  {reflectionLoading ? 'Un instant…' : 'Recevoir ma réflexion'}
+                  {reflectionLoading ? t('home.reflection.loading') : t('home.reflection.receive')}
                 </Text>
               </Pressable>
             ) : reflectionRemaining !== null && reflectionRemaining > 0 ? (
@@ -185,11 +183,11 @@ export default function IndexScreen() {
                 hitSlop={6}
               >
                 <Text style={s.reflectionRefreshTxt}>
-                  {reflectionLoading ? 'Un instant…' : 'Une autre réflexion'}
+                  {reflectionLoading ? t('home.reflection.loading') : t('home.reflection.another')}
                 </Text>
               </Pressable>
             ) : (
-              <Text style={s.reflectionHint}>Une nouvelle réflexion demain.</Text>
+              <Text style={s.reflectionHint}>{t('home.reflection.tomorrow')}</Text>
             )}
           </View>
         ) : null}

@@ -475,7 +475,15 @@ export const en: LocaleDict = {
       subtitle: 'Your needs evolve. A new photo, updated advice.',
       cta: 'Start the analysis',
     },
-  },
+      reflection: {
+      label: 'REFLECTION OF THE DAY',
+      prompt: 'Receive a personal reflection on your skin and your ritual.',
+      receive: 'Get my reflection',
+      another: 'Another reflection',
+      loading: 'One moment…',
+      tomorrow: 'A new reflection tomorrow.',
+    },
+},
 
   common: {
     back: 'Back',

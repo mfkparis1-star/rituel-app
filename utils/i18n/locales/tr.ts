@@ -476,7 +476,15 @@ export const tr: LocaleDict = {
       subtitle: 'İhtiyaçların değişir. Yeni bir fotoğraf, güncel tavsiyeler.',
       cta: 'Analizi başlat',
     },
-  },
+      reflection: {
+      label: 'GÜNÜN YANSIMASI',
+      prompt: 'Cildin ve ritüelin üzerine kişisel bir yansıma al.',
+      receive: 'Yansımamı al',
+      another: 'Başka bir yansıma',
+      loading: 'Bir an…',
+      tomorrow: 'Yarın yeni bir yansıma.',
+    },
+},
 
   common: {
     back: 'Geri',
