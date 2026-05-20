@@ -19,11 +19,13 @@ import { useProfile } from '../../hooks/useProfile';
 import { useMemory } from '../../hooks/useMemory';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { safeBack } from '../../utils/safeBack';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sp, Type } from '../../theme';
 
 const MAX_CAPTION = 280;
 
 export default function NewPostScreen() {
+  const { t } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const { profile } = useProfile();
   const { memory } = useMemory();
@@ -85,11 +87,11 @@ export default function NewPostScreen() {
     if (!r.ok) {
       if (r.reason === 'no_permission') {
         Alert.alert(
-          'Accès aux photos refusé',
-          'Active l’accès aux photos dans Réglages pour ajouter une image à ta publication.',
+          t('postNew.alerts.permissionTitle'),
+          t('postNew.alerts.permissionBody'),
           [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Ouvrir Réglages', onPress: () => { Linking.openSettings().catch(() => {}); } },
+            { text: t('postNew.alerts.permissionCancel'), style: 'cancel' },
+            { text: t('postNew.alerts.permissionOpenSettings'), onPress: () => { Linking.openSettings().catch(() => {}); } },
           ]
         );
       }
@@ -107,7 +109,7 @@ export default function NewPostScreen() {
       imageUrl = await uploadPostImage(session.user.id, imageUri);
       if (!imageUrl) {
         setSubmitting(false);
-        Alert.alert('Erreur', 'Téléchargement de l’image impossible. Réessaye.');
+        Alert.alert(t('postNew.alerts.uploadErrorTitle'), t('postNew.alerts.uploadErrorBody'));
         return;
       }
     }
@@ -128,7 +130,7 @@ export default function NewPostScreen() {
     setSubmitting(false);
 
     if (!result.ok) {
-      Alert.alert('Erreur', 'Publication impossible. Réessaye dans un instant.');
+      Alert.alert(t('postNew.alerts.publishErrorTitle'), t('postNew.alerts.publishErrorBody'));
       return;
     }
     await AsyncStorage.setItem('@rituel:community:invalidate', '1');
@@ -140,8 +142,8 @@ export default function NewPostScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
-          <Text style={s.muted}>Connecte-toi pour partager ton rituel.</Text>
-          <PillButton label="Retour" variant="primary" onPress={() => safeBack('/(tabs)/community')} style={{ marginTop: Sp.md }} />
+          <Text style={s.muted}>{t('postNew.needSignIn')}</Text>
+          <PillButton label={t('postNew.back')} variant="primary" onPress={() => safeBack('/(tabs)/community')} style={{ marginTop: Sp.md }} />
         </View>
       </SafeAreaView>
     );
@@ -155,26 +157,26 @@ export default function NewPostScreen() {
           <Text style={s.backTxt}>{'←  Retour'}</Text>
         </Pressable>
 
-        <Text style={s.label}>NOUVEAU RITUEL</Text>
-        <Text style={s.title}>Partage ton instant</Text>
-        <Text style={s.subtitle}>Une note, une photo, un rituel. Ton journal beauté est privé par défaut, mais ce que tu publies ici est partagé avec la communauté Rituel.</Text>
+        <Text style={s.label}>{t('postNew.kicker')}</Text>
+        <Text style={s.title}>{t('postNew.title')}</Text>
+        <Text style={s.subtitle}>{t('postNew.subtitle')}</Text>
 
         <Pressable onPress={handlePickImage} style={s.imageSlot} disabled={submitting}>
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={s.imagePreview} resizeMode="cover" />
           ) : (
             <View style={s.imagePlaceholder}>
-              <Text style={s.imagePlaceholderTitle}>Ajouter une photo</Text>
-              <Text style={s.imagePlaceholderSub}>Optionnel · format portrait</Text>
+              <Text style={s.imagePlaceholderTitle}>{t('postNew.addPhoto')}</Text>
+              <Text style={s.imagePlaceholderSub}>{t('postNew.addPhotoSub')}</Text>
             </View>
           )}
         </Pressable>
 
-        <Text style={s.fieldLabel}>Ta note</Text>
+        <Text style={s.fieldLabel}>{t('postNew.noteLabel')}</Text>
         <TextInput
           value={caption}
           onChangeText={(t) => t.length <= MAX_CAPTION && setCaption(t)}
-          placeholder="Comment se sent ta peau aujourd’hui ? Quel rituel as-tu suivi ?"
+          placeholder={t('postNew.notePlaceholder')}
           placeholderTextColor={C.textSoft}
           style={s.captionInput}
           multiline
@@ -190,7 +192,7 @@ export default function NewPostScreen() {
 
         {/* Phase 17A — emotion picker (optional, beauty ritual emotion) */}
         <View style={s.emotionWrap}>
-          <Text style={s.emotionLabel}>Comment t'es-tu sentie ?</Text>
+          <Text style={s.emotionLabel}>{t('postNew.emotionLabel')}</Text>
           <View style={s.emotionRow}>
             {(['Apaisant','Réconfortant','Lumineux','Énergisant','Fragile','Doux'] as const).map((e) => {
               const active = emotion === e;
@@ -201,18 +203,18 @@ export default function NewPostScreen() {
                   style={[s.emotionChip, active && s.emotionChipActive]}
                   hitSlop={6}
                 >
-                  <Text style={[s.emotionChipTxt, active && s.emotionChipTxtActive]}>{e}</Text>
+                  <Text style={[s.emotionChipTxt, active && s.emotionChipTxtActive]}>{t(`postNew.emotions.${e}`)}</Text>
                 </Pressable>
               );
             })}
           </View>
-          <Text style={s.emotionHint}>Facultatif</Text>
+          <Text style={s.emotionHint}>{t('postNew.emotionHint')}</Text>
         </View>
 
         {/* Phase 17B/C data integrity — products from active archive */}
         {archiveProducts.length > 0 && (
           <View style={s.productsWrap}>
-            <Text style={s.productsLabelLg}>PRODUITS DE TON RITUEL</Text>
+            <Text style={s.productsLabelLg}>{t('postNew.productsLabel')}</Text>
             <View style={s.productsRow}>
               {archiveProducts.map((label) => {
                 const active = selectedProducts.has(label);
@@ -240,12 +242,12 @@ export default function NewPostScreen() {
                 );
               })}
             </View>
-            <Text style={s.productsHint}>Touche pour retirer · Facultatif</Text>
+            <Text style={s.productsHint}>{t('postNew.productsHint')}</Text>
           </View>
         )}
 
         <PillButton
-          label="Publier"
+          label={t('postNew.publish')}
           variant="primary"
           fullWidth
           disabled={!canSubmit}

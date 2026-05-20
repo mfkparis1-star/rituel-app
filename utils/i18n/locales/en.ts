@@ -532,6 +532,37 @@ export const en: LocaleDict = {
     },
   },
 
+  postNew: {
+    needSignIn: 'Sign in to share your ritual.',
+    back: 'Back',
+    kicker: 'NEW RITUAL',
+    title: 'Share your moment',
+    subtitle: 'A note, a photo, a ritual. Your beauty journal is private by default, but what you post here is shared with the Rituel community.',
+    addPhoto: 'Add a photo',
+    addPhotoSub: 'Optional · portrait format',
+    noteLabel: 'Your note',
+    notePlaceholder: 'How does your skin feel today? Which ritual did you follow?',
+    emotionLabel: 'How did you feel?',
+    emotionHint: 'Optional',
+    productsLabel: 'PRODUCTS IN YOUR RITUAL',
+    productsHint: 'Tap to remove · Optional',
+    publish: 'Publish',
+    emotions: {
+      Apaisant: 'Soothing', 'Réconfortant': 'Comforting', Lumineux: 'Radiant',
+      'Énergisant': 'Energizing', Fragile: 'Fragile', Doux: 'Gentle',
+    },
+    alerts: {
+      permissionTitle: 'Photo access denied',
+      permissionBody: 'Enable photo access in Settings to add an image to your post.',
+      permissionCancel: 'Cancel',
+      permissionOpenSettings: 'Open Settings',
+      uploadErrorTitle: 'Error',
+      uploadErrorBody: "Couldn't upload the image. Try again.",
+      publishErrorTitle: 'Error',
+      publishErrorBody: "Couldn't publish. Try again in a moment.",
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

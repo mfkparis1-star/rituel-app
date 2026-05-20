@@ -548,6 +548,40 @@ export const fr = {
     },
   },
 
+  // Post create / share ritual (Phase 19.12)
+  // emotions.* keys are FR canonical DB values (posts.emotion); only the
+  // displayed chip label is translated. No migration.
+  postNew: {
+    needSignIn: 'Connecte-toi pour partager ton rituel.',
+    back: 'Retour',
+    kicker: 'NOUVEAU RITUEL',
+    title: 'Partage ton instant',
+    subtitle: 'Une note, une photo, un rituel. Ton journal beauté est privé par défaut, mais ce que tu publies ici est partagé avec la communauté Rituel.',
+    addPhoto: 'Ajouter une photo',
+    addPhotoSub: 'Optionnel · format portrait',
+    noteLabel: 'Ta note',
+    notePlaceholder: 'Comment se sent ta peau aujourd\u2019hui ? Quel rituel as-tu suivi ?',
+    emotionLabel: 'Comment t\'es-tu sentie ?',
+    emotionHint: 'Facultatif',
+    productsLabel: 'PRODUITS DE TON RITUEL',
+    productsHint: 'Touche pour retirer · Facultatif',
+    publish: 'Publier',
+    emotions: {
+      Apaisant: 'Apaisant', 'Réconfortant': 'Réconfortant', Lumineux: 'Lumineux',
+      'Énergisant': 'Énergisant', Fragile: 'Fragile', Doux: 'Doux',
+    },
+    alerts: {
+      permissionTitle: 'Accès aux photos refusé',
+      permissionBody: 'Active l\u2019accès aux photos dans Réglages pour ajouter une image à ta publication.',
+      permissionCancel: 'Annuler',
+      permissionOpenSettings: 'Ouvrir Réglages',
+      uploadErrorTitle: 'Erreur',
+      uploadErrorBody: 'Téléchargement de l\u2019image impossible. Réessaye.',
+      publishErrorTitle: 'Erreur',
+      publishErrorBody: 'Publication impossible. Réessaye dans un instant.',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

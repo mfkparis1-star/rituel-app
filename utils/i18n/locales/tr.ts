@@ -533,6 +533,37 @@ export const tr: LocaleDict = {
     },
   },
 
+  postNew: {
+    needSignIn: 'Ritüelini paylaşmak için giriş yap.',
+    back: 'Geri',
+    kicker: 'YENİ RİTÜEL',
+    title: 'Anını paylaş',
+    subtitle: 'Bir not, bir fotoğraf, bir ritüel. Güzellik günlüğün varsayılan olarak özeldir, ama burada paylaştığın Rituel topluluğuyla paylaşılır.',
+    addPhoto: 'Fotoğraf ekle',
+    addPhotoSub: 'İsteğe bağlı · dikey format',
+    noteLabel: 'Notun',
+    notePlaceholder: 'Cildin bugün nasıl hissediyor? Hangi ritüeli uyguladın?',
+    emotionLabel: 'Nasıl hissettin?',
+    emotionHint: 'İsteğe bağlı',
+    productsLabel: 'RİTÜELİNDEKİ ÜRÜNLER',
+    productsHint: 'Çıkarmak için dokun · İsteğe bağlı',
+    publish: 'Paylaş',
+    emotions: {
+      Apaisant: 'Yatıştırıcı', 'Réconfortant': 'Rahatlatıcı', Lumineux: 'Işıltılı',
+      'Énergisant': 'Enerjik', Fragile: 'Kırılgan', Doux: 'Yumuşak',
+    },
+    alerts: {
+      permissionTitle: 'Fotoğraf erişimi reddedildi',
+      permissionBody: 'Paylaşımına görsel eklemek için Ayarlar\'dan fotoğraf erişimini aç.',
+      permissionCancel: 'İptal',
+      permissionOpenSettings: 'Ayarları aç',
+      uploadErrorTitle: 'Hata',
+      uploadErrorBody: 'Görsel yüklenemedi. Tekrar dene.',
+      publishErrorTitle: 'Hata',
+      publishErrorBody: 'Paylaşılamadı. Birazdan tekrar dene.',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',
