@@ -353,6 +353,18 @@ export const fr = {
     },
 },
 
+  // Saved / favorites screen (Phase 19.7)
+  saved: {
+    needSignIn: 'Connecte-toi pour voir tes favoris.',
+    back: 'Retour',
+    kicker: 'INSPIRATIONS',
+    title: 'Mes favoris',
+    subtitle: 'Les rituels et les inspirations que tu as choisis de garder.',
+    emptyTitle: 'Ton tableau d\u2019inspirations',
+    anonymous: 'Anonyme',
+    justNow: 'à l\u2019instant',
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

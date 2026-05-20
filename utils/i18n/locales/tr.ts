@@ -349,6 +349,17 @@ export const tr: LocaleDict = {
     },
 },
 
+  saved: {
+    needSignIn: 'Favorilerini görmek için giriş yap.',
+    back: 'Geri',
+    kicker: 'İLHAMLAR',
+    title: 'Favorilerim',
+    subtitle: 'Saklamayı seçtiğin ritüeller ve ilhamlar.',
+    emptyTitle: 'İlham panon',
+    anonymous: 'Anonim',
+    justNow: 'az önce',
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

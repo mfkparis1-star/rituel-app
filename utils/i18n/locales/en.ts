@@ -348,6 +348,17 @@ export const en: LocaleDict = {
     },
 },
 
+  saved: {
+    needSignIn: 'Sign in to see your favorites.',
+    back: 'Back',
+    kicker: 'INSPIRATIONS',
+    title: 'My favorites',
+    subtitle: 'The rituals and inspirations you chose to keep.',
+    emptyTitle: 'Your inspiration board',
+    anonymous: 'Anonymous',
+    justNow: 'just now',
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

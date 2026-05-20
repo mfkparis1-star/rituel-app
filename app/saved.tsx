@@ -19,9 +19,10 @@ import { supabase } from '../lib/supabase';
 import { fetchSavedPostIds } from '../utils/postSaves';
 import type { FeedPost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
+import { useLanguage } from '../hooks/useLanguage';
 import { C, R, Sp, Type } from '../theme';
 
-function relativeTime(iso: string): string {
+function relativeTime(iso: string, justNowLabel: string = "à l’instant"): string {
   const d = new Date(iso);
   const sec = Math.floor((Date.now() - d.getTime()) / 1000);
   if (sec < 60) return "à l\u2019instant";
@@ -31,6 +32,7 @@ function relativeTime(iso: string): string {
 }
 
 export default function SavedScreen() {
+  const { t } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,8 +71,8 @@ export default function SavedScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
-          <Text style={s.muted}>Connecte-toi pour voir tes favoris.</Text>
-          <PillButton label="Retour" variant="primary" onPress={() => safeBack('/(tabs)')} style={{ marginTop: Sp.md }} />
+          <Text style={s.muted}>{t('saved.needSignIn')}</Text>
+          <PillButton label={t('saved.back')} variant="primary" onPress={() => safeBack('/(tabs)')} style={{ marginTop: Sp.md }} />
         </View>
       </SafeAreaView>
     );
@@ -84,15 +86,15 @@ export default function SavedScreen() {
           <Text style={s.backTxt}>{'←  Retour'}</Text>
         </Pressable>
 
-        <Text style={s.label}>INSPIRATIONS</Text>
-        <Text style={s.title}>Mes favoris</Text>
-        <Text style={s.subtitle}>Les rituels et les inspirations que tu as choisis de garder.</Text>
+        <Text style={s.label}>{t('saved.kicker')}</Text>
+        <Text style={s.title}>{t('saved.title')}</Text>
+        <Text style={s.subtitle}>{t('saved.subtitle')}</Text>
 
         {loading ? (
           <View style={s.centered}><ActivityIndicator color={C.copper} /></View>
         ) : posts.length === 0 ? (
           <View style={s.emptyBox}>
-            <Text style={s.emptyTitle}>Ton tableau d’inspirations</Text>
+            <Text style={s.emptyTitle}>{t('saved.emptyTitle')}</Text>
             <Text style={s.emptySub}>
               Tes inspirations sauvegardées apparaîtront ici. Touche le marque-page sur les publications qui te plaisent.
             </Text>
@@ -104,7 +106,7 @@ export default function SavedScreen() {
                 <Image source={{ uri: p.image_url }} style={s.cardImage} resizeMode="cover" />
               ) : null}
               <View style={s.cardBody}>
-                <Text style={s.cardAuthor}>{p.display_name ?? (p.user_email?.split('@')[0] ?? 'Anonyme')}</Text>
+                <Text style={s.cardAuthor}>{p.display_name ?? (p.user_email?.split('@')[0] ?? t('saved.anonymous'))}</Text>
                 <Text style={s.cardCaption} numberOfLines={4}>{p.caption}</Text>
                 <Text style={s.cardMeta}>{relativeTime(p.created_at)}</Text>
               </View>
