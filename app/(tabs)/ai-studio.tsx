@@ -7,6 +7,7 @@ import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { useEffect, useState } from 'react';
 import { getRecentAcrossTypes, AnyCacheEntry } from '../../utils/aiCache';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 function MakeupIcon({ color }: { color: string }) {
@@ -45,34 +46,16 @@ type ToolCard = {
   Icon: (props: { color: string }) => any;
 };
 
-const TOOLS: ToolCard[] = [
-  {
-    id: 'makeup',
-    label: 'MAQUILLAGE',
-    title: 'Studio Maquillage',
-    description: 'Looks personnalisés selon ton événement.',
-    route: '/(tabs)/makeup',
-    Icon: MakeupIcon,
-  },
-  {
-    id: 'routine',
-    label: 'ROUTINE',
-    title: 'Mon rituel',
-    description: 'Compose et optimise ta routine matin et soir.',
-    route: '/(tabs)/routine',
-    Icon: RoutineIcon,
-  },
-  {
-    id: 'compatibility',
-    label: 'INGRÉDIENTS',
-    title: 'Compatibilité ingrédients',
-    description: 'Vérifie si tes produits font bon ménage.',
-    route: '/(tabs)/compatibility',
-    Icon: CompatibilityIcon,
-  },
+// Display copy (label/title/description) is resolved at render via
+// t(`aiStudio.tools.${id}.*`); the array carries only ids, routes, icons.
+const TOOLS: { id: string; route: string; Icon: (props: { color: string }) => any }[] = [
+  { id: 'makeup', route: '/(tabs)/makeup', Icon: MakeupIcon },
+  { id: 'routine', route: '/(tabs)/routine', Icon: RoutineIcon },
+  { id: 'compatibility', route: '/(tabs)/compatibility', Icon: CompatibilityIcon },
 ];
 
 export default function AIStudioScreen() {
+  const { t } = useLanguage();
   const [recent, setRecent] = useState<AnyCacheEntry[]>([]);
 
   useEffect(() => {
@@ -84,8 +67,8 @@ export default function AIStudioScreen() {
     return () => { cancelled = true; };
   }, []);
 
-  const typeLabel = (t: 'makeup' | 'routine' | 'skin') =>
-    t === 'makeup' ? 'Maquillage' : t === 'routine' ? 'Routine' : 'Analyse de peau';
+  const typeLabel = (tp: 'makeup' | 'routine' | 'skin') =>
+    tp === 'makeup' ? t('aiStudio.history.typeMakeup') : tp === 'routine' ? t('aiStudio.history.typeRoutine') : t('aiStudio.history.typeSkin');
 
   const typeRoute = (t: 'makeup' | 'routine' | 'skin') =>
     t === 'makeup' ? '/(tabs)/makeup' : t === 'routine' ? '/(tabs)/routine' : '/(tabs)/skin-analysis';
@@ -104,16 +87,16 @@ export default function AIStudioScreen() {
     <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.header}>
-          <Text style={s.label}>STUDIO IA</Text>
-          <Text style={s.title}>Tes outils beauté</Text>
-          <Text style={s.subtitle}>Cinq expériences IA pour révéler ta peau</Text>
+          <Text style={s.label}>{t('aiStudio.kicker')}</Text>
+          <Text style={s.title}>{t('aiStudio.title')}</Text>
+          <Text style={s.subtitle}>{t('aiStudio.subtitle')}</Text>
         </View>
 
         <HeroCard
-          label="ANALYSE IA"
-          title="Analyse de peau IA"
-          subtitle="Détecte ton type de peau, tes besoins et les produits manquants."
-          ctaLabel="Commencer"
+          label={t('aiStudio.hero.label')}
+          title={t('aiStudio.hero.title')}
+          subtitle={t('aiStudio.hero.subtitle')}
+          ctaLabel={t('aiStudio.hero.cta')}
           variant="espresso"
           onPress={() => router.push('/(tabs)/skin-analysis' as any)}
           style={{ marginBottom: Sp.xl }}
@@ -122,7 +105,7 @@ export default function AIStudioScreen() {
         <View style={s.grid}>
         {recent.length > 0 && (
           <>
-            <Text style={s.sectionTitleHistory}>Mes derniers résultats</Text>
+            <Text style={s.sectionTitleHistory}>{t('aiStudio.history.title')}</Text>
             {recent.map((entry, i) => (
               <Pressable
                 key={`${entry.type}-${entry.savedAt}-${i}`}
@@ -154,10 +137,10 @@ export default function AIStudioScreen() {
                 <View style={s.toolIconBox}>
                   <Icon color={C.espresso} />
                 </View>
-                <Text style={s.toolLabel}>{tool.label}</Text>
-                <Text style={s.toolTitle}>{tool.title}</Text>
+                <Text style={s.toolLabel}>{t(`aiStudio.tools.${tool.id}.label`)}</Text>
+                <Text style={s.toolTitle}>{t(`aiStudio.tools.${tool.id}.title`)}</Text>
                 <Text style={s.toolDesc} numberOfLines={2}>
-                  {tool.description}
+                  {t(`aiStudio.tools.${tool.id}.description`)}
                 </Text>
               </Pressable>
             );
@@ -165,13 +148,13 @@ export default function AIStudioScreen() {
         </View>
 
         <PremiumCard variant="espresso" style={s.premium}>
-          <Text style={s.premiumLabel}>PREMIUM</Text>
-          <Text style={s.premiumTitle}>Débloque tout</Text>
+          <Text style={s.premiumLabel}>{t('aiStudio.premium.label')}</Text>
+          <Text style={s.premiumTitle}>{t('aiStudio.premium.title')}</Text>
           <Text style={s.premiumSub}>
             Analyses illimitées, routines IA et recommandations personnalisées.
           </Text>
           <PillButton
-            label="Passer Premium"
+            label={t('aiStudio.premium.cta')}
             variant="primary"
             size="md"
             onPress={() => router.push('/paywall' as any)}

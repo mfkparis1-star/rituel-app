@@ -430,6 +430,35 @@ export const tr: LocaleDict = {
     },
   },
 
+  aiStudio: {
+    kicker: 'AI STÜDYO',
+    title: 'Güzellik araçların',
+    subtitle: 'Cildini ortaya çıkarmak için beş AI deneyimi',
+    hero: {
+      label: 'AI ANALİZ',
+      title: 'AI cilt analizi',
+      subtitle: 'Cilt tipini, ihtiyaçlarını ve eksik ürünleri tespit et.',
+      cta: 'Başla',
+    },
+    tools: {
+      makeup: { label: 'MAKYAJ', title: 'Makyaj Stüdyosu', description: 'Etkinliğine özel kişisel görünümler.' },
+      routine: { label: 'RUTİN', title: 'Ritüelim', description: 'Sabah ve akşam rutinini oluştur ve optimize et.' },
+      compatibility: { label: 'İÇERİKLER', title: 'İçerik uyumu', description: 'Ürünlerinin birbiriyle uyumlu olup olmadığını kontrol et.' },
+    },
+    history: {
+      title: 'Son sonuçlarım',
+      justNow: 'az önce',
+      typeMakeup: 'Makyaj',
+      typeRoutine: 'Rutin',
+      typeSkin: 'Cilt analizi',
+    },
+    premium: {
+      label: 'PREMIUM',
+      title: 'Her şeyi aç',
+      cta: 'Premium\'a geç',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

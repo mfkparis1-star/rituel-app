@@ -440,6 +440,36 @@ export const fr = {
     },
   },
 
+  // AI Studio hub (Phase 19.8)
+  aiStudio: {
+    kicker: 'STUDIO IA',
+    title: 'Tes outils beauté',
+    subtitle: 'Cinq expériences IA pour révéler ta peau',
+    hero: {
+      label: 'ANALYSE IA',
+      title: 'Analyse de peau IA',
+      subtitle: 'Détecte ton type de peau, tes besoins et les produits manquants.',
+      cta: 'Commencer',
+    },
+    tools: {
+      makeup: { label: 'MAQUILLAGE', title: 'Studio Maquillage', description: 'Looks personnalisés selon ton événement.' },
+      routine: { label: 'ROUTINE', title: 'Mon rituel', description: 'Compose et optimise ta routine matin et soir.' },
+      compatibility: { label: 'INGRÉDIENTS', title: 'Compatibilité ingrédients', description: 'Vérifie si tes produits font bon ménage.' },
+    },
+    history: {
+      title: 'Mes derniers résultats',
+      justNow: "à l'instant",
+      typeMakeup: 'Maquillage',
+      typeRoutine: 'Routine',
+      typeSkin: 'Analyse de peau',
+    },
+    premium: {
+      label: 'PREMIUM',
+      title: 'Débloque tout',
+      cta: 'Passer Premium',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',

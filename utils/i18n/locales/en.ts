@@ -429,6 +429,35 @@ export const en: LocaleDict = {
     },
   },
 
+  aiStudio: {
+    kicker: 'AI STUDIO',
+    title: 'Your beauty tools',
+    subtitle: 'Five AI experiences to reveal your skin',
+    hero: {
+      label: 'AI ANALYSIS',
+      title: 'AI skin analysis',
+      subtitle: 'Detect your skin type, your needs, and the products you are missing.',
+      cta: 'Start',
+    },
+    tools: {
+      makeup: { label: 'MAKEUP', title: 'Makeup Studio', description: 'Personalized looks for your occasion.' },
+      routine: { label: 'ROUTINE', title: 'My ritual', description: 'Build and optimize your morning and evening routine.' },
+      compatibility: { label: 'INGREDIENTS', title: 'Ingredient compatibility', description: 'Check whether your products get along.' },
+    },
+    history: {
+      title: 'My latest results',
+      justNow: 'just now',
+      typeMakeup: 'Makeup',
+      typeRoutine: 'Routine',
+      typeSkin: 'Skin analysis',
+    },
+    premium: {
+      label: 'PREMIUM',
+      title: 'Unlock everything',
+      cta: 'Go Premium',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',
