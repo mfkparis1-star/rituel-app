@@ -393,6 +393,42 @@ export const en: LocaleDict = {
     },
   },
 
+  paywall: {
+    heroLabel: 'RITUEL PREMIUM',
+    heroTitle: 'Unlock the full power of Rituel',
+    heroSub: 'Full analyses, AI recommendations, and premium access.',
+    benefits: {
+      analyses: 'Full AI analyses',
+      reco: 'Personalized recommendations',
+      unlimited: 'Unlimited access to all features',
+    },
+    plans: {
+      monthlyTitle: 'Monthly',
+      yearlyTitle: 'Yearly',
+      yearlyHint: 'That\'s 1.49 €/month',
+      badge: 'BEST VALUE',
+    },
+    continue: 'Continue',
+    restore: 'Restore my purchases',
+    compliance: 'Subscription renews automatically unless cancelled at least 24h before the end of the current period. You can cancel anytime from your App Store account.',
+    legalTerms: 'Terms',
+    legalPrivacy: 'Privacy',
+    alerts: {
+      welcomeTitle: 'Welcome to Rituel Premium',
+      welcomeBody: 'You now have access to all premium features.',
+      receivedTitle: 'Purchase received',
+      receivedBody: 'Your subscription will be activated shortly.',
+      errorTitle: "Purchase couldn't complete",
+      errorBody: 'Something went wrong. Try again in a moment.',
+      restoreSuccessTitle: 'Purchases restored',
+      restoreSuccessBody: 'Your Rituel Premium subscription is active.',
+      restoreEmptyTitle: 'No purchases found',
+      restoreEmptyBody: "We couldn't find any active purchase linked to your account.",
+      restoreErrorTitle: "Couldn't restore",
+      restoreErrorBody: 'Something went wrong. Try again in a moment.',
+    },
+  },
+
   common: {
     back: 'Back',
     cancel: 'Cancel',

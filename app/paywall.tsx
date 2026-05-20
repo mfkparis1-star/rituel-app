@@ -8,6 +8,7 @@ import PillButton from '../components/ui/PillButton';
 import { C, G, R, Sh, Sp, Type } from '../theme';
 import { trackEvent } from '../utils/analytics';
 import { safeBack } from '../utils/safeBack';
+import { useLanguage } from '../hooks/useLanguage';
 import { purchaseProduct, restorePurchases, hasActivePremium } from '../utils/purchases';
 
 type Plan = 'monthly' | 'yearly';
@@ -26,28 +27,27 @@ const PRODUCT_IDS: Record<Plan, string> = {
   yearly: 'com.mfkparis.rituel.premium.yearly',
 };
 
+// Display strings (title/hint/badge) are resolved at render via t();
+// these fields only carry stable ids and price formatting. hint/badge
+// presence flags whether to render those elements for the plan.
 const PLANS: PlanInfo[] = [
   {
     id: 'monthly',
-    title: 'Mensuel',
+    title: 'monthly',
     price: '2,99 €',
     period: '/ mois',
   },
   {
     id: 'yearly',
-    title: 'Annuel',
+    title: 'yearly',
     price: '17,99 €',
     period: '/ an',
-    hint: 'Soit 1,49 €/mois',
-    badge: 'MEILLEURE OFFRE',
+    hint: 'yearly',
+    badge: 'yearly',
   },
 ];
 
-const BENEFITS = [
-  'Analyses IA complètes',
-  'Recommandations personnalisées',
-  'Accès illimité à toutes les fonctionnalités',
-];
+const BENEFIT_KEYS = ['analyses', 'reco', 'unlimited'] as const;
 
 function CloseIcon({ color }: { color: string }) {
   return (
@@ -66,6 +66,7 @@ function CheckIcon({ color }: { color: string }) {
 }
 
 export default function PaywallScreen() {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<Plan>('yearly');
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -86,14 +87,14 @@ export default function PaywallScreen() {
         if (premium) {
           trackEvent('purchase_success', { plan: selected });
           Alert.alert(
-            'Bienvenue dans Rituel Premium',
-            'Tu as maintenant accès à toutes les fonctionnalités premium.'
+            t('paywall.alerts.welcomeTitle'),
+            t('paywall.alerts.welcomeBody')
           );
           safeBack('/(tabs)/auth');
         } else {
           Alert.alert(
-            'Achat reçu',
-            'Ton abonnement sera activé sous peu.'
+            t('paywall.alerts.receivedTitle'),
+            t('paywall.alerts.receivedBody')
           );
         }
       } else if ('userCancelled' in result && result.userCancelled) {
@@ -102,15 +103,15 @@ export default function PaywallScreen() {
         trackEvent('purchase_failed', { plan: selected });
         const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
-          'Achat impossible (debug)',
-          'Une erreur est survenue. Réessaie dans un instant.'
+          t('paywall.alerts.errorTitle'),
+          t('paywall.alerts.errorBody')
         );
       }
     } catch (e: any) {
       trackEvent('purchase_failed', { plan: selected });
       Alert.alert(
-        'Achat impossible (catch)',
-        'Une erreur est survenue. Réessaie dans un instant.'
+        t('paywall.alerts.errorTitle'),
+        t('paywall.alerts.errorBody')
       );
     } finally {
       setPurchasing(false);
@@ -127,22 +128,22 @@ export default function PaywallScreen() {
       if (premium) {
         trackEvent('restore_success');
         Alert.alert(
-          'Achats restaurés',
-          'Ton abonnement Rituel Premium est actif.'
+          t('paywall.alerts.restoreSuccessTitle'),
+          t('paywall.alerts.restoreSuccessBody')
         );
         safeBack('/(tabs)/auth');
       } else {
         trackEvent('restore_failed');
         Alert.alert(
-          'Aucun achat trouvé',
-          "Nous n'avons pas trouvé d'achat actif lié à ton compte."
+          t('paywall.alerts.restoreEmptyTitle'),
+          t('paywall.alerts.restoreEmptyBody')
         );
       }
     } catch {
       trackEvent('restore_failed');
       Alert.alert(
-        'Restauration impossible',
-        'Une erreur est survenue. Réessaye dans un instant.'
+        t('paywall.alerts.restoreErrorTitle'),
+        t('paywall.alerts.restoreErrorBody')
       );
     } finally {
       setRestoring(false);
@@ -161,18 +162,16 @@ export default function PaywallScreen() {
           </View>
 
           <LinearGradient colors={G.espresso} style={[s.hero, Sh.medium]}>
-            <Text style={s.heroLabel}>RITUEL PREMIUM</Text>
-            <Text style={s.heroTitle}>Active toute la puissance de Rituel</Text>
-            <Text style={s.heroSub}>
-              Analyses complètes, recommandations IA et accès premium.
-            </Text>
+            <Text style={s.heroLabel}>{t('paywall.heroLabel')}</Text>
+            <Text style={s.heroTitle}>{t('paywall.heroTitle')}</Text>
+            <Text style={s.heroSub}>{t('paywall.heroSub')}</Text>
             <View style={s.benefits}>
-              {BENEFITS.map((b) => (
+              {BENEFIT_KEYS.map((b) => (
                 <View key={b} style={s.benefitRow}>
                   <View style={s.checkBox}>
                     <CheckIcon color={C.espresso} />
                   </View>
-                  <Text style={s.benefitTxt}>{b}</Text>
+                  <Text style={s.benefitTxt}>{t(`paywall.benefits.${b}`)}</Text>
                 </View>
               ))}
             </View>
@@ -194,11 +193,11 @@ export default function PaywallScreen() {
                 >
                   {p.badge && (
                     <View style={s.badge}>
-                      <Text style={s.badgeTxt}>{p.badge}</Text>
+                      <Text style={s.badgeTxt}>{t('paywall.plans.badge')}</Text>
                     </View>
                   )}
                   <View style={s.planHead}>
-                    <Text style={s.planTitle}>{p.title}</Text>
+                    <Text style={s.planTitle}>{p.id === 'monthly' ? t('paywall.plans.monthlyTitle') : t('paywall.plans.yearlyTitle')}</Text>
                     <View style={[s.radio, active && s.radioActive]}>
                       {active && <View style={s.radioDot} />}
                     </View>
@@ -207,14 +206,14 @@ export default function PaywallScreen() {
                     <Text style={s.planPrice}>{p.price}</Text>
                     <Text style={s.planPeriod}>{p.period}</Text>
                   </View>
-                  {p.hint && <Text style={s.planHint}>{p.hint}</Text>}
+                  {p.hint && <Text style={s.planHint}>{t('paywall.plans.yearlyHint')}</Text>}
                 </Pressable>
               );
             })}
           </View>
 
           <PillButton
-            label="Continuer"
+            label={t('paywall.continue')}
             variant="primary"
             fullWidth
             loading={purchasing}
@@ -223,7 +222,7 @@ export default function PaywallScreen() {
           />
 
           <PillButton
-            label="Restaurer mes achats"
+            label={t('paywall.restore')}
             variant="ghost"
             fullWidth
             loading={restoring}
@@ -231,19 +230,15 @@ export default function PaywallScreen() {
             style={{ marginTop: Sp.xs }}
           />
 
-          <Text style={s.compliance}>
-            Abonnement renouvelé automatiquement sauf annulation 24h avant la fin
-            de la période en cours. Annulation possible à tout moment depuis votre
-            compte App Store.
-          </Text>
+          <Text style={s.compliance}>{t('paywall.compliance')}</Text>
 
           <View style={s.legalRow}>
             <Pressable onPress={() => Linking.openURL('https://rituel.beauty/terms').catch(() => {})}>
-              <Text style={s.legalLink}>Conditions</Text>
+              <Text style={s.legalLink}>{t('paywall.legalTerms')}</Text>
             </Pressable>
             <Text style={s.legalDot}>·</Text>
             <Pressable onPress={() => Linking.openURL('https://rituel.beauty/privacy').catch(() => {})}>
-              <Text style={s.legalLink}>Confidentialité</Text>
+              <Text style={s.legalLink}>{t('paywall.legalPrivacy')}</Text>
             </Pressable>
           </View>
 

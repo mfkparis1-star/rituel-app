@@ -394,6 +394,42 @@ export const tr: LocaleDict = {
     },
   },
 
+  paywall: {
+    heroLabel: 'RITUEL PREMIUM',
+    heroTitle: 'Rituel\'in tüm gücünü aç',
+    heroSub: 'Tam analizler, AI önerileri ve premium erişim.',
+    benefits: {
+      analyses: 'Tam AI analizleri',
+      reco: 'Kişiselleştirilmiş öneriler',
+      unlimited: 'Tüm özelliklere sınırsız erişim',
+    },
+    plans: {
+      monthlyTitle: 'Aylık',
+      yearlyTitle: 'Yıllık',
+      yearlyHint: 'Ayda 1,49 €',
+      badge: 'EN İYİ TEKLİF',
+    },
+    continue: 'Devam',
+    restore: 'Satın alımlarımı geri yükle',
+    compliance: 'Abonelik, mevcut dönemin bitiminden en az 24 saat önce iptal edilmedikçe otomatik olarak yenilenir. App Store hesabından istediğin zaman iptal edebilirsin.',
+    legalTerms: 'Koşullar',
+    legalPrivacy: 'Gizlilik',
+    alerts: {
+      welcomeTitle: 'Rituel Premium\'e hoş geldin',
+      welcomeBody: 'Artık tüm premium özelliklere erişimin var.',
+      receivedTitle: 'Satın alım alındı',
+      receivedBody: 'Aboneliğin kısa süre içinde etkinleşecek.',
+      errorTitle: 'Satın alım tamamlanamadı',
+      errorBody: 'Bir hata oluştu. Birazdan tekrar dene.',
+      restoreSuccessTitle: 'Satın alımlar geri yüklendi',
+      restoreSuccessBody: 'Rituel Premium aboneliğin aktif.',
+      restoreEmptyTitle: 'Satın alım bulunamadı',
+      restoreEmptyBody: 'Hesabına bağlı aktif bir satın alım bulamadık.',
+      restoreErrorTitle: 'Geri yüklenemedi',
+      restoreErrorBody: 'Bir hata oluştu. Birazdan tekrar dene.',
+    },
+  },
+
   common: {
     back: 'Geri',
     cancel: 'İptal',

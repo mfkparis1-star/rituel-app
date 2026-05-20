@@ -403,6 +403,43 @@ export const fr = {
     },
   },
 
+  // Paywall / premium upsell (Phase 19.7)
+  paywall: {
+    heroLabel: 'RITUEL PREMIUM',
+    heroTitle: 'Active toute la puissance de Rituel',
+    heroSub: 'Analyses complètes, recommandations IA et accès premium.',
+    benefits: {
+      analyses: 'Analyses IA complètes',
+      reco: 'Recommandations personnalisées',
+      unlimited: 'Accès illimité à toutes les fonctionnalités',
+    },
+    plans: {
+      monthlyTitle: 'Mensuel',
+      yearlyTitle: 'Annuel',
+      yearlyHint: 'Soit 1,49 €/mois',
+      badge: 'MEILLEURE OFFRE',
+    },
+    continue: 'Continuer',
+    restore: 'Restaurer mes achats',
+    compliance: 'Abonnement renouvelé automatiquement sauf annulation 24h avant la fin de la période en cours. Annulation possible à tout moment depuis votre compte App Store.',
+    legalTerms: 'Conditions',
+    legalPrivacy: 'Confidentialité',
+    alerts: {
+      welcomeTitle: 'Bienvenue dans Rituel Premium',
+      welcomeBody: 'Tu as maintenant accès à toutes les fonctionnalités premium.',
+      receivedTitle: 'Achat reçu',
+      receivedBody: 'Ton abonnement sera activé sous peu.',
+      errorTitle: 'Achat impossible',
+      errorBody: 'Une erreur est survenue. Réessaie dans un instant.',
+      restoreSuccessTitle: 'Achats restaurés',
+      restoreSuccessBody: 'Ton abonnement Rituel Premium est actif.',
+      restoreEmptyTitle: 'Aucun achat trouvé',
+      restoreEmptyBody: "Nous n'avons pas trouvé d'achat actif lié à ton compte.",
+      restoreErrorTitle: 'Restauration impossible',
+      restoreErrorBody: 'Une erreur est survenue. Réessaye dans un instant.',
+    },
+  },
+
   common: {
     back: 'Retour',
     cancel: 'Annuler',
