@@ -46,14 +46,14 @@ function emojiSymbol(id: CheckinEmoji): string {
   return CHECKIN_EMOJIS.find((e) => e.id === id)?.symbol ?? '·';
 }
 
-function todaySuggestion(latest: CheckinEmoji | null): string {
+function todaySuggestion(latest: CheckinEmoji | null, adviceLabels: { glowing: string; good: string; neutral: string; tired: string; rough: string; none: string }): string {
   switch (latest) {
-    case 'glowing': return 'Profite. Garde ta routine telle quelle aujourd’hui.';
-    case 'good':    return 'Routine de base. Hydratation + SPF.';
-    case 'neutral': return 'Ajoute un sérum apaisant ce soir.';
-    case 'tired':   return 'Allège : nettoyant doux + crème riche, pas d’actifs ce soir.';
-    case 'rough':   return 'Pause des actifs. Crème barrière + masque hydratant.';
-    default:        return 'Un check-in de 10 secondes suffit pour ajuster tes conseils du jour.';
+    case 'glowing': return adviceLabels.glowing;
+    case 'good':    return adviceLabels.good;
+    case 'neutral': return adviceLabels.neutral;
+    case 'tired':   return adviceLabels.tired;
+    case 'rough':   return adviceLabels.rough;
+    default:        return adviceLabels.none;
   }
 }
 
@@ -212,10 +212,10 @@ export default function IndexScreen() {
             <View style={s.blockText}>
               <Text style={s.blockTitle}>
                 {latestCheckin
-                  ? CHECKIN_EMOJIS.find((e) => e.id === latestCheckin)?.label_fr
-                  : 'Ta peau attend son rituel'}
+                  ? t(`checkin.emojis.${latestCheckin}`)
+                  : t('home.today.waiting')}
               </Text>
-              <Text style={s.blockSub}>{todaySuggestion(latestCheckin)}</Text>
+              <Text style={s.blockSub}>{todaySuggestion(latestCheckin, { glowing: t('home.today.advice.glowing'), good: t('home.today.advice.good'), neutral: t('home.today.advice.neutral'), tired: t('home.today.advice.tired'), rough: t('home.today.advice.rough'), none: t('home.today.advice.none') })}</Text>
             </View>
           </View>
         </PremiumCard>
@@ -230,10 +230,8 @@ export default function IndexScreen() {
         <PremiumCard variant="espresso" style={s.blockWeek}>
           {weekEmojis.length === 0 ? (
             <>
-              <Text style={s.weekTitle}>Ton rythme commence ici</Text>
-              <Text style={s.weekSub}>
-                Fais ton premier check-in pour construire ton suivi beauté de la semaine.
-              </Text>
+              <Text style={s.weekTitle}>{t('home.week.emptyTitle')}</Text>
+              <Text style={s.weekSub}>{t('home.week.emptySub')}</Text>
             </>
           ) : (
             <>
@@ -252,27 +250,25 @@ export default function IndexScreen() {
         <PremiumCard variant="cream" style={s.block}>
           {lastSummary?.skinType ? (
             <>
-              <Text style={s.aboutLabel}>TYPE DE PEAU</Text>
+              <Text style={s.aboutLabel}>{t('home.about.skinTypeLabel')}</Text>
               <Text style={s.aboutValue}>{lastSummary.skinType}</Text>
               {lastSummary.issues && lastSummary.issues.length > 0 && (
                 <>
-                  <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>OBSERVATIONS</Text>
+                  <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>{t('home.about.observationsLabel')}</Text>
                   <Text style={s.aboutValue}>{lastSummary.issues.join(' · ')}</Text>
                 </>
               )}
-              <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>ROUTINE</Text>
+              <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>{t('home.about.routineLabel')}</Text>
               <Text style={s.aboutValue}>
-                {routineCount > 0 ? `${routineCount} étape${routineCount > 1 ? 's' : ''}` : 'Pas encore configurée'}
+                {routineCount > 0 ? (routineCount > 1 ? t('home.about.routineStepsMany') : t('home.about.routineStepsOne')).replace('{n}', String(routineCount)) : t('home.about.routineEmpty')}
               </Text>
             </>
           ) : (
             <>
-              <Text style={s.blockTitle}>Rituel apprend à te connaître</Text>
-              <Text style={s.blockSub}>
-                Lance ta première analyse pour adapter tes conseils à ta peau, ton rythme et tes produits.
-              </Text>
+              <Text style={s.blockTitle}>{t('home.about.emptyTitle')}</Text>
+              <Text style={s.blockSub}>{t('home.about.emptySub')}</Text>
               <PillButton
-                label="Analyser ma peau"
+                label={t('home.about.analyzeCta')}
                 variant="primary"
                 onPress={() => router.push('/(tabs)/skin-analysis' as any)}
                 style={{ marginTop: Sp.md }}

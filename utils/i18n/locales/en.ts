@@ -483,6 +483,32 @@ export const en: LocaleDict = {
       loading: 'One moment…',
       tomorrow: 'A new reflection tomorrow.',
     },
+    today: {
+      waiting: 'Your skin awaits its ritual',
+      advice: {
+        glowing: 'Enjoy it. Keep your routine just as it is today.',
+        good: 'Base routine. Moisturizer + SPF.',
+        neutral: 'Add a soothing serum tonight.',
+        tired: 'Go gentle: mild cleanser + rich cream, no actives tonight.',
+        rough: 'Pause the actives. Barrier cream + hydrating mask.',
+        none: 'A 10-second check-in is enough to tune your advice for the day.',
+      },
+    },
+    week: {
+      emptyTitle: 'Your rhythm starts here',
+      emptySub: 'Do your first check-in to build your beauty tracking for the week.',
+    },
+    about: {
+      skinTypeLabel: 'SKIN TYPE',
+      observationsLabel: 'OBSERVATIONS',
+      routineLabel: 'ROUTINE',
+      routineStepsOne: '{n} step',
+      routineStepsMany: '{n} steps',
+      routineEmpty: 'Not set up yet',
+      emptyTitle: 'Rituel is getting to know you',
+      emptySub: 'Run your first analysis to tailor your advice to your skin, your rhythm, and your products.',
+      analyzeCta: 'Analyze my skin',
+    },
 },
 
   common: {

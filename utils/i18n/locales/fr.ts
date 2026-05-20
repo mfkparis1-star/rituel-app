@@ -496,6 +496,32 @@ export const fr = {
       loading: 'Un instant…',
       tomorrow: 'Une nouvelle réflexion demain.',
     },
+    today: {
+      waiting: 'Ta peau attend son rituel',
+      advice: {
+        glowing: 'Profite. Garde ta routine telle quelle aujourd\u2019hui.',
+        good: 'Routine de base. Hydratation + SPF.',
+        neutral: 'Ajoute un sérum apaisant ce soir.',
+        tired: 'Allège : nettoyant doux + crème riche, pas d\u2019actifs ce soir.',
+        rough: 'Pause des actifs. Crème barrière + masque hydratant.',
+        none: 'Un check-in de 10 secondes suffit pour ajuster tes conseils du jour.',
+      },
+    },
+    week: {
+      emptyTitle: 'Ton rythme commence ici',
+      emptySub: 'Fais ton premier check-in pour construire ton suivi beauté de la semaine.',
+    },
+    about: {
+      skinTypeLabel: 'TYPE DE PEAU',
+      observationsLabel: 'OBSERVATIONS',
+      routineLabel: 'ROUTINE',
+      routineStepsOne: '{n} étape',
+      routineStepsMany: '{n} étapes',
+      routineEmpty: 'Pas encore configurée',
+      emptyTitle: 'Rituel apprend à te connaître',
+      emptySub: 'Lance ta première analyse pour adapter tes conseils à ta peau, ton rythme et tes produits.',
+      analyzeCta: 'Analyser ma peau',
+    },
 },
 
   common: {

@@ -484,6 +484,32 @@ export const tr: LocaleDict = {
       loading: 'Bir an…',
       tomorrow: 'Yarın yeni bir yansıma.',
     },
+    today: {
+      waiting: 'Cildin ritüelini bekliyor',
+      advice: {
+        glowing: 'Tadını çıkar. Bugün rutinini olduğu gibi koru.',
+        good: 'Temel rutin. Nemlendirici + SPF.',
+        neutral: 'Bu akşam yatıştırıcı bir serum ekle.',
+        tired: 'Hafif tut: yumuşak temizleyici + zengin krem, bu akşam aktif yok.',
+        rough: 'Aktiflere ara ver. Bariyer kremi + nemlendirici maske.',
+        none: 'Günün tavsiyelerini ayarlamak için 10 saniyelik bir check-in yeterli.',
+      },
+    },
+    week: {
+      emptyTitle: 'Ritmin burada başlıyor',
+      emptySub: 'Haftanın güzellik takibini oluşturmak için ilk check-in\'ini yap.',
+    },
+    about: {
+      skinTypeLabel: 'CİLT TİPİ',
+      observationsLabel: 'GÖZLEMLER',
+      routineLabel: 'RUTİN',
+      routineStepsOne: '{n} adım',
+      routineStepsMany: '{n} adım',
+      routineEmpty: 'Henüz ayarlanmadı',
+      emptyTitle: 'Rituel seni tanımaya başlıyor',
+      emptySub: 'Tavsiyelerini cildine, ritmine ve ürünlerine göre uyarlamak için ilk analizini yap.',
+      analyzeCta: 'Cildimi analiz et',
+    },
 },
 
   common: {
