@@ -47,11 +47,11 @@ makeup · routine · skin-analysis
 ## Deferred (not done — intentional)
 - Dynamic AI-generated output localization: `optimizeRoutine(...,'fr')`,
   `generateMakeupLooks(...,'fr')`, skin-analysis AI output — all stay FR for now.
-- `relativeTime()` (community): "à l'instant"/"il y a … min/h/j" FR default.
-- `displayName()` fallback ('Membre'/'Anonyme') FR default.
+- ~~`relativeTime()` FR default~~ -> DONE (19D.1): consolidated into lang-aware utils/format.ts relativeTime(iso, lang) via common.time.* keys; 3 local copies removed; >=7d threshold standardized to locale short date.
+- ~~`displayName()` member/anonymous fallback FR default~~ -> DONE (19D.2a): community.memberFallback/anonymous + productDiscovery.memberFallback wired through t() at call sites.
 - Community author-profile plural line (`N publication(s) · M mention(s)`):
   pluralization/format work.
-- `Peau ${post.skin_type}` raw value (community) and skin_type raw FR generally.
+- skin_type display localization -- DEFERRED (needs value-source normalization). Raw skin_type rendered in: community author alert (Peau {skin_type}), post/new chip, home about value, auth profile, glow-timeline. Lang-aware helper getSkinTypeLabel(value, lang) exists in utils/skinAnalysis.ts but maps ONLY English canonical keys (dry/oily/combination/normal/sensitive). Value source inconsistent: AI analysis writes English canonical; skin-quiz writes FR canonical (mixte/seche/...). Global wiring now would silently fall back to raw FR on quiz-sourced values. Required future cleanup (NO DB migration): (1) normalizeSkinTypeValue(raw) mapping both English canonical AND FR legacy to one key; (2) extend/wrap getSkinTypeLabel to consume normalized keys; (3) then wire all raw callsites safely. (skin-analysis screen already uses getSkinTypeLabel correctly.)
 - `formatDateFR` not locale-aware; `weekSummary`.
 - `translate()` call direction in community PostCard (en→fr hardcoded):
   behavior preserved, separate fix.
