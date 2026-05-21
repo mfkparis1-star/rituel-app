@@ -607,6 +607,8 @@ export const fr = {
       title: 'Pas encore de routines',
       subtitle: 'Les routines partagées par la communauté apparaîtront ici.',
     },
+    memberFallback: 'Membre',
+    anonymous: 'Anonyme',
     productsUsed: 'PRODUITS UTILISÉS',
     likes: 'j\'aime',
     translate: {

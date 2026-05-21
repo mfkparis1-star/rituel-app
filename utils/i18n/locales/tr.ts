@@ -589,6 +589,8 @@ export const tr: LocaleDict = {
       title: 'Henüz rutin yok',
       subtitle: 'Topluluğun paylaştığı rutinler burada görünecek.',
     },
+    memberFallback: 'Üye',
+    anonymous: 'Anonim',
     productsUsed: 'KULLANILAN ÜRÜNLER',
     likes: 'beğeni',
     translate: {

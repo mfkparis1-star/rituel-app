@@ -99,11 +99,11 @@ export default function ProductDiscoveryScreen() {
               <View style={s.cardHead}>
                 <View style={s.avatar}>
                   <Text style={s.avatarLetter}>
-                    {(authorName(post)[0] || 'M').toUpperCase()}
+                    {(authorName(post, t('productDiscovery.memberFallback'))[0] || 'M').toUpperCase()}
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={s.cardName}>{authorName(post)}</Text>
+                  <Text style={s.cardName}>{authorName(post, t('productDiscovery.memberFallback'))}</Text>
                   <Text style={s.cardMeta}>{relativeTime(post.created_at, lang)}</Text>
                 </View>
                 {post.emotion ? (

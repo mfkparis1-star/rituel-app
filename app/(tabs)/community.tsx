@@ -42,8 +42,8 @@ function mapSkinType(raw: string): Exclude<SkinFilter, "all"> {
   return 'normal';
 }
 
-function displayName(post: Post): string {
-  return post.display_name || (post.user_email ? post.user_email.split('@')[0] : 'Membre');
+function displayName(post: Post, memberLabel: string): string {
+  return post.display_name || (post.user_email ? post.user_email.split('@')[0] : memberLabel);
 }
 
 const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
@@ -183,7 +183,7 @@ export default function CommunityScreen() {
   };
 
   const handleAuthorPress = (post: Post) => {
-    const name = post.display_name?.trim() || (post.user_email?.split('@')[0] ?? 'Anonyme');
+    const name = post.display_name?.trim() || (post.user_email?.split('@')[0] ?? t('community.anonymous'));
     const ownPostsCount = posts.filter((p) => p.user_id === post.user_id).length;
     const totalLikes = posts
       .filter((p) => p.user_id === post.user_id)
@@ -418,7 +418,7 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
   const emotionLabel = post.emotion
     ? (emotionKey && t(emotionKey) !== emotionKey ? t(emotionKey) : post.emotion)
     : null;
-  const username = displayName(post);
+  const username = displayName(post, t('community.memberFallback'));
   const meta = relativeTime(post.created_at, lang);
   const showTranslated = !!translatedCaption;
   const captionToShow = showTranslated ? translatedCaption : post.caption;

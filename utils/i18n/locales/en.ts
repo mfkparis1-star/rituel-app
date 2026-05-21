@@ -588,6 +588,8 @@ export const en: LocaleDict = {
       title: 'No routines yet',
       subtitle: 'Routines shared by the community will appear here.',
     },
+    memberFallback: 'Member',
+    anonymous: 'Anonymous',
     productsUsed: 'PRODUCTS USED',
     likes: 'likes',
     translate: {
