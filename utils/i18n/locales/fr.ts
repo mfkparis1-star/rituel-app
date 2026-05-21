@@ -719,6 +719,12 @@ export const fr = {
     },
   },
   common: {
+    time: {
+    justNow: 'à l\'instant',
+    minutesAgo: 'il y a {n} min',
+    hoursAgo: 'il y a {n} h',
+    daysAgo: 'il y a {n} j',
+    },
     back: 'Retour',
     cancel: 'Annuler',
     save: 'Sauvegarder',

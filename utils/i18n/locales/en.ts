@@ -700,6 +700,12 @@ export const en: LocaleDict = {
     },
   },
   common: {
+    time: {
+    justNow: 'just now',
+    minutesAgo: '{n} min ago',
+    hoursAgo: '{n} h ago',
+    daysAgo: '{n} d ago',
+    },
     back: 'Back',
     cancel: 'Cancel',
     save: 'Save',

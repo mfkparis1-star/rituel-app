@@ -701,6 +701,12 @@ export const tr: LocaleDict = {
     },
   },
   common: {
+    time: {
+    justNow: 'az önce',
+    minutesAgo: '{n} dk önce',
+    hoursAgo: '{n} sa önce',
+    daysAgo: '{n} gün önce',
+    },
     back: 'Geri',
     cancel: 'İptal',
     save: 'Kaydet',
