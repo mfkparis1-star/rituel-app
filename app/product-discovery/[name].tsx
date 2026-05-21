@@ -16,6 +16,7 @@
  */
 import { type Session } from '@supabase/supabase-js';
 import { useLanguage } from '../../hooks/useLanguage';
+import { relativeTime } from '../../utils/format';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -24,15 +25,6 @@ import { supabase } from '../../lib/supabase';
 import { fetchPostsByProduct, type FeedPost } from '../../utils/posts';
 import { safeBack } from '../../utils/safeBack';
 import { C, R, Sh, Sp, Type } from '../../theme';
-
-function relativeTime(iso: string, justNowLabel: string = "à l’instant"): string {
-  const d = new Date(iso);
-  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return justNowLabel;
-  if (sec < 3600) return `il y a ${Math.floor(sec / 60)} min`;
-  if (sec < 86400) return `il y a ${Math.floor(sec / 3600)} h`;
-  return `il y a ${Math.floor(sec / 86400)} j`;
-}
 
 function authorName(post: FeedPost, memberLabel: string = "Membre"): string {
   const dn = (post as any).display_name as string | null | undefined;
@@ -43,7 +35,7 @@ function authorName(post: FeedPost, memberLabel: string = "Membre"): string {
 }
 
 export default function ProductDiscoveryScreen() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { name } = useLocalSearchParams<{ name: string }>();
   const productName = (() => {
     try {
@@ -112,7 +104,7 @@ export default function ProductDiscoveryScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={s.cardName}>{authorName(post)}</Text>
-                  <Text style={s.cardMeta}>{relativeTime(post.created_at)}</Text>
+                  <Text style={s.cardMeta}>{relativeTime(post.created_at, lang)}</Text>
                 </View>
                 {post.emotion ? (
                   <View style={s.emotionPill}>

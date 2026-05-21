@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../utils/translate';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { useLanguage } from '../../hooks/useLanguage';
+import { relativeTime } from '../../utils/format';
 
 type SkinFilter = 'all' | 'dry' | 'oily' | 'combination' | 'normal';
 
@@ -39,18 +40,6 @@ function mapSkinType(raw: string): Exclude<SkinFilter, "all"> {
   if (v.includes('mixt') || v.includes('combin') || v.includes('karma')) return 'combination';
   if (v.includes('normal')) return 'normal';
   return 'normal';
-}
-
-function relativeTime(iso: string): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return "à l'instant";
-  if (sec < 3600) return `il y a ${Math.floor(sec / 60)} min`;
-  if (sec < 86400) return `il y a ${Math.floor(sec / 3600)} h`;
-  if (sec < 604800) return `il y a ${Math.floor(sec / 86400)} j`;
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
 function displayName(post: Post): string {
@@ -422,7 +411,7 @@ type PostCardProps = {
 };
 
 function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, isLiked, onLikePress, isSaved, onSavePress, onAuthorPress, isOwn, onMenuPress }: PostCardProps) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const skinType = mapSkinType(post.skin_type);
   const skinLabel = t(`community.skinLabel.${skinType}`);
   const emotionKey = post.emotion ? `postNew.emotions.${post.emotion}` : null;
@@ -430,7 +419,7 @@ function PostCard({ post, translatedCaption, isTranslating, onTranslatePress, is
     ? (emotionKey && t(emotionKey) !== emotionKey ? t(emotionKey) : post.emotion)
     : null;
   const username = displayName(post);
-  const meta = relativeTime(post.created_at);
+  const meta = relativeTime(post.created_at, lang);
   const showTranslated = !!translatedCaption;
   const captionToShow = showTranslated ? translatedCaption : post.caption;
   const productNames = post.product_names || [];

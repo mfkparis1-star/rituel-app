@@ -20,19 +20,11 @@ import { fetchSavedPostIds } from '../utils/postSaves';
 import type { FeedPost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
+import { relativeTime } from '../utils/format';
 import { C, R, Sp, Type } from '../theme';
 
-function relativeTime(iso: string, justNowLabel: string = "à l’instant"): string {
-  const d = new Date(iso);
-  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return "à l\u2019instant";
-  if (sec < 3600) return `il y a ${Math.floor(sec / 60)} min`;
-  if (sec < 86400) return `il y a ${Math.floor(sec / 3600)} h`;
-  return `il y a ${Math.floor(sec / 86400)} j`;
-}
-
 export default function SavedScreen() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +100,7 @@ export default function SavedScreen() {
               <View style={s.cardBody}>
                 <Text style={s.cardAuthor}>{p.display_name ?? (p.user_email?.split('@')[0] ?? t('saved.anonymous'))}</Text>
                 <Text style={s.cardCaption} numberOfLines={4}>{p.caption}</Text>
-                <Text style={s.cardMeta}>{relativeTime(p.created_at)}</Text>
+                <Text style={s.cardMeta}>{relativeTime(p.created_at, lang)}</Text>
               </View>
             </View>
           ))
