@@ -54,7 +54,7 @@ const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
 };
 
 export default function CommunityScreen() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [filter, setFilter] = useState<SkinFilter>('all');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -279,7 +279,7 @@ export default function CommunityScreen() {
       return next;
     });
     try {
-      const result = await translate(post.caption, 'en', 'fr');
+      const result = await translate(post.caption, 'fr', lang);
       if (!result.failed && result.text) {
         setTranslated((prev) => ({ ...prev, [post.id]: result.text }));
       }

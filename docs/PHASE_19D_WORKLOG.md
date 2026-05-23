@@ -2,7 +2,7 @@
 
 **Sprint type:** build-free · no native dep · no AI API call · no DB migration
 **Branch push target:** `main:phase15-rebuild`
-**Status:** in progress (19D.1 + 19D.2a done; 19D.3 + 19D.4 pending)
+**Status:** 19D.1 + 19D.2a + 19D.4 done; 19D.3 deferred (plural needs format helper)
 
 ## Goal
 Close the intentional deferred items left by Phase 19 (i18n). String/format
@@ -42,16 +42,22 @@ push. Commit/push only after explicit approval.
     `t('productDiscovery.memberFallback')` (existing key reused, dict
     untouched). Default param `"Membre"` kept as safety net.
 
-### 19D.3 — plural cleanup (PENDING — inspection)
-- Target: community author-profile line `N publication(s) · M mention(s)`,
-  likes label. FR/EN/TR plural rules differ (TR usually no plural suffix).
-  Needs decision on i18n parametric/plural support vs `{n}` + singular/plural
-  keys vs keep deferred.
+### 19D.3 — plural cleanup (DEFERRED)
+- Target: community author-profile composite line `N publication(s) · M
+  mention(s) J'aime` and home weekSummary `N check-in(s)`. FR/EN/TR plural
+  rules differ; t() has no parametric/plural/interpolation support.
+- Decision: DEFERRED. A proper fix needs a count-aware formatting helper or
+  i18n interpolation/plural support; not a quick ternary patch. Exceeds the
+  string/format cleanup boundary of Phase 19D.
 
-### 19D.4 — community translate() direction (PENDING — inspection only)
-- community PostCard `translate(post.caption, 'en', 'fr')` is reversed/
-  hardcoded (source en, target fr). This is a behavior issue, not string
-  extraction. Inspection only; ask before any behavior change.
+### 19D.4 — community translate() direction (DONE)
+- Was `translate(post.caption, 'en', 'fr')` — hardcoded wrong source (en) and
+  fixed target (fr), meaningless for EN/TR users.
+- Fix: `translate(post.caption, 'fr', lang)` — source = app FR-dominant
+  content, target = active user lang. Added lang to CommunityScreen hook.
+  No auto-detect (out of scope). If lang==='fr', translate util returns the
+  original (sourceLang===targetLang short-circuit) — acceptable, behavior not
+  expanded.
 
 ## Deferred (carried forward — see PHASE_19_STATUS.md)
 - **skin_type display localization** — value source inconsistent: AI analysis
@@ -72,3 +78,4 @@ push. Commit/push only after explicit approval.
 - `9e29228` phase 19D.1b — migrate relativeTime callers to lang-aware util
 - `58b35ab` phase 19D.2a — localize member/anonymous name fallbacks
 - `c7eaebc` docs — update Phase 19D deferred (relativeTime/displayName done)
+- `(this commit)` phase 19D.4 — fix community translate target language
