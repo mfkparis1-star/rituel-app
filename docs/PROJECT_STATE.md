@@ -41,5 +41,7 @@ deferred during Phase work.
   skin_type raw, formatDate locale, translate() direction).
 - Next major: Phase 15.2+ RevenueCat full integration (needs dashboard config:
   product import, entitlement, iOS SDK key).
+- Phase 20/21 planned: Optical Intelligence Layer (silent optical accuracy
+  layer, no new screen) — see docs/OPTICAL_INTELLIGENCE_LAYER.md.
 - Other deferred: journal photo upload (skin-journal bucket), affiliate expansion,
   EN+TR App Store screenshots (v1.1.3+), Google Play upload, Build 18 viral share port.
