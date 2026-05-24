@@ -2,7 +2,7 @@
 
 **Sprint type:** build-free · no native dep · no AI API call · no DB migration
 **Branch push target:** `main:phase15-rebuild`
-**Status:** 19D.1 + 19D.2a + 19D.4 done; 19D.3 deferred (plural needs format helper)
+**Status:** 19D.1 + 19D.2a + 19D.4 + 19D.5 done; 19D.3 deferred (plural)
 
 ## Goal
 Close the intentional deferred items left by Phase 19 (i18n). String/format
@@ -73,9 +73,30 @@ push. Commit/push only after explicit approval.
   quota + output-quality testing; out of build-free sprint scope).
 - `formatDateFR` still used in auth.tsx (not migrated to `formatDate(iso, lang)`).
 
+### 19D.5 — i18n QA/audit + lang-aware callsite fixes (DONE)
+- Full cross-check before closing Phase 19 + 19D.
+- Findings:
+  - Hardcoded JSX FR string scan: CLEAN (no leaks).
+  - Locale namespace parity fr/en/tr: CLEAN; TS LocaleDict enforces parity.
+  - 9 `.fr` lang-aware util callsites still hardcoded -> fixed to `[lang]`:
+    - makeup.tsx occasion labels (selfie + result headers, 2)
+    - routine.tsx disclaimers (AI + cosmetic, 2; added lang to hook)
+    - compatibility.tsx disclaimer (1)
+    - skin-analysis.tsx disclaimers (4)
+  - auth.tsx `formatDateFR(iso)` migrated to `formatDate(iso, currentLang)`.
+  - Total: 10 user-facing callsites fixed (EN/TR users were seeing FR text).
+- Still deferred (reported, not patched):
+  - AI output hardcoded 'fr' in routine (optimizeRoutine) + makeup
+    (generateMakeupLooks) — needs quota + output-quality testing.
+  - Plural cleanup (community author alert, home weekSummary) — needs
+    count-aware format helper / i18n interpolation.
+  - skin_type display — needs normalizeSkinTypeValue (value-source mismatch).
+
 ## Commit ledger (this sprint)
 - `b11ee8b` phase 19D.1a — relativeTime/formatDate helpers + common.time dict
 - `9e29228` phase 19D.1b — migrate relativeTime callers to lang-aware util
 - `58b35ab` phase 19D.2a — localize member/anonymous name fallbacks
 - `c7eaebc` docs — update Phase 19D deferred (relativeTime/displayName done)
 - `(this commit)` phase 19D.4 — fix community translate target language
+- `1797653` phase 19D.4 — fix community translate target language
+- `3307afd` phase 19D.5 — fix lang-aware util .fr callsite leaks (audit)
