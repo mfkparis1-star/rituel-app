@@ -217,7 +217,7 @@ export default function CompatibilityScreen() {
           </View>
         )}
 
-        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+        <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>

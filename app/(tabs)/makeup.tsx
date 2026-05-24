@@ -182,7 +182,7 @@ export default function MakeupScreen() {
   // ---------- SELFIE STEP ----------
   if (step === 'selfie') {
     const occLabel =
-      MAKEUP_OCCASIONS.find((o) => o.id === occasion)?.labels.fr ?? '';
+      MAKEUP_OCCASIONS.find((o) => o.id === occasion)?.labels[lang] ?? '';
     return (
       <SafeAreaView style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -263,7 +263,7 @@ export default function MakeupScreen() {
   // ---------- RESULT STEP ----------
   if (step === 'result' && result) {
     const occLabel =
-      MAKEUP_OCCASIONS.find((o) => o.id === occasion)?.labels.fr ?? '';
+      MAKEUP_OCCASIONS.find((o) => o.id === occasion)?.labels[lang] ?? '';
     return (
       <SafeAreaView style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>

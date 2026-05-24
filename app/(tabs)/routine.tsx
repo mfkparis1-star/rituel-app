@@ -50,7 +50,7 @@ function CloseIcon({ color }: { color: string }) {
 }
 
 export default function RoutineScreen() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [slot, setSlot] = useState<Slot>('matin');
   const [steps, setSteps] = useState<RoutineStep[]>([]);
 
@@ -418,9 +418,9 @@ export default function RoutineScreen() {
                   </PremiumCard>
                 )}
 
-                <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+                <Text style={s.disclaimer}>{AI_DISCLAIMER[lang]}</Text>
                 <View style={{ height: Sp.xs }} />
-                <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+                <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
 
                 <PillButton
                   label={t('routine.optimizeModal.close')}

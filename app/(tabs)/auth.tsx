@@ -14,7 +14,7 @@ import CreditPackModal from '../../components/credits/CreditPackModal';
 import { useCredits } from '../../hooks/useCredits';
 import { useRoutineCount } from '../../hooks/useRoutineCount';
 import { usePremium } from '../../hooks/usePremium';
-import { formatDateFR } from '../../utils/format';
+import { formatDate } from '../../utils/format';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
@@ -38,7 +38,7 @@ export default function AuthScreen() {
   const [draftName, setDraftName] = useState('');
 
   const premiumExpiryISO = customerInfo?.entitlements?.active?.['Rituel Pro']?.expirationDate ?? null;
-  const premiumExpiryFR = formatDateFR(premiumExpiryISO);
+  const premiumExpiryFR = formatDate(premiumExpiryISO, currentLang);
   const premiumSubtitle = premiumExpiryFR
     ? t('auth.alerts.subscription.activeUntil').replace('{date}', premiumExpiryFR)
     : t('auth.alerts.subscription.activeFallback');

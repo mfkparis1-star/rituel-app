@@ -216,9 +216,9 @@ export default function SkinAnalysisScreen() {
             />
           </View>
 
-          <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+          <Text style={s.disclaimer}>{AI_DISCLAIMER[lang]}</Text>
           <View style={{ height: Sp.xs }} />
-          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+          <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
         </ScrollView>
       </SafeAreaView>
     );
@@ -316,9 +316,9 @@ export default function SkinAnalysisScreen() {
               style={{ marginTop: Sp.lg }}
             />
 
-            <Text style={s.disclaimer}>{AI_DISCLAIMER.fr}</Text>
+            <Text style={s.disclaimer}>{AI_DISCLAIMER[lang]}</Text>
             <View style={{ height: Sp.xs }} />
-            <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER.fr}</Text>
+            <Text style={s.disclaimer}>{COSMETIC_DISCLAIMER[lang]}</Text>
           </Animated.View>
         </ScrollView>
       </SafeAreaView>
