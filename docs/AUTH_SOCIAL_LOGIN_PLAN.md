@@ -1,22 +1,36 @@
-# Social Login — Deferred Plan (Google + Apple)
+# Social Login — Active Plan (Google + Apple)
 
-**Status:** DEFERRED to post-launch (v1.3+). No code in repo. No build planned.
-**Date of this plan:** 31 May 2026.
+**Status:** ACTIVE / LAUNCH SCOPE (as of 31 May 2026, second decision).
+**Target release:** v1.2.0 (current launch scope).
 **Decision rule:** Apple Guideline 4.8 — if Google Sign-In is offered on
-iOS, Apple Sign-In MUST also be offered. Therefore Google cannot ship alone.
+iOS, Apple Sign-In MUST also be offered. Google alone is forbidden.
 
-## Why deferred
-1. Codebase inspection (31 May 2026): social login is **zero code**. No
-   `signInWithOAuth`, no `WebBrowser.openAuth`, no `expo-apple-authentication`,
-   no provider keys in locales, no `.bak` traces. Auth.tsx git history shows
-   only i18n + UI commits — social login was never added in rituel_v2.
-2. Email/password auth is implemented and works (`signInWithPassword`,
-   `signUp`, `resetPasswordForEmail`, `signOut`). Sufficient for launch.
-3. Adding Google alone would trigger Apple Sign-In requirement (Apple
-   Guideline 4.8) -> native dependency (`expo-apple-authentication`) -> new
-   EAS build -> App Review risk -> feature creep at the worst time.
-4. Real launch blockers right now: RevenueCat real-device test, device QA,
-   App Store metadata + screenshots, production build, submission.
+## Decision history
+
+### 31 May 2026 — first decision: DEFER to v1.3+
+Reasons (preserved for reality-trail):
+1. Codebase audit confirmed zero social login code in rituel_v2.
+2. Email/password auth implemented and working; technically sufficient.
+3. Apple Guideline 4.8 forces Google + Apple together — feature creep
+   at launch time.
+4. Apple Sign-In requires native dep (`expo-apple-authentication`),
+   new EAS build, App Review risk.
+5. Real launch blockers framed as: RevenueCat real-device test, device
+   QA, App Store metadata + screenshots, production build, submission.
+
+Commit: `def7dc8`.
+
+### 31 May 2026 — second decision (this update): MOVE INTO LAUNCH SCOPE
+Reasons:
+- Goal is not fastest submit; goal is shipping Rituel as a finished
+  premium consumer beauty app.
+- Email/password works technically but social login is the consumer
+  expectation for fast onboarding in this product category.
+- Reducing signup friction is part of product quality, not feature creep.
+- Apple Guideline 4.8 still binds: Google and Apple must ship together.
+
+The first decision's reality check (audit, dependency state, external
+config) remains valid and is the starting point for implementation.
 
 ## Reality check — current auth state (audit, 31 May 2026)
 
@@ -53,44 +67,75 @@ iOS, Apple Sign-In MUST also be offered. Therefore Google cannot ship alone.
 - **No iOS OAuth client, no Android OAuth client.** Web client alone is
   sufficient for Supabase-mediated web-flow OAuth, but native sign-in
   SDKs would need iOS/Android clients added.
+- **Apple side: not yet configured.** Apple Developer Service ID, key,
+  and Supabase Apple provider all need setup before Slice 3.
 
-**Summary:** dashboard side is ready for a web-flow Google OAuth. Code
-side has zero implementation. Apple Sign-In needs both native dep and
-its own provider setup (Apple Developer Service ID, key, Supabase).
+**Summary:** Google web-flow dashboard config is ready. Apple side needs
+full configuration. Code side has zero implementation. Implementation
+order is locale-first (build-free) -> Google handler (build-free) ->
+Apple Sign-In (native dep, new build).
 
-## Future implementation plan (v1.3+)
+## Active implementation plan
 
-Order is intentional — locale + UI first (build-free), native dep last.
+Slices are ordered to push native-dep / build work as late as possible,
+so locale and Google handler can land while EAS quota is unavailable.
 
-1. **Locale keys** (FR/EN/TR) — `auth.google.*`, `auth.apple.*`,
-   `auth.alerts.oauth.*`. Pure JS, no build.
-2. **Google OAuth handler + button** — `signInWithOAuth({ provider:
-   'google', options: { redirectTo: Linking.createURL('auth/callback'),
-   skipBrowserRedirect: true } })` + `WebBrowser.openAuthSessionAsync`.
-   Pure JS, no build. Uses existing deps. May run in current dev build if
-   redirect config is correct; must be verified on real device.
-3. **Apple Sign-In** — add `expo-apple-authentication`, iOS-only guard
-   (`Platform.OS === 'ios'`), Apple Service ID + key in Apple Developer,
-   Supabase Apple provider enable. **Requires new EAS build.**
-4. **Supabase redirect verification** — confirm Site URL + Redirect URLs
-   list still includes both `rituel://auth/callback` and
-   `com.mfkparis.rituel://auth/callback`. (Currently configured, may need
-   re-check before shipping.)
-5. **Real-device QA** — both providers, both flows (new user / existing
-   user), session persistence, sign-out, error states, language switch.
-6. **App Review compliance check** — Apple Guideline 4.8 satisfied
-   (Apple Sign-In offered with Google), privacy nutrition labels updated
-   (auth data collection), App Privacy questions answered.
+### Slice 1 — Locale keys (FR/EN/TR)
+- Add `auth.google.*`, `auth.apple.*`, `auth.alerts.oauth.*` to all
+  three locales. Match Phase 19 conventions; FR canonical, TS LocaleDict
+  parity enforced.
+- Pure JS, no build. Risk class A.
 
-## Non-goals (explicit)
+### Slice 2 — Google OAuth handler + button
+- `supabase.auth.signInWithOAuth({ provider: 'google', options: {
+  redirectTo: Linking.createURL('auth/callback'),
+  skipBrowserRedirect: true } })` followed by
+  `WebBrowser.openAuthSessionAsync(...)`.
+- New button in auth screen (signIn + signUp share the same OAuth path).
+- Existing dependencies (`expo-linking`, `expo-web-browser`) sufficient.
+- Pure JS, no build. Runs in current dev build if redirect config is
+  correct; must still be verified on real device.
+- Risk class B (auth surface, but no native dep).
 
-- Do NOT add any social login code before launch.
-- Do NOT commit Google Sign-In alone (Guideline 4.8 violation if shipped).
-- Do NOT submit social login without Apple Sign-In implemented.
-- Do NOT remove the Supabase / Google Cloud external config — it stays
-  parked and ready, costs nothing.
+### Slice 3 — Apple Sign-In (native dependency)
+- Add `expo-apple-authentication`.
+- iOS-only guard (`Platform.OS === 'ios'`).
+- Apple Developer side: Service ID + key + Supabase Apple provider enable.
+- New EAS build required. Earliest practical: after 1 Jun 2026 quota reset.
+- Risk class C (native dep + App Review impact).
 
-## When to revisit
+### Slice 4 — Redirect config + real-device QA checklist
+- Re-confirm Supabase Site URL + Redirect URLs.
+- Re-confirm Google Cloud Web Client redirect URI.
+- Document Apple Service ID redirect URL.
+- Build the QA matrix: Google new-user, Google existing-user, Apple
+  new-user, Apple existing-user, session persistence across reload,
+  sign-out, error states, language switch mid-flow, deep-link return
+  on cold start.
+- Risk class B (no new code, but validates the chain).
 
-After v1.2.0 ships and stabilizes. Earliest practical window: post-launch
-sprint with EAS quota available and Phase 16/17 stabilized.
+## Non-goals (still enforced)
+
+- Do NOT commit Google Sign-In alone (Apple Guideline 4.8 violation
+  if shipped without Apple). Slices 1+2 may land independently as
+  build-free preparation, BUT Slice 2 must not produce a shipped binary
+  without Slice 3 also implemented.
+- Do NOT submit any build to App Store Review with social login until
+  Apple Sign-In is implemented and tested on a real device.
+- Do NOT remove the parked Supabase / Google Cloud external config.
+
+## Open items before implementation
+
+Before Slice 2 starts, re-inspect:
+- `app/(tabs)/auth.tsx` button layout (where Google button goes relative
+  to email/password form on both signIn and signUp views).
+- `components/ui/PillButton` variants (does an "outline" or "secondary"
+  variant exist for the Google button, or is a new variant needed?).
+- Whether OAuth callback needs explicit handling in `onAuthStateChange`
+  or whether Supabase auto-injects the session on deep link return.
+
+## When to declare this plan obsolete
+
+When all four slices are landed, Apple Service ID configured, full QA
+matrix passed on real device, and v1.2.0 (or whichever version ships)
+includes both providers visible in the auth UI.
