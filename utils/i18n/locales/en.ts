@@ -239,6 +239,15 @@ export const en: LocaleDict = {
       passwordLabel: 'PASSWORD',
       passwordPlaceholder: '••••••••',
     },
+    divider: {
+      or: 'or',
+    },
+    google: {
+      button: 'Sign in with Google',
+    },
+    apple: {
+      button: 'Sign in with Apple',
+    },
       profile: {
       namePlaceholder: 'Your first name',
       skinTypePrefix: 'Skin: ',
@@ -344,6 +353,12 @@ export const en: LocaleDict = {
       subscription: {
         activeUntil: 'Active until {date}',
         activeFallback: 'Subscription active',
+      },
+      oauth: {
+        errorTitle: 'Sign-in failed',
+        errorBody: 'Something went wrong. Please try again.',
+        cancelledTitle: 'Sign-in cancelled',
+        cancelledBody: 'You can try again anytime.',
       },
     },
 },

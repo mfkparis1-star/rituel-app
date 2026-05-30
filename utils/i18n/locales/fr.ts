@@ -244,6 +244,15 @@ export const fr = {
       passwordLabel: 'MOT DE PASSE',
       passwordPlaceholder: '••••••••',
     },
+    divider: {
+      or: 'ou',
+    },
+    google: {
+      button: 'Continuer avec Google',
+    },
+    apple: {
+      button: 'Continuer avec Apple',
+    },
       profile: {
       namePlaceholder: 'Ton prénom',
       skinTypePrefix: 'Peau ',
@@ -349,6 +358,12 @@ export const fr = {
       subscription: {
         activeUntil: 'Actif jusqu\u2019au {date}',
         activeFallback: 'Abonnement actif',
+      },
+      oauth: {
+        errorTitle: 'Connexion impossible',
+        errorBody: 'Une erreur est survenue. Réessaie.',
+        cancelledTitle: 'Connexion annulée',
+        cancelledBody: 'Tu peux réessayer quand tu veux.',
       },
     },
 },

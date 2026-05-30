@@ -240,6 +240,15 @@ export const tr: LocaleDict = {
       passwordLabel: 'ŞİFRE',
       passwordPlaceholder: '••••••••',
     },
+    divider: {
+      or: 'veya',
+    },
+    google: {
+      button: 'Google ile devam et',
+    },
+    apple: {
+      button: 'Apple ile devam et',
+    },
       profile: {
       namePlaceholder: 'Adın',
       skinTypePrefix: 'Cilt: ',
@@ -345,6 +354,12 @@ export const tr: LocaleDict = {
       subscription: {
         activeUntil: '{date} tarihine kadar aktif',
         activeFallback: 'Abonelik aktif',
+      },
+      oauth: {
+        errorTitle: 'Giriş başarısız',
+        errorBody: 'Bir hata oluştu. Lütfen tekrar dene.',
+        cancelledTitle: 'Giriş iptal edildi',
+        cancelledBody: 'İstediğin zaman tekrar deneyebilirsin.',
       },
     },
 },
