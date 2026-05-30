@@ -18,6 +18,8 @@ import { formatDate } from '../../utils/format';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
+import * as WebBrowser from 'expo-web-browser';
+import { createURL, parse as parseURL } from 'expo-linking';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { localizedAuthInfo, mapAuthError } from '../../utils/authErrors';
@@ -176,6 +178,47 @@ export default function AuthScreen() {
       return;
     }
     setInfo(localizedAuthInfo('reset_sent', currentLang));
+  };
+
+  const handleGoogleSignIn = async () => {
+    clearMessages();
+    setSubmitting(true);
+    try {
+      const redirectTo = createURL('auth/callback');
+      const { data, error: err } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo, skipBrowserRedirect: true },
+      });
+      if (err) throw err;
+      if (!data?.url) throw new Error('no_oauth_url');
+
+      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+
+      if (result.type !== 'success' || !result.url) {
+        if (result.type === 'cancel' || result.type === 'dismiss') {
+          Alert.alert(
+            t('auth.alerts.oauth.cancelledTitle'),
+            t('auth.alerts.oauth.cancelledBody'),
+          );
+        }
+        return;
+      }
+
+      const { queryParams } = parseURL(result.url);
+      const code = typeof queryParams?.code === 'string' ? queryParams.code : null;
+      if (!code) throw new Error('no_code');
+
+      const { error: exchErr } = await supabase.auth.exchangeCodeForSession(code);
+      if (exchErr) throw exchErr;
+      // Session change handled by existing onAuthStateChange listener.
+    } catch {
+      Alert.alert(
+        t('auth.alerts.oauth.errorTitle'),
+        t('auth.alerts.oauth.errorBody'),
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -343,6 +386,20 @@ export default function AuthScreen() {
               disabled={mode === 'signin' ? !canSubmitSignin : !canSubmitSignup}
               onPress={mode === 'signin' ? handleSignIn : handleSignUp}
               style={{ marginTop: Sp.md }}
+            />
+
+            <View style={s.oauthDivider}>
+              <View style={s.oauthDividerLine} />
+              <Text style={s.oauthDividerTxt}>{t('auth.divider.or')}</Text>
+              <View style={s.oauthDividerLine} />
+            </View>
+
+            <PillButton
+              label={t('auth.google.button')}
+              variant="outline"
+              fullWidth
+              disabled={submitting}
+              onPress={handleGoogleSignIn}
             />
 
             {mode === 'signup' && (
@@ -741,6 +798,24 @@ const s = StyleSheet.create({
   },
   forgotTxt: {
     fontSize: 12, color: C.copper, fontWeight: '500',
+  },
+  oauthDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Sp.md,
+    marginBottom: Sp.sm,
+  },
+  oauthDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: C.border,
+  },
+  oauthDividerTxt: {
+    marginHorizontal: Sp.sm,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: C.textSoft,
   },
   legalNote: {
     marginTop: Sp.md,
