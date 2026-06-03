@@ -49,8 +49,7 @@ export function useOnboarded(userId: string | null | undefined) {
     try {
       await supabase
         .from('profiles')
-        .update({ onboarded: true })
-        .eq('id', userId);
+        .upsert({ id: userId, onboarded: true }, { onConflict: 'id' });
     } catch {
       // If the write fails, the next login will re-trigger onboarding.
       // Not a fatal error.

@@ -204,12 +204,16 @@ export default function AuthScreen() {
         return;
       }
 
-      const { queryParams } = parseURL(result.url);
-      const code = typeof queryParams?.code === 'string' ? queryParams.code : null;
-      if (!code) throw new Error('no_code');
+      // Supabase implicit flow returns tokens in URL fragment (#).
+      // expo-linking parseURL does not extract fragment params, so parse manually.
+      const fragment = result.url.split('#')[1] ?? '';
+      const params = new URLSearchParams(fragment);
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      if (!access_token || !refresh_token) throw new Error('no_tokens');
 
-      const { error: exchErr } = await supabase.auth.exchangeCodeForSession(code);
-      if (exchErr) throw exchErr;
+      const { error: setErr } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (setErr) throw setErr;
       // Session change handled by existing onAuthStateChange listener.
     } catch {
       Alert.alert(
