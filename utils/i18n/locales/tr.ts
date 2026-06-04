@@ -146,6 +146,42 @@ export const tr: LocaleDict = {
     },
   },
 
+  skinProfileAnalysis: {
+    title: 'Kişisel analizin',
+    kicker: 'CİLT PROFİLİ',
+    loading: 'Analiz ediliyor…',
+    loadingSub: 'Cevaplarını yorumlamak için birkaç saniye.',
+    error: {
+      title: 'Analiz başarısız',
+      body: 'Bir hata oluştu. Birazdan tekrar dene.',
+      retry: 'Tekrar dene',
+    },
+    empty: {
+      title: 'Cilt profili eksik',
+      body: 'Analiz için önce anketi tamamla.',
+      cta: 'Anketi doldur',
+    },
+    parametersHeader: 'Cildinin beş yüzü',
+    parameters: {
+      hydration: 'Nem',
+      luminosity: 'Işıltı',
+      sensitivity: 'Hassasiyet',
+      poreVisibility: 'Gözenek',
+      pigmentation: 'Eşit ton',
+    },
+    levels: {
+      low: 'Düşük',
+      medium: 'Orta',
+      high: 'Yüksek',
+    },
+    narrativeHeader: 'Senin portren',
+    recommendationsHeader: 'Sana öneriler',
+    disclaimer: 'Kozmetik rehberlik, tıbbi teşhis değil.',
+    back: 'Geri',
+    updatedAt: '{date} tarihinde güncellendi',
+    refresh: 'Analizi yenile',
+  },
+
   checkin: {
     back: 'Geri',
     kicker: 'GÜNÜN CHECK-IN\'İ',

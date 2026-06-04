@@ -21,7 +21,8 @@ export type Endpoint =
   | 'product'
   | 'translate'
   | 'routine_optimize'
-  | 'reflection';
+  | 'reflection'
+  | 'skin_profile_analysis';
 
 export type Lang = 'fr' | 'en' | 'tr';
 

@@ -50,6 +50,25 @@ export type SkinProfile = {
   completed_at?: string;       // ISO timestamp
 };
 
+export type SkinAnalysisParameter = {
+  level: 'low' | 'medium' | 'high';
+  note: string;
+};
+
+export type SkinProfileAnalysis = {
+  skinTypeCanonical: string;     // dry | oily | combination | normal | sensitive
+  parameters: {
+    hydration: SkinAnalysisParameter;
+    luminosity: SkinAnalysisParameter;
+    sensitivity: SkinAnalysisParameter;
+    poreVisibility: SkinAnalysisParameter;
+    pigmentation: SkinAnalysisParameter;
+  };
+  narrative: string;             // 3-4 paragraph warm interpretation
+  recommendations: string[];     // 3-5 short suggestions
+  createdAt: string;             // ISO timestamp
+};
+
 export type Memory = {
   last_analysis_summary?: LastAnalysisSummary;
   routine_preference?: RoutinePreference;
@@ -57,6 +76,7 @@ export type Memory = {
   concerns_extracted?: string[];
   last_reflection?: LastReflection;
   skin_profile?: SkinProfile;
+  skin_profile_analysis?: SkinProfileAnalysis;
 };
 
 /**

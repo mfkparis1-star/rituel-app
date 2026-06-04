@@ -146,6 +146,42 @@ export const en: LocaleDict = {
     },
   },
 
+  skinProfileAnalysis: {
+    title: 'Your personalized analysis',
+    kicker: 'SKIN PROFILE',
+    loading: 'Analyzing…',
+    loadingSub: 'A few seconds to interpret your answers.',
+    error: {
+      title: 'Analysis failed',
+      body: 'Something went wrong. Try again in a moment.',
+      retry: 'Try again',
+    },
+    empty: {
+      title: 'Skin profile missing',
+      body: 'Complete the questionnaire first to receive your analysis.',
+      cta: 'Take the questionnaire',
+    },
+    parametersHeader: 'Your skin in five facets',
+    parameters: {
+      hydration: 'Hydration',
+      luminosity: 'Luminosity',
+      sensitivity: 'Sensitivity',
+      poreVisibility: 'Pores',
+      pigmentation: 'Evenness',
+    },
+    levels: {
+      low: 'Low',
+      medium: 'Medium',
+      high: 'High',
+    },
+    narrativeHeader: 'Your portrait',
+    recommendationsHeader: 'Suggestions for you',
+    disclaimer: 'Cosmetic guidance, not a medical diagnosis.',
+    back: 'Back',
+    updatedAt: 'Updated on {date}',
+    refresh: 'Refresh analysis',
+  },
+
   checkin: {
     back: 'Back',
     kicker: 'TODAY\'S CHECK-IN',

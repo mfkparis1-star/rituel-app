@@ -13,7 +13,8 @@ export type EventName =
   | 'restore_clicked'
   | 'restore_success'
   | 'restore_failed'
-  | 'skin_quiz_ai_cta_tapped';
+  | 'skin_quiz_ai_cta_tapped'
+  | 'skin_profile_analysis_completed';
 
 export function trackEvent(name: EventName, payload?: Record<string, any>): void {
   if (__DEV__) {

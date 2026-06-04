@@ -147,6 +147,42 @@ export const fr = {
     },
   },
 
+  skinProfileAnalysis: {
+    title: 'Ton analyse personnalisée',
+    kicker: 'PROFIL DE PEAU',
+    loading: 'Analyse en cours…',
+    loadingSub: 'Quelques secondes pour interpréter tes réponses.',
+    error: {
+      title: 'Analyse impossible',
+      body: 'Une erreur est survenue. Réessaie dans un instant.',
+      retry: 'Réessayer',
+    },
+    empty: {
+      title: 'Profil de peau manquant',
+      body: 'Complète d\'abord le questionnaire pour recevoir ton analyse.',
+      cta: 'Faire le questionnaire',
+    },
+    parametersHeader: 'Ta peau en cinq nuances',
+    parameters: {
+      hydration: 'Hydratation',
+      luminosity: 'Éclat',
+      sensitivity: 'Sensibilité',
+      poreVisibility: 'Pores',
+      pigmentation: 'Uniformité',
+    },
+    levels: {
+      low: 'Faible',
+      medium: 'Moyenne',
+      high: 'Élevée',
+    },
+    narrativeHeader: 'Ton portrait',
+    recommendationsHeader: 'Pistes pour toi',
+    disclaimer: 'Conseils cosmétiques, pas un diagnostic médical.',
+    back: 'Retour',
+    updatedAt: 'Mis à jour le {date}',
+    refresh: 'Refaire l\'analyse',
+  },
+
   // Daily skin check-in (Phase 16C)
   checkin: {
     back: 'Retour',
