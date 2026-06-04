@@ -296,6 +296,14 @@ export const en: LocaleDict = {
       skinQuiz: {
         title: 'My skin profile',
         subtitle: 'A few gentle questions to accompany you better.',
+        emptyTitle: 'Complete your skin profile',
+        emptySubtitle: 'For truly personalized recommendations',
+        update: 'Update',
+        summary: {
+          skinType: '{value} skin',
+          sensitivity: '{value} sensitivity',
+          goal: 'Goal: {value}',
+        },
       },
       rows: {
         journal: { title: 'My journal', subtitle: 'Your beauty journey, day after day' },

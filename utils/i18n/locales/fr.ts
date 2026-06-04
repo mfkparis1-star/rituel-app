@@ -301,6 +301,14 @@ export const fr = {
       skinQuiz: {
         title: 'Mon profil de peau',
         subtitle: 'Quelques questions douces pour mieux t\'accompagner.',
+        emptyTitle: 'Complète ton profil de peau',
+        emptySubtitle: 'Pour des recommandations vraiment personnalisées',
+        update: 'Mettre à jour',
+        summary: {
+          skinType: 'Peau {value}',
+          sensitivity: 'Sensibilité {value}',
+          goal: 'Objectif : {value}',
+        },
       },
       rows: {
         journal: { title: 'Mon journal', subtitle: 'Ton parcours beauté, jour après jour' },

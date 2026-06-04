@@ -297,6 +297,14 @@ export const tr: LocaleDict = {
       skinQuiz: {
         title: 'Cilt profilim',
         subtitle: 'Sana daha iyi eşlik etmek için birkaç yumuşak soru.',
+        emptyTitle: 'Cilt profilini tamamla',
+        emptySubtitle: 'Gerçekten sana özel öneriler için',
+        update: 'Güncelle',
+        summary: {
+          skinType: '{value} cilt',
+          sensitivity: '{value} hassas',
+          goal: 'Hedef: {value}',
+        },
       },
       rows: {
         journal: { title: 'Günlüğüm', subtitle: 'Güzellik yolculuğun, gün gün' },

@@ -6,6 +6,7 @@ import { pickAvatarFromLibrary, uploadAvatar } from '../../utils/avatar';
 import { useProfile } from '../../hooks/useProfile'
 import { useFavoriteProducts } from '../../hooks/useFavoriteProducts';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useMemory } from '../../hooks/useMemory';
 import { SUPPORTED_LANGS, type Lang } from '../../utils/i18n';;
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
@@ -34,6 +35,7 @@ export default function AuthScreen() {
   const { isPremium, customerInfo, restore } = usePremium();
   const { profile, update: updateProfile } = useProfile();
   const { lang: currentLang, setLanguage, t } = useLanguage();
+  const { memory } = useMemory();
   const { products: favoriteProducts } = useFavoriteProducts(profile?.id ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -687,19 +689,52 @@ export default function AuthScreen() {
         ) : null}
 <View style={s.skinQuizSection}>
                   <Text style={s.section}>{t('auth.profile.sections.discoverSkin')}</Text>
-                  <Pressable
-                    onPress={() => router.push('/profile/skin-quiz' as any)}
-                    style={s.skinQuizCard}
-                    hitSlop={4}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.title')}</Text>
-                      <Text style={s.skinQuizSub}>
-                        {t('auth.profile.skinQuiz.subtitle')}
-                      </Text>
-                    </View>
-                    <Text style={s.skinQuizArrow}>›</Text>
-                  </Pressable>
+                  {(() => {
+                    const sp = memory?.skin_profile;
+                    const hasProfile = !!(sp?.skin_type || sp?.sensitivity || sp?.goal);
+                    const summaryLines: string[] = [];
+                    if (sp?.skin_type) {
+                      const v = t(`skinQuiz.q.skin_type.choices.${sp.skin_type}`);
+                      summaryLines.push(t('auth.profile.skinQuiz.summary.skinType').replace('{value}', v));
+                    }
+                    if (sp?.sensitivity) {
+                      const v = t(`skinQuiz.q.sensitivity.choices.${sp.sensitivity}`);
+                      summaryLines.push(t('auth.profile.skinQuiz.summary.sensitivity').replace('{value}', v));
+                    }
+                    if (sp?.goal) {
+                      const v = t(`skinQuiz.q.goal.choices.${sp.goal}`);
+                      summaryLines.push(t('auth.profile.skinQuiz.summary.goal').replace('{value}', v));
+                    }
+                    return (
+                      <Pressable
+                        onPress={() => router.push('/profile/skin-quiz' as any)}
+                        style={s.skinQuizCard}
+                        hitSlop={4}
+                      >
+                        <View style={{ flex: 1 }}>
+                          {hasProfile ? (
+                            <>
+                              <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.title')}</Text>
+                              <View style={s.skinQuizSummaryRows}>
+                                {summaryLines.map((line) => (
+                                  <Text key={line} style={s.skinQuizSummaryLine}>{line}</Text>
+                                ))}
+                                <Text style={s.skinQuizUpdateCta}>{t('auth.profile.skinQuiz.update')}</Text>
+                              </View>
+                            </>
+                          ) : (
+                            <>
+                              <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.emptyTitle')}</Text>
+                              <Text style={s.skinQuizSub}>
+                                {t('auth.profile.skinQuiz.emptySubtitle')}
+                              </Text>
+                            </>
+                          )}
+                        </View>
+                        <Text style={s.skinQuizArrow}>›</Text>
+                      </Pressable>
+                    );
+                  })()}
                 </View>
 
                                 <Text style={s.section}>{t('auth.profile.sections.quickAccess')}</Text>
@@ -943,6 +978,22 @@ const s = StyleSheet.create({
     color: '#7A6555',
     lineHeight: 17,
     letterSpacing: 0.2,
+  },
+  skinQuizSummaryRows: {
+    marginTop: 6,
+  },
+  skinQuizSummaryLine: {
+    fontSize: 13,
+    color: '#5A4A3D',
+    marginTop: 3,
+    letterSpacing: 0.2,
+  },
+  skinQuizUpdateCta: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: C.copper,
+    marginTop: 10,
+    letterSpacing: 0.5,
   },
   skinQuizArrow: {
     fontSize: 24,
