@@ -60,6 +60,10 @@ export const tr: LocaleDict = {
       saving: 'Bir an…',
       later: 'Daha sonra',
     },
+    ai: {
+      ctaLabel: 'Kapsamlı AI analizi',
+      ctaSubtitle: 'Kişisel öneriler · Detaylı profil',
+    },
     text: {
       placeholder: 'İsteğe bağlı, sadece sana özel…',
     },

@@ -61,6 +61,10 @@ export const fr = {
       saving: 'Un instant…',
       later: 'Plus tard',
     },
+    ai: {
+      ctaLabel: 'Analyse complète avec l\'IA',
+      ctaSubtitle: 'Recommandations personnalisées · Profil détaillé',
+    },
     text: {
       placeholder: 'Optionnel, juste pour toi…',
     },

@@ -24,6 +24,7 @@ import PillButton from '../../components/ui/PillButton';
 import { supabase } from '../../lib/supabase';
 import { useMemory } from '../../hooks/useMemory';
 import { safeBack } from '../../utils/safeBack';
+import { trackEvent } from '../../utils/analytics';
 import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sh, Sp } from '../../theme';
 
@@ -184,6 +185,27 @@ export default function SkinQuizScreen() {
     safeBack('/(tabs)/auth');
   };
 
+  const handleAiAnalysis = async () => {
+    setSubmitting(true);
+    const clean: Answers = {};
+    if (answers.skin_type) clean.skin_type = answers.skin_type;
+    if (answers.concerns && answers.concerns.length > 0) clean.concerns = answers.concerns;
+    if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
+    if (answers.routine_level) clean.routine_level = answers.routine_level;
+    if (answers.goal) clean.goal = answers.goal;
+    if (answers.self_note && answers.self_note.trim()) clean.self_note = answers.self_note.trim();
+
+    await patch({
+      skin_profile: {
+        ...clean,
+        completed_at: new Date().toISOString(),
+      },
+    });
+    trackEvent('skin_quiz_ai_cta_tapped');
+    setSubmitting(false);
+    router.push('/paywall?source=skin_quiz_ai' as any);
+  };
+
   const handleExit = () => {
     safeBack('/(tabs)/auth');
   };
@@ -243,12 +265,21 @@ export default function SkinQuizScreen() {
           </View>
 
           <PillButton
+            label={t('skinQuiz.ai.ctaLabel')}
+            variant="primary"
+            fullWidth
+            disabled={submitting}
+            onPress={handleAiAnalysis}
+            style={{ marginTop: Sp.lg }}
+          />
+          <Text style={s.aiCtaSubtitle}>{t('skinQuiz.ai.ctaSubtitle')}</Text>
+          <PillButton
             label={submitting ? t('skinQuiz.nav.saving') : t('skinQuiz.nav.save')}
             variant="primary"
             fullWidth
             disabled={submitting}
             onPress={handleSave}
-            style={{ marginTop: Sp.lg }}
+            style={{ marginTop: Sp.md }}
           />
           <Pressable onPress={handleExit} hitSlop={6} style={s.summaryCancel}>
             <Text style={s.summaryCancelTxt}>{t('skinQuiz.nav.later')}</Text>
@@ -546,6 +577,14 @@ const s = StyleSheet.create({
     fontStyle: 'italic',
     color: '#3A2E25',
     lineHeight: 21,
+  },
+  aiCtaSubtitle: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#7A6555',
+    textAlign: 'center',
+    marginTop: 8,
+    letterSpacing: 0.3,
   },
   summaryCancel: {
     alignSelf: 'center',

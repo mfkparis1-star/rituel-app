@@ -60,6 +60,10 @@ export const en: LocaleDict = {
       saving: 'One moment…',
       later: 'Later',
     },
+    ai: {
+      ctaLabel: 'Full AI analysis',
+      ctaSubtitle: 'Personalized recommendations · Detailed profile',
+    },
     text: {
       placeholder: 'Optional, just for you…',
     },

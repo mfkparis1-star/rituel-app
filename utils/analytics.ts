@@ -12,7 +12,8 @@ export type EventName =
   | 'purchase_failed'
   | 'restore_clicked'
   | 'restore_success'
-  | 'restore_failed';
+  | 'restore_failed'
+  | 'skin_quiz_ai_cta_tapped';
 
 export function trackEvent(name: EventName, payload?: Record<string, any>): void {
   if (__DEV__) {
