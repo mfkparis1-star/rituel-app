@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -68,11 +68,12 @@ function CheckIcon({ color }: { color: string }) {
 export default function PaywallScreen() {
   const { t } = useLanguage();
   const [selected, setSelected] = useState<Plan>('yearly');
+  const params = useLocalSearchParams<{ source?: string }>();
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
   useEffect(() => {
-    trackEvent('paywall_viewed', { source: 'route' });
+    trackEvent('paywall_viewed', { source: params.source ?? 'route' });
   }, []);
 
   const handlePurchase = async () => {
@@ -85,12 +86,16 @@ export default function PaywallScreen() {
       if (result.ok) {
         const premium = hasActivePremium(result.customerInfo);
         if (premium) {
-          trackEvent('purchase_success', { plan: selected });
+          trackEvent('purchase_success', { plan: selected, source: params.source ?? 'route' });
           Alert.alert(
             t('paywall.alerts.welcomeTitle'),
             t('paywall.alerts.welcomeBody')
           );
-          safeBack('/(tabs)/auth');
+          if (params.source === 'skin_quiz_ai') {
+            router.replace('/profile/skin-analysis-result' as any);
+          } else {
+            safeBack('/(tabs)/auth');
+          }
         } else {
           Alert.alert(
             t('paywall.alerts.receivedTitle'),

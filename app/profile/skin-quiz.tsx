@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
 import { supabase } from '../../lib/supabase';
 import { useMemory } from '../../hooks/useMemory';
+import { usePremium } from '../../hooks/usePremium';
 import { safeBack } from '../../utils/safeBack';
 import { trackEvent } from '../../utils/analytics';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -116,6 +117,7 @@ const MAX_NOTE = 140;
 export default function SkinQuizScreen() {
   const { t } = useLanguage();
   const { memory, patch, loading: memLoading } = useMemory();
+  const { isPremium } = usePremium();
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [submitting, setSubmitting] = useState(false);
@@ -203,7 +205,11 @@ export default function SkinQuizScreen() {
     });
     trackEvent('skin_quiz_ai_cta_tapped');
     setSubmitting(false);
-    router.push('/paywall?source=skin_quiz_ai' as any);
+    if (isPremium) {
+      router.push('/profile/skin-analysis-result' as any);
+    } else {
+      router.push('/paywall?source=skin_quiz_ai' as any);
+    }
   };
 
   const handleExit = () => {
