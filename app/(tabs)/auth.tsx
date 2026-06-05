@@ -20,6 +20,7 @@ import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import StatCard from '../../components/ui/StatCard';
 import * as WebBrowser from 'expo-web-browser';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { createURL, parse as parseURL } from 'expo-linking';
 import { supabase } from '../../lib/supabase';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -180,6 +181,39 @@ export default function AuthScreen() {
       return;
     }
     setInfo(localizedAuthInfo('reset_sent', currentLang));
+  };
+
+  const handleAppleSignIn = async () => {
+    clearMessages();
+    setSubmitting(true);
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      if (!credential.identityToken) throw new Error('no_id_token');
+      const { error: setErr } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+      });
+      if (setErr) throw setErr;
+    } catch (e: any) {
+      if (e?.code === 'ERR_REQUEST_CANCELED') {
+        Alert.alert(
+          t('auth.alerts.oauth.cancelledTitle'),
+          t('auth.alerts.oauth.cancelledBody'),
+        );
+        return;
+      }
+      Alert.alert(
+        t('auth.alerts.oauth.errorTitle'),
+        t('auth.alerts.oauth.errorBody'),
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -406,6 +440,14 @@ export default function AuthScreen() {
               fullWidth
               disabled={submitting}
               onPress={handleGoogleSignIn}
+            />
+
+            <PillButton
+              label={t('auth.apple.button')}
+              variant="outline"
+              fullWidth
+              disabled={submitting}
+              onPress={handleAppleSignIn}
             />
 
             {mode === 'signup' && (
