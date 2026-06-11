@@ -14,6 +14,7 @@ import ListRow from '../../components/ui/ListRow';
 import CreditPackModal from '../../components/credits/CreditPackModal';
 import { useCredits } from '../../hooks/useCredits';
 import { useRoutineCount } from '../../hooks/useRoutineCount';
+import { useProfileStats } from '../../hooks/useProfileStats';
 import { usePremium } from '../../hooks/usePremium';
 import { formatDate } from '../../utils/format';
 import PillButton from '../../components/ui/PillButton';
@@ -33,6 +34,7 @@ export default function AuthScreen() {
   const [creditModalOpen, setCreditModalOpen] = useState(false);
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const { count: routineCount } = useRoutineCount();
+  const { productCount, analysisCount } = useProfileStats();
   const { isPremium, customerInfo, restore } = usePremium();
   const { profile, update: updateProfile } = useProfile();
   const { lang: currentLang, setLanguage, t } = useLanguage();
@@ -569,16 +571,11 @@ export default function AuthScreen() {
           text: l.toUpperCase(),
           onPress: () => setLanguage(l as Lang),
         })),
-        { text: 'Annuler', style: 'cancel' as const },
+        { text: t('common.cancel'), style: 'cancel' as const },
       ]
     );
   };
 
-  const profileStats = {
-    productCount: 0,
-    analysisCount: 0,
-    routineActive: false,
-  };
 
   return (
     <SafeAreaView style={s.root} edges={['top']}>
@@ -639,9 +636,9 @@ export default function AuthScreen() {
         </View>
 
         <View style={s.statsRow}>
-          <StatCard label={t('auth.profile.stats.products')} value={profileStats.productCount} />
+          <StatCard label={t('auth.profile.stats.products')} value={productCount} />
           <View style={s.gap} />
-          <StatCard label={t('auth.profile.stats.analysis')} value={profileStats.analysisCount} />
+          <StatCard label={t('auth.profile.stats.analysis')} value={analysisCount} />
           <View style={s.gap} />
           <StatCard label={t('auth.profile.stats.routine')} value={routineCount} />
         </View>
