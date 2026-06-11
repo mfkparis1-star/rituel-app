@@ -7,6 +7,13 @@
 import type { LocaleDict } from './fr';
 
 export const tr: LocaleDict = {
+  tabs: {
+    home: 'Ana Sayfa',
+    products: 'Ürünler',
+    studio: 'AI Stüdyo',
+    community: 'Topluluk',
+    profile: 'Profil',
+  },
   compatibility: {
     title: 'İçerik Uyumu',
     slot1Label: 'İçerik 1',
@@ -561,6 +568,7 @@ export const tr: LocaleDict = {
       typeSkin: 'Cilt analizi',
     },
     premium: {
+      subtitle: 'Sınırsız analiz, IA rutinleri ve kişisel öneriler.',
       label: 'PREMIUM',
       title: 'Her şeyi aç',
       cta: 'Premium\'a geç',
@@ -570,7 +578,7 @@ export const tr: LocaleDict = {
   home: {
     greeting: { morning: 'Günaydın', afternoon: 'İyi öğlenler', evening: 'İyi akşamlar' },
     subtitle: 'Güzellik ritüeline hazır mısın?',
-    checkin: { label: 'GÜNÜN CHECK-IN\'İ', title: 'Cildin bugün nasıl?' },
+    checkin: { label: 'GÜNÜN CHECK-IN\'İ', title: 'Cildin bugün nasıl?', subtitle: 'Günün ritüelini ayarlamak için 10 saniye.' },
     sections: {
       today: 'Bugün',
       thisWeek: 'Bu hafta',

@@ -151,7 +151,7 @@ export default function AIStudioScreen() {
           <Text style={s.premiumLabel}>{t('aiStudio.premium.label')}</Text>
           <Text style={s.premiumTitle}>{t('aiStudio.premium.title')}</Text>
           <Text style={s.premiumSub}>
-            Analyses illimitées, routines IA et recommandations personnalisées.
+            {t('aiStudio.premium.subtitle')}
           </Text>
           <PillButton
             label={t('aiStudio.premium.cta')}

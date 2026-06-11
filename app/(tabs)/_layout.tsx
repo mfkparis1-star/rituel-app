@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { useOnboarded } from '../../hooks/useOnboarded';
+import { useLanguage } from '../../hooks/useLanguage';
 
 function HomeIcon({ color }: { color: string }) {
   return (
@@ -54,6 +55,7 @@ function ProfileIcon({ color }: { color: string }) {
 }
 
 export default function TabLayout() {
+  const { t } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -91,11 +93,11 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Accueil', tabBarIcon: ({ color }) => <HomeIcon color={color} /> }} />
-      <Tabs.Screen name="archive" options={{ title: 'Produits', tabBarIcon: ({ color }) => <ArchiveIcon color={color} /> }} />
-      <Tabs.Screen name="ai-studio" options={{ title: 'Studio IA', tabBarIcon: ({ color }) => <StudioIcon color={color} /> }} />
-      <Tabs.Screen name="community" options={{ title: 'Communauté', tabBarIcon: ({ color }) => <CommunityIcon color={color} /> }} />
-      <Tabs.Screen name="auth" options={{ title: 'Profil', tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }} />
+      <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: ({ color }) => <HomeIcon color={color} /> }} />
+      <Tabs.Screen name="archive" options={{ title: t('tabs.products'), tabBarIcon: ({ color }) => <ArchiveIcon color={color} /> }} />
+      <Tabs.Screen name="ai-studio" options={{ title: t('tabs.studio'), tabBarIcon: ({ color }) => <StudioIcon color={color} /> }} />
+      <Tabs.Screen name="community" options={{ title: t('tabs.community'), tabBarIcon: ({ color }) => <CommunityIcon color={color} /> }} />
+      <Tabs.Screen name="auth" options={{ title: t('tabs.profile'), tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }} />
 
       <Tabs.Screen name="skin-analysis" options={{ href: null }} />
       <Tabs.Screen name="makeup" options={{ href: null }} />

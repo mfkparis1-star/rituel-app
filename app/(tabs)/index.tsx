@@ -200,7 +200,7 @@ export default function IndexScreen() {
           >
             <Text style={s.checkinLabel}>{t('home.checkin.label')}</Text>
             <Text style={s.checkinTitle}>{t('home.checkin.title')}</Text>
-            <Text style={s.checkinSub}>10 secondes pour ajuster ton rituel du jour.</Text>
+            <Text style={s.checkinSub}>{t('home.checkin.subtitle')}</Text>
           </Pressable>
         )}
 

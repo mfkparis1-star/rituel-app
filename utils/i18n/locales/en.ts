@@ -7,6 +7,13 @@
 import type { LocaleDict } from './fr';
 
 export const en: LocaleDict = {
+  tabs: {
+    home: 'Home',
+    products: 'Products',
+    studio: 'AI Studio',
+    community: 'Community',
+    profile: 'Profile',
+  },
   compatibility: {
     title: 'Compatibility',
     slot1Label: 'Ingredient 1',
@@ -560,6 +567,7 @@ export const en: LocaleDict = {
       typeSkin: 'Skin analysis',
     },
     premium: {
+      subtitle: 'Unlimited analyses, AI routines and personalised recommendations.',
       label: 'PREMIUM',
       title: 'Unlock everything',
       cta: 'Go Premium',
@@ -569,7 +577,7 @@ export const en: LocaleDict = {
   home: {
     greeting: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' },
     subtitle: 'Ready for your beauty ritual?',
-    checkin: { label: "TODAY'S CHECK-IN", title: 'How is your skin today?' },
+    checkin: { label: "TODAY'S CHECK-IN", title: 'How is your skin today?', subtitle: '10 seconds to adjust today\'s ritual.' },
     sections: {
       today: 'Today',
       thisWeek: 'This week',

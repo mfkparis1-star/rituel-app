@@ -7,6 +7,13 @@
  * Keys are flat dotted paths: namespace.section.key
  */
 export const fr = {
+  tabs: {
+    home: 'Accueil',
+    products: 'Produits',
+    studio: 'Studio IA',
+    community: 'Communauté',
+    profile: 'Profil',
+  },
   compatibility: {
     title: 'Compatibilité',
     slot1Label: 'Actif 1',
@@ -572,6 +579,7 @@ export const fr = {
       typeSkin: 'Analyse de peau',
     },
     premium: {
+      subtitle: 'Analyses illimitées, routines IA et recommandations personnalisées.',
       label: 'PREMIUM',
       title: 'Débloque tout',
       cta: 'Passer Premium',
@@ -582,7 +590,7 @@ export const fr = {
   home: {
     greeting: { morning: 'Bonjour', afternoon: 'Bel après-midi', evening: 'Bonsoir' },
     subtitle: 'Prête pour ton rituel beauté ?',
-    checkin: { label: 'CHECK-IN DU JOUR', title: 'Comment va ta peau aujourd\u2019hui ?' },
+    checkin: { label: 'CHECK-IN DU JOUR', title: 'Comment va ta peau aujourd\u2019hui ?', subtitle: '10 secondes pour ajuster ton rituel du jour.' },
     sections: {
       today: 'Aujourd\u2019hui',
       thisWeek: 'Cette semaine',
