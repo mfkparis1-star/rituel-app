@@ -7,6 +7,51 @@
 import type { LocaleDict } from './fr';
 
 export const en: LocaleDict = {
+  compatibility: {
+    title: 'Compatibility',
+    slot1Label: 'Ingredient 1',
+    slot2Label: 'Ingredient 2',
+    slotEmpty: 'Choose an ingredient',
+    choosePrompt1: 'Pick the first ingredient to check',
+    choosePrompt2: 'Pick the second ingredient',
+    newCheck: 'New check',
+    reset: 'Reset',
+    share: 'Share',
+    shareFallback1: 'I checked my skincare ingredient pairing on Rituel ✦',
+    shareFallback2: 'See if your ingredients work well together on Rituel.',
+    tipLabel: 'Tip',
+    verdict: {
+      compatible: 'Compatible',
+      caution: 'Use with caution',
+      avoid: 'Avoid together',
+    },
+  },
+  archive: {
+    title: 'My archive',
+    subtitle: 'Your products, your tracking',
+    searchPlaceholder: 'Search a product…',
+    stats: {
+      total: 'Total',
+      active: 'Active',
+      finished: 'Finished',
+    },
+    filters: {
+      all: 'All',
+      active: 'Active',
+      finished: 'Finished',
+      stocked: 'In stock',
+    },
+    emptyTitle: 'Your archive is empty',
+    emptySubtitle: 'Add your first product to start tracking.',
+    swipeDelete: 'Delete',
+    deleteAlert: {
+      title: 'Delete this product?',
+      cancel: 'Cancel',
+      confirm: 'Delete',
+      errorTitle: 'Oops',
+      errorBody: 'Couldn\'t delete it. Please try again.',
+    },
+  },
   onboarding: {
     skip: 'Skip',
     next: 'Continue',

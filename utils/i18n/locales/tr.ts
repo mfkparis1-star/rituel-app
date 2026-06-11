@@ -7,6 +7,51 @@
 import type { LocaleDict } from './fr';
 
 export const tr: LocaleDict = {
+  compatibility: {
+    title: 'İçerik Uyumu',
+    slot1Label: 'İçerik 1',
+    slot2Label: 'İçerik 2',
+    slotEmpty: 'Bir içerik seç',
+    choosePrompt1: 'Kontrol için ilk içeriği seç',
+    choosePrompt2: 'İkinci içeriği seç',
+    newCheck: 'Yeni kontrol',
+    reset: 'Sıfırla',
+    share: 'Paylaş',
+    shareFallback1: 'İçeriklerimin uyumunu Rituel\'de kontrol ettim ✦',
+    shareFallback2: 'İçeriklerinin birbiriyle uyumunu Rituel\'de keşfet.',
+    tipLabel: 'İpucu',
+    verdict: {
+      compatible: 'Uyumlu',
+      caution: 'Dikkatli kullan',
+      avoid: 'Birlikte kullanma',
+    },
+  },
+  archive: {
+    title: 'Arşivim',
+    subtitle: 'Ürünlerin, takibin',
+    searchPlaceholder: 'Ürün ara…',
+    stats: {
+      total: 'Toplam',
+      active: 'Aktif',
+      finished: 'Biten',
+    },
+    filters: {
+      all: 'Tümü',
+      active: 'Aktif',
+      finished: 'Biten',
+      stocked: 'Stokta',
+    },
+    emptyTitle: 'Arşivin boş',
+    emptySubtitle: 'Takibe başlamak için ilk ürününü ekle.',
+    swipeDelete: 'Sil',
+    deleteAlert: {
+      title: 'Bu ürün silinsin mi?',
+      cancel: 'Vazgeç',
+      confirm: 'Sil',
+      errorTitle: 'Hata',
+      errorBody: 'Silinemedi. Tekrar dene.',
+    },
+  },
   onboarding: {
     skip: 'Atla',
     next: 'Devam et',

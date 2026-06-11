@@ -7,6 +7,51 @@
  * Keys are flat dotted paths: namespace.section.key
  */
 export const fr = {
+  compatibility: {
+    title: 'Compatibilité',
+    slot1Label: 'Actif 1',
+    slot2Label: 'Actif 2',
+    slotEmpty: 'Choisir un actif',
+    choosePrompt1: 'Choisis le premier actif à vérifier',
+    choosePrompt2: 'Choisis le second actif',
+    newCheck: 'Nouvelle vérification',
+    reset: 'Réinitialiser',
+    share: 'Partager',
+    shareFallback1: 'J\'ai vérifié la compatibilité de mes actifs sur Rituel ✦',
+    shareFallback2: 'Découvre si tes actifs font bon ménage sur Rituel.',
+    tipLabel: 'Conseil',
+    verdict: {
+      compatible: 'Compatibles',
+      caution: 'Avec précaution',
+      avoid: 'À éviter ensemble',
+    },
+  },
+  archive: {
+    title: 'Mon archive',
+    subtitle: 'Tes produits, ton suivi',
+    searchPlaceholder: 'Rechercher un produit…',
+    stats: {
+      total: 'Total',
+      active: 'Actifs',
+      finished: 'Terminés',
+    },
+    filters: {
+      all: 'Tous',
+      active: 'Actifs',
+      finished: 'Terminés',
+      stocked: 'En réserve',
+    },
+    emptyTitle: 'Ton archive est vide',
+    emptySubtitle: 'Ajoute ton premier produit pour commencer ton suivi.',
+    swipeDelete: 'Supprimer',
+    deleteAlert: {
+      title: 'Supprimer ce produit ?',
+      cancel: 'Annuler',
+      confirm: 'Supprimer',
+      errorTitle: 'Oups',
+      errorBody: 'La suppression a échoué. Réessaie.',
+    },
+  },
   onboarding: {
     skip: 'Passer',
     next: 'Continuer',
