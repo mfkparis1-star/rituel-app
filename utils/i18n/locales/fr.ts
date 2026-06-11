@@ -494,6 +494,18 @@ export const fr = {
   // categories.* keys are the FR canonical DB values (no migration);
   // only the displayed label is translated.
   addProduct: {
+    duplicate: {
+      title: 'Déjà dans ton archive',
+      body: 'Ce produit existe déjà. L\'ajouter quand même ? (nouveau flacon)',
+      cancel: 'Annuler',
+      confirm: 'Ajouter quand même',
+    },
+    sameName: {
+      title: 'Nom identique à la marque',
+      body: 'Le nom du produit semble être la marque. Continuer quand même ?',
+      cancel: 'Corriger',
+      confirm: 'Continuer',
+    },
     kicker: 'ARCHIVE',
     title: 'Ajouter un produit',
     methodManual: 'Saisie manuelle',

@@ -485,6 +485,18 @@ export const tr: LocaleDict = {
   },
 
   addProduct: {
+    duplicate: {
+      title: 'Arşivinde zaten var',
+      body: 'Bu ürün arşivinde mevcut. Yine de eklensin mi? (yeni şişe)',
+      cancel: 'Vazgeç',
+      confirm: 'Yine de ekle',
+    },
+    sameName: {
+      title: 'İsim markayla aynı',
+      body: 'Ürün adı markayla aynı görünüyor. Yine de devam edilsin mi?',
+      cancel: 'Düzelt',
+      confirm: 'Devam et',
+    },
     kicker: 'ARŞİV',
     title: 'Ürün ekle',
     methodManual: 'Manuel giriş',

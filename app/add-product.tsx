@@ -107,20 +107,10 @@ export default function AddProductScreen() {
     !submitting &&
     !!session;
 
-  const handleSave = async () => {
-    setError(null);
-    if (!session) {
-      setError(t('addProduct.errorSignIn'));
-      return;
-    }
-    if (!canSubmit) {
-      setError(t('addProduct.errorEmpty'));
-      return;
-    }
-
+  const doInsert = async () => {
     setSubmitting(true);
     const { error: err } = await supabase.from('products').insert({
-      user_id: session.user.id,
+      user_id: session!.user.id,
       brand: brand.trim(),
       name: name.trim(),
       category,
@@ -134,6 +124,58 @@ export default function AddProductScreen() {
     }
 
     safeBack('/(tabs)/archive');
+  };
+
+  const checkDuplicateThenInsert = async () => {
+    try {
+      const { count } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session!.user.id)
+        .ilike('brand', brand.trim())
+        .ilike('name', name.trim());
+      if ((count ?? 0) > 0) {
+        Alert.alert(
+          t('addProduct.duplicate.title'),
+          t('addProduct.duplicate.body'),
+          [
+            { text: t('addProduct.duplicate.cancel'), style: 'cancel' },
+            { text: t('addProduct.duplicate.confirm'), onPress: () => void doInsert() },
+          ]
+        );
+        return;
+      }
+    } catch {
+      // dedup check is best-effort — never block saving
+    }
+    await doInsert();
+  };
+
+  const handleSave = async () => {
+    setError(null);
+    if (!session) {
+      setError(t('addProduct.errorSignIn'));
+      return;
+    }
+    if (!canSubmit) {
+      setError(t('addProduct.errorEmpty'));
+      return;
+    }
+
+    // Guard: name identical to brand ("La Roche-Posay La Roche-Posay")
+    if (brand.trim().toLowerCase() === name.trim().toLowerCase()) {
+      Alert.alert(
+        t('addProduct.sameName.title'),
+        t('addProduct.sameName.body'),
+        [
+          { text: t('addProduct.sameName.cancel'), style: 'cancel' },
+          { text: t('addProduct.sameName.confirm'), onPress: () => void checkDuplicateThenInsert() },
+        ]
+      );
+      return;
+    }
+
+    await checkDuplicateThenInsert();
   };
 
   // Don't render until auth is checked (avoids flash)

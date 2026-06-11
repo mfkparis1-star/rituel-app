@@ -62,7 +62,7 @@ export default function NewPostScreen() {
         .limit(20);
       if (!mounted || error || !data) return;
       const labels = data
-        .map((p: any) => `${(p.brand ?? '').trim()} ${(p.name ?? '').trim()}`.trim())
+        .map((p: any) => { const b = (p.brand ?? '').trim(); const n = (p.name ?? '').trim(); return b && n.toLowerCase().startsWith(b.toLowerCase()) ? n : `${b} ${n}`.trim(); })
         .filter((s: string) => s.length > 0);
       // Deduplicate (same brand+name repeated)
       const unique = Array.from(new Set(labels));

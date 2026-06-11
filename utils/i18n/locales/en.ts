@@ -484,6 +484,18 @@ export const en: LocaleDict = {
   },
 
   addProduct: {
+    duplicate: {
+      title: 'Already in your archive',
+      body: 'This product already exists. Add it anyway? (new bottle)',
+      cancel: 'Cancel',
+      confirm: 'Add anyway',
+    },
+    sameName: {
+      title: 'Name matches the brand',
+      body: 'The product name looks like the brand. Continue anyway?',
+      cancel: 'Fix it',
+      confirm: 'Continue',
+    },
     kicker: 'ARCHIVE',
     title: 'Add a product',
     methodManual: 'Manual entry',
