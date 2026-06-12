@@ -70,6 +70,9 @@ export default function RoutineScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [productName, setProductName] = useState('');
   const [brand, setBrand] = useState('');
+  const [category, setCategory] = useState<string | null>(null);
+  const [myProducts, setMyProducts] = useState<{ id: string; name: string; brand: string | null; category: string | null }[]>([]);
+  const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -142,8 +145,17 @@ export default function RoutineScreen() {
     }
     setProductName('');
     setBrand('');
+    setCategory(null);
+    setSearch('');
     setError(null);
     setModalOpen(true);
+    // load user's archived products for quick-pick
+    supabase
+      .from('products')
+      .select('id, name, brand, category')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setMyProducts(data as any); });
   };
 
   const handleSave = async () => {
@@ -154,13 +166,15 @@ export default function RoutineScreen() {
       return;
     }
     setSaving(true);
+    const info = categoryInfo(category);
     const { error: err } = await supabase.from('routine_steps').insert({
       user_id: session.user.id,
       product_name: productName.trim(),
       brand: brand.trim(),
       step_order: steps.length + 1,
-      duration: '60s',
+      duration: info.duration,
       routine_type: slot,
+      category: category,
       icon: '',
     });
     setSaving(false);
@@ -480,6 +494,60 @@ export default function RoutineScreen() {
               <Text style={s.title}>{t('routine.addModal.title')}</Text>
             </View>
 
+            <View style={s.searchBox}>
+              <Text style={s.searchIcon}>⌕</Text>
+              <TextInput
+                style={s.searchInput}
+                placeholder={t('routine.addModal.searchPlaceholder')}
+                placeholderTextColor={C.textSoft}
+                value={search}
+                onChangeText={setSearch}
+                autoCorrect={false}
+              />
+            </View>
+
+            {(() => {
+              const q = search.trim().toLowerCase();
+              const filtered = q
+                ? myProducts.filter((mp) =>
+                    (mp.name || '').toLowerCase().includes(q) ||
+                    (mp.brand || '').toLowerCase().includes(q))
+                : myProducts;
+              if (filtered.length === 0) return null;
+              return (
+                <View style={{ marginBottom: Sp.md }}>
+                  <Text style={s.quickLabel}>{t('routine.addModal.fromProducts')}</Text>
+                  {filtered.slice(0, 6).map((mp) => (
+                    <Pressable
+                      key={mp.id}
+                      style={s.quickRow}
+                      onPress={() => {
+                        setProductName(mp.name || '');
+                        setBrand(mp.brand || '');
+                        setCategory(mp.category ?? null);
+                        setError(null);
+                      }}
+                    >
+                      <View style={s.quickAvatar}>
+                        <Text style={s.quickAvatarTxt}>
+                          {(mp.name || '?').slice(0, 2).toUpperCase()}
+                        </Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={s.quickName}>{mp.name}</Text>
+                        <Text style={s.quickMeta}>
+                          {[mp.brand, mp.category].filter(Boolean).join(' · ')}
+                        </Text>
+                      </View>
+                      <Text style={s.quickAdd}>+</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              );
+            })()}
+
+            <Text style={s.orLabel}>{t('routine.addModal.orManual')}</Text>
+
             <PremiumCard variant="white" style={{ marginBottom: Sp.md }}>
               <Text style={s.fieldLabel}>{t('routine.addModal.productLabel')}</Text>
               <TextInput
@@ -613,6 +681,37 @@ const s = StyleSheet.create({
   stepRowLast: { borderBottomWidth: 0 },
   stepIdx: { fontSize: 13, color: C.copper, width: 18, fontVariant: ['tabular-nums'] },
   stepHint: { fontSize: 12, color: C.textSoft, marginTop: 2 },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: C.white,
+    borderRadius: R.md,
+    paddingHorizontal: Sp.md,
+    marginBottom: Sp.md,
+    ...Sh.soft,
+  },
+  searchIcon: { fontSize: 16, color: C.copper, marginRight: 8 },
+  searchInput: { flex: 1, paddingVertical: 14, fontSize: 14, color: C.espresso },
+  quickLabel: {
+    fontSize: 11, letterSpacing: 1.2, color: C.textSoft,
+    fontWeight: '600', textTransform: 'uppercase', marginBottom: Sp.xs, marginLeft: 2,
+  },
+  quickRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 13,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border,
+  },
+  quickAvatar: {
+    width: 40, height: 40, borderRadius: 12, backgroundColor: C.cream,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  quickAvatarTxt: { fontSize: 12, color: C.copper, fontWeight: '600' },
+  quickName: { fontSize: 14.5, color: C.text, fontWeight: '500' },
+  quickMeta: { fontSize: 11.5, color: C.textSoft, marginTop: 1 },
+  quickAdd: { fontSize: 20, color: C.copper },
+  orLabel: {
+    fontSize: 12, color: C.textSoft, textAlign: 'center', marginBottom: Sp.sm,
+  },
   _segmented_old: {
     flexDirection: 'row',
     backgroundColor: C.white, borderRadius: R.full, padding: 4,
