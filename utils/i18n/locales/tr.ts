@@ -588,6 +588,17 @@ export const tr: LocaleDict = {
   },
 
   home: {
+    gestures: {
+      nettoyant: 'Nemli cilde, masaj yaparak',
+      tonique: 'Pamuk veya avuçla, hafifçe bastır',
+      serum: 'Birkaç damla, dışa doğru',
+      hydratant: 'Nemi içine kilitle',
+      contour: 'Küçük dokunuşlar, nazikçe bastır',
+      huile: 'Avuçta ısıt, bastırarak uygula',
+      masque: 'Bol katman, beklet',
+      spf: 'Son adım, boynu unutma',
+      corps: 'Tüm vücuda, masaj yaparak',
+    },
     tonight: {
       label: 'BU AKŞAMIN RİTÜELİ',
       adapted: {

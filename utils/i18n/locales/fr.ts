@@ -600,6 +600,17 @@ export const fr = {
 
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
+    gestures: {
+      nettoyant: 'Sur peau humide, en massant',
+      tonique: 'Sur coton ou paume, tapoter',
+      serum: 'Quelques gouttes, vers l\'extérieur',
+      hydratant: 'Sceller l\'hydratation',
+      contour: 'Petites touches, tapoter doucement',
+      huile: 'Réchauffer entre les paumes, presser',
+      masque: 'Couche généreuse, laisser poser',
+      spf: 'Dernière étape, sans oublier le cou',
+      corps: 'Sur tout le corps, en massant',
+    },
     tonight: {
       label: 'LE RITUEL DE CE SOIR',
       adapted: {

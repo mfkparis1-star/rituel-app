@@ -587,6 +587,17 @@ export const en: LocaleDict = {
   },
 
   home: {
+    gestures: {
+      nettoyant: 'On damp skin, massaging gently',
+      tonique: 'On a cotton pad or palm, pat in',
+      serum: 'A few drops, outward motions',
+      hydratant: 'Seal in the hydration',
+      contour: 'Small dabs, tap gently',
+      huile: 'Warm between palms, press in',
+      masque: 'Generous layer, leave on',
+      spf: 'Last step, don\'t forget the neck',
+      corps: 'All over the body, massaging in',
+    },
     tonight: {
       label: 'TONIGHT\'S RITUAL',
       adapted: {
