@@ -372,7 +372,7 @@ export default function RoutineScreen() {
               label={t('routine.startRitual')}
               variant="primary"
               fullWidth
-              onPress={() => router.push('/check-in' as any)}
+              onPress={() => router.push('/routine-session' as any)}
               style={{ marginTop: Sp.sm }}
             />
             <Pressable onPress={handleOptimize} style={s.optimizeLink} hitSlop={6}>

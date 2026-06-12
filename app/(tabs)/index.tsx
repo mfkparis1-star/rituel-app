@@ -193,7 +193,7 @@ export default function IndexScreen() {
           checkinEmoji={tonightEmoji}
           completedIds={completedIds}
           onToggleStep={toggleTonightStep}
-          onStart={() => router.push('/(tabs)/routine' as any)}
+          onStart={() => router.push('/routine-session' as any)}
           onCreate={() => router.push('/(tabs)/routine' as any)}
           onCheckin={() => router.push('/check-in' as any)}
         />
