@@ -19,6 +19,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import RoutineShareCard, { RoutineSlot, RoutineStepLite } from '../../components/share/RoutineShareCard';
 import { captureAndShare } from '../../utils/shareCard';
 
+import { categoryInfo } from '../../utils/routineGestures';
 type Slot = 'matin' | 'soir';
 
 type RoutineStep = {
@@ -30,6 +31,7 @@ type RoutineStep = {
   duration: string;
   routine_type: string;
   icon: string;
+  category: string | null;
 };
 
 function BackArrow({ color }: { color: string }) {
@@ -251,6 +253,16 @@ export default function RoutineScreen() {
     setOptimizeError('');
   };
 
+  const routineMinutes = Math.max(
+    1,
+    Math.round(
+      steps.reduce((a, st) => {
+        const n = parseInt(String(st.duration).replace(/\D/g, ''), 10) || 60;
+        return a + (/min/i.test(String(st.duration)) ? n * 60 : n);
+      }, 0) / 60
+    )
+  );
+
   if (!authChecked) {
     return (
       <SafeAreaView style={s.root} edges={['top']}>
@@ -274,13 +286,25 @@ export default function RoutineScreen() {
         </View>
 
         <View style={s.segmented}>
-          <Pressable onPress={() => setSlot('matin')} style={[s.segBtn, slot === 'matin' && s.segBtnActive]}>
+          <Pressable onPress={() => setSlot('matin')} style={s.segBtn}>
             <Text style={[s.segTxt, slot === 'matin' && s.segTxtActive]}>{t('routine.segment.morning')}</Text>
+            {slot === 'matin' && <View style={s.segUnderline} />}
           </Pressable>
-          <Pressable onPress={() => setSlot('soir')} style={[s.segBtn, slot === 'soir' && s.segBtnActive]}>
+          <Pressable onPress={() => setSlot('soir')} style={s.segBtn}>
             <Text style={[s.segTxt, slot === 'soir' && s.segTxtActive]}>{t('routine.segment.evening')}</Text>
+            {slot === 'soir' && <View style={s.segUnderline} />}
           </Pressable>
         </View>
+
+        {steps.length > 0 && (
+          <View style={s.summaryRow}>
+            <Text style={s.summaryTxt}>
+              {steps.length} {steps.length > 1 ? t('routine.summary.steps') : t('routine.summary.step')}
+            </Text>
+            <View style={s.summaryDot} />
+            <Text style={s.summaryTxt}>{routineMinutes} {t('routine.summary.min')}</Text>
+          </View>
+        )}
 
         {loading ? (
           <View style={s.loadingBox}><ActivityIndicator color={C.copper} /></View>
@@ -309,32 +333,37 @@ export default function RoutineScreen() {
                   </Pressable>
                 )}
               >
-              <View style={[s.stepCard, Sh.soft]}>
-                <View style={s.stepNumber}>
-                  <Text style={s.stepNumberTxt}>{i + 1}</Text>
-                </View>
+              <View style={[s.stepRow, i === steps.length - 1 && s.stepRowLast]}>
+                <Text style={s.stepIdx}>{String(i + 1).padStart(2, '0')}</Text>
                 <View style={{ flex: 1 }}>
-                  {step.brand ? <Text style={s.stepBrand}>{step.brand.toUpperCase()}</Text> : null}
                   <Text style={s.stepProduct}>{step.product_name}</Text>
-                  <Text style={s.stepTime}>{step.duration}</Text>
+                  {(() => {
+                    const info = categoryInfo(step.category);
+                    const hint = info.hintKey ? t(info.hintKey) : step.brand || null;
+                    return hint ? <Text style={s.stepHint}>{hint}</Text> : null;
+                  })()}
                 </View>
+                <Text style={s.stepTime}>{step.duration}</Text>
               </View>
               </ReanimatedSwipeable>
             ))}
-            <PillButton
-              label={t('routine.optimizeCta')}
-              variant="primary"
-              fullWidth
-              onPress={handleOptimize}
-              style={{ marginTop: Sp.md }}
-            />
             <PillButton
               label={t('routine.empty.addStep')}
               variant="outline"
               fullWidth
               onPress={openAddModal}
-              style={{ marginTop: Sp.xs }}
+              style={{ marginTop: Sp.md }}
             />
+            <PillButton
+              label={t('routine.startRitual')}
+              variant="primary"
+              fullWidth
+              onPress={() => router.push('/check-in' as any)}
+              style={{ marginTop: Sp.sm }}
+            />
+            <Pressable onPress={handleOptimize} style={s.optimizeLink} hitSlop={6}>
+              <Text style={s.optimizeLinkTxt}>{t('routine.optimizeCta')}</Text>
+            </Pressable>
           </View>
         )}
 
@@ -549,6 +578,43 @@ const s = StyleSheet.create({
 
   segmented: {
     flexDirection: 'row',
+    gap: 26,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+    marginBottom: Sp.md,
+  },
+  segUnderline: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -1,
+    height: 2,
+    backgroundColor: C.copper,
+    borderRadius: 2,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: Sp.md,
+  },
+  summaryTxt: { fontSize: 12.5, color: C.textSoft },
+  summaryDot: { width: 3, height: 3, borderRadius: 2, backgroundColor: C.copper },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+    paddingVertical: 16,
+    paddingHorizontal: Sp.md,
+    backgroundColor: C.white,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: C.border,
+  },
+  stepRowLast: { borderBottomWidth: 0 },
+  stepIdx: { fontSize: 13, color: C.copper, width: 18, fontVariant: ['tabular-nums'] },
+  stepHint: { fontSize: 12, color: C.textSoft, marginTop: 2 },
+  _segmented_old: {
+    flexDirection: 'row',
     backgroundColor: C.white, borderRadius: R.full, padding: 4,
     marginBottom: Sp.lg, borderWidth: 1, borderColor: C.border,
   },
@@ -558,7 +624,15 @@ const s = StyleSheet.create({
   segTxtActive: { color: C.white },
 
   emptyCard: { backgroundColor: C.white, borderRadius: R.lg, ...Sh.soft },
-  list: {},
+  list: {
+    backgroundColor: C.white,
+    borderRadius: R.lg,
+    overflow: 'hidden',
+    marginBottom: Sp.xs,
+    ...Sh.soft,
+  },
+  optimizeLink: { alignItems: 'center', marginTop: Sp.md, paddingVertical: 4 },
+  optimizeLinkTxt: { fontSize: 13, color: C.copper, fontWeight: '500' },
   stepCard: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: C.white, borderRadius: R.md,

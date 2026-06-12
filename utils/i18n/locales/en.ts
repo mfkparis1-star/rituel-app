@@ -791,6 +791,8 @@ export const en: LocaleDict = {
       addStep: '+ Add a step',
     },
     swipeDelete: 'Delete',
+    startRitual: 'Begin the ritual',
+    summary: { step: 'step', steps: 'steps', min: 'min' },
     optimizeCta: 'Optimize with AI',
     shareCta: 'Share my routine',
     addModal: {

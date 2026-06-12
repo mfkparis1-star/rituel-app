@@ -810,6 +810,8 @@ export const fr = {
       addStep: '+ Ajouter une étape',
     },
     swipeDelete: 'Supprimer',
+    startRitual: 'Commencer le rituel',
+    summary: { step: 'étape', steps: 'étapes', min: 'min' },
     optimizeCta: 'Optimiser avec l\'IA',
     shareCta: 'Partager ma routine',
     addModal: {

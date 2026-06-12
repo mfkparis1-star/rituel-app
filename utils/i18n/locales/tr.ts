@@ -792,6 +792,8 @@ export const tr: LocaleDict = {
       addStep: '+ Adım ekle',
     },
     swipeDelete: 'Sil',
+    startRitual: 'Ritüele başla',
+    summary: { step: 'adım', steps: 'adım', min: 'dk' },
     optimizeCta: 'Yapay zekâ ile iyileştir',
     shareCta: 'Rutinimi paylaş',
     addModal: {
