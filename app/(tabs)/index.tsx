@@ -31,6 +31,14 @@ import { useCheckins } from '../../hooks/useCheckins';
 import { generateReflection, getCachedReflection, getQuotaRemaining, REFLECTION_FALLBACK } from '../../utils/reflection';
 import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
+import WeekStrip from '../../components/home/WeekStrip';
+import AphorismCard from '../../components/home/AphorismCard';
+import TonightRitualCard from '../../components/home/TonightRitualCard';
+import { useRoutineSteps } from '../../hooks/useRoutineSteps';
+import { useTonightProgress } from '../../hooks/useTonightProgress';
+import { fr as frDict } from '../../utils/i18n/locales/fr';
+import { en as enDict } from '../../utils/i18n/locales/en';
+import { tr as trDict } from '../../utils/i18n/locales/tr';
 import { supabase } from '../../lib/supabase';
 import { CHECKIN_EMOJIS, CheckinEmoji } from '../../utils/checkins';
 import { C, R, Sh, Sp, Type } from '../../theme';
@@ -68,11 +76,13 @@ function weekSummary(emojis: CheckinEmoji[]): string {
 }
 
 export default function IndexScreen() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const greeting = getGreeting({ morning: t('home.greeting.morning'), afternoon: t('home.greeting.afternoon'), evening: t('home.greeting.evening') });
   const { count: routineCount } = useRoutineCount();
   const { memory } = useMemory();
   const { recent, hasToday } = useCheckins(7);
+  const { steps: tonightSteps } = useRoutineSteps('soir');
+  const { completedIds, toggle: toggleTonightStep } = useTonightProgress();
 
   const [recommendations, setRecommendations] = useState<AffiliateProduct[]>([]);
 
@@ -91,6 +101,30 @@ export default function IndexScreen() {
 
   const latestCheckin = recent[0]?.emoji ?? null;
   const weekEmojis = recent.map((c) => c.emoji);
+
+  // Phase 1.1d — tonight ritual derived values
+  const tonightEmoji = hasToday ? latestCheckin : null;
+  const homeDict = lang === 'en' ? enDict : lang === 'tr' ? trDict : frDict;
+  const dayLabels = homeDict.home.weekStrip.days;
+  const aphorisms = homeDict.home.aphorisms;
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  const aphorism = aphorisms[dayOfYear % aphorisms.length];
+  const weekCompleted = (() => {
+    const arr = [false, false, false, false, false, false, false];
+    const now = new Date();
+    const todayIdx = (now.getDay() + 6) % 7;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - todayIdx);
+    monday.setHours(0, 0, 0, 0);
+    for (const c of recent) {
+      const d = new Date(c.created_at);
+      const idx = Math.floor((d.getTime() - monday.getTime()) / 86400000);
+      if (idx >= 0 && idx < 7) arr[idx] = true;
+    }
+    return arr;
+  })();
   const lastSummary = memory?.last_analysis_summary ?? null;
 
   // Phase 17D — soft AI reflection
@@ -151,6 +185,19 @@ export default function IndexScreen() {
           <Text style={s.greeting}>{greeting}</Text>
           <Text style={s.subtitle}>{t('home.subtitle')}</Text>
         </View>
+
+        {/* Phase 1.1d — week strip + tonight ritual + aphorism */}
+        <WeekStrip dayLabels={dayLabels} completed={weekCompleted} />
+        <TonightRitualCard
+          steps={tonightSteps}
+          checkinEmoji={tonightEmoji}
+          completedIds={completedIds}
+          onToggleStep={toggleTonightStep}
+          onStart={() => router.push('/(tabs)/routine' as any)}
+          onCreate={() => router.push('/(tabs)/routine' as any)}
+          onCheckin={() => router.push('/check-in' as any)}
+        />
+        <AphorismCard text={aphorism} />
 
         {/* Phase 17D — Soft AI Reflection (Home top) */}
         {reflectionUserId ? (
