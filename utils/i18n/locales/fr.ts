@@ -600,6 +600,36 @@ export const fr = {
 
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
+    tonight: {
+      label: 'LE RITUEL DE CE SOIR',
+      adapted: {
+        glowing: 'Rayonnante — garde ton rituel tel quel',
+        good: 'Belle journée — ton rituel classique',
+        neutral: 'Journée neutre — l\'essentiel suffit',
+        tired: 'Fatiguée — allégé pour ce soir, pas d\'actifs',
+        rough: 'Journée difficile — douceur uniquement ce soir',
+      },
+      noCheckin: 'Fais ton check-in pour adapter ce rituel',
+      start: 'Commencer · {n} min',
+      continueOne: 'Continuer · 1 étape restante',
+      continueMany: 'Continuer · {n} étapes restantes',
+      doneTitle: 'Terminé pour ce soir',
+      doneBody: 'Ta peau te remercie. À demain.',
+      emptyTitle: 'Ton rituel du soir t\'attend',
+      emptyBody: 'Trois gestes simples suffisent pour commencer.',
+      emptyCta: 'Créer mon rituel',
+    },
+    lune: { label: 'Cette semaine · Lune' },
+    weekStrip: { days: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] },
+    aphorisms: [
+      'Prendre soin de soi, c\'est la plus élégante des promesses.',
+      'Ta peau écoute ce que tu lui murmures chaque soir.',
+      'La constance est le plus doux des secrets.',
+      'Ce soir, trois minutes rien que pour toi.',
+      'La beauté aime la lenteur.',
+      'Chaque geste compte, même le plus petit.',
+      'Ton rituel, ton moment.',
+    ],
     greeting: { morning: 'Bonjour', afternoon: 'Bel après-midi', evening: 'Bonsoir' },
     subtitle: 'Prête pour ton rituel beauté ?',
     checkin: { label: 'CHECK-IN DU JOUR', title: 'Comment va ta peau aujourd\u2019hui ?', subtitle: '10 secondes pour ajuster ton rituel du jour.' },
