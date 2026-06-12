@@ -102,7 +102,6 @@ export default function AIStudioScreen() {
           style={{ marginBottom: Sp.xl }}
         />
 
-        <View style={s.grid}>
         {recent.length > 0 && (
           <>
             <Text style={s.sectionTitleHistory}>{t('aiStudio.history.title')}</Text>
@@ -122,6 +121,7 @@ export default function AIStudioScreen() {
             <View style={{ height: Sp.md }} />
           </>
         )}
+        <View style={s.grid}>
           {TOOLS.map((tool) => {
             const Icon = tool.Icon;
             return (

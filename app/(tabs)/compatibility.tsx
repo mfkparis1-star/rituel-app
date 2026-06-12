@@ -82,7 +82,6 @@ export default function CompatibilityScreen() {
     setResultTip('');
   };
 
-
   const shareCardRef = useRef<View>(null);
 
   function compatToShareStatus(c: Compat): ShareCompatStatus {
