@@ -135,10 +135,10 @@ export default function SavedScreen() {
                 <Pressable onPress={() => handleTranslate(p)} hitSlop={6}>
                   <Text style={s.translateBtn}>
                     {translatingIds.has(p.id)
-                      ? t('community.translating')
+                      ? t('community.translate.loading')
                       : translated[p.id]
-                        ? t('community.showOriginal')
-                        : t('community.translate')}
+                        ? t('community.translate.original')
+                        : t('community.translate.action')}
                   </Text>
                 </Pressable>
                 <Text style={s.cardMeta}>{relativeTime(p.created_at, lang)}</Text>
