@@ -82,6 +82,8 @@ export default function GlowTimelineScreen() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [ownPosts, setOwnPosts] = useState<FeedPost[]>([]);
   const { memory } = useMemory();
@@ -90,25 +92,29 @@ export default function GlowTimelineScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      const sess = data.session;
-      if (cancelled) return;
-      setSession(sess);
-      if (!sess) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const sess = data.session;
+        if (cancelled) return;
+        setSession(sess);
+        if (!sess) {
+          setLoading(false);
+          return;
+        }
+        const [c, p] = await Promise.all([
+          getRecentCheckins(sess.user.id, 30),
+          fetchOwnPosts(sess.user.id, 30),
+        ]);
+        if (cancelled) return;
+        setCheckins(c);
+        setOwnPosts(p);
         setLoading(false);
-        return;
+      } catch {
+        if (!cancelled) { setLoadError(true); setLoading(false); }
       }
-      const [c, p] = await Promise.all([
-        getRecentCheckins(sess.user.id, 30),
-        fetchOwnPosts(sess.user.id, 30),
-      ]);
-      if (cancelled) return;
-      setCheckins(c);
-      setOwnPosts(p);
-      setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [reloadKey]);
 
   const items: TimelineItem[] = useMemo(() => {
     const out: TimelineItem[] = [];
@@ -260,11 +266,17 @@ export default function GlowTimelineScreen() {
           <View style={s.centered}>
             <ActivityIndicator color={C.copper} />
           </View>
+        ) : loadError ? (
+          <View style={s.emptyBox}>
+            <Text style={s.emptyTitle}>{t('common.loadError.title')}</Text>
+            <Text style={s.emptySub}>{t('common.loadError.body')}</Text>
+            <PillButton label={t('common.loadError.retry')} variant="primary" onPress={() => { setLoadError(false); setLoading(true); setReloadKey((k) => k + 1); }} style={{ marginTop: Sp.md }} />
+          </View>
         ) : grouped.length === 0 ? (
           <View style={s.emptyBox}>
             <Text style={s.emptyTitle}>{t('glowTimeline.emptyTitle')}</Text>
             <Text style={s.emptySub}>
-              Fais ton premier check-in pour ouvrir ton parcours beauté personnel.
+              {t('glowTimeline.emptySub')}
             </Text>
             <PillButton
               label={t('glowTimeline.emptyCta')}

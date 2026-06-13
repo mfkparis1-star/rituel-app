@@ -262,6 +262,7 @@ export const tr: LocaleDict = {
   },
 
   glowTimeline: {
+    emptySub: 'Kişisel güzellik yolculuğunu açmak için ilk check-in’ini yap.',
     back: 'Geri',
     kicker: 'GÜNLÜK',
     title: 'Yolculuğun',
@@ -475,6 +476,7 @@ export const tr: LocaleDict = {
 },
 
   saved: {
+    emptySub: 'Kaydettiğin ilhamlar burada görünür. Beğendiğin gönderilerdeki yer imine dokun.',
     needSignIn: 'Favorilerini görmek için giriş yap.',
     back: 'Geri',
     kicker: 'İLHAMLAR',
@@ -921,6 +923,7 @@ export const tr: LocaleDict = {
     },
   },
   common: {
+    loadError: { title: 'Bir aksilik oldu', body: 'Yüklenemedi. Bağlantını kontrol et.', retry: 'Tekrar dene' },
     time: {
     justNow: 'az önce',
     minutesAgo: '{n} dk önce',

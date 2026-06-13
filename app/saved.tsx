@@ -18,6 +18,7 @@ import PillButton from '../components/ui/PillButton';
 import { supabase } from '../lib/supabase';
 import { fetchSavedPostIds } from '../utils/postSaves';
 import type { FeedPost } from '../utils/posts';
+import { translate } from '../utils/translate';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
 import { relativeTime } from '../utils/format';
@@ -28,32 +29,59 @@ export default function SavedScreen() {
   const [session, setSession] = useState<Session | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [translated, setTranslated] = useState<Record<string, string>>({});
+  const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
-    const { data: sess } = await supabase.auth.getSession();
-    setSession(sess.session);
-    if (!sess.session) {
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      setSession(sess.session);
+      if (!sess.session) {
+        setLoading(false);
+        return;
+      }
+      const saved = await fetchSavedPostIds(sess.session.user.id, 50);
+      if (saved.length === 0) {
+        setPosts([]);
+        setLoading(false);
+        return;
+      }
+      const ids = saved.map((s) => s.post_id);
+      const { data: postRows } = await supabase
+        .from('posts')
+        .select('*')
+        .in('id', ids);
+      // Preserve save order (saved newest first)
+      const byId = new Map<string, FeedPost>();
+      (postRows ?? []).forEach((p: FeedPost) => byId.set(p.id, p));
+      const ordered = saved.map((s) => byId.get(s.post_id)).filter(Boolean) as FeedPost[];
+      setPosts(ordered);
       setLoading(false);
-      return;
-    }
-    const saved = await fetchSavedPostIds(sess.session.user.id, 50);
-    if (saved.length === 0) {
-      setPosts([]);
+    } catch {
+      setLoadError(true);
       setLoading(false);
-      return;
     }
-    const ids = saved.map((s) => s.post_id);
-    const { data: postRows } = await supabase
-      .from('posts')
-      .select('*')
-      .in('id', ids);
-    // Preserve save order (saved newest first)
-    const byId = new Map<string, FeedPost>();
-    (postRows ?? []).forEach((p: FeedPost) => byId.set(p.id, p));
-    const ordered = saved.map((s) => byId.get(s.post_id)).filter(Boolean) as FeedPost[];
-    setPosts(ordered);
-    setLoading(false);
   }, []);
+
+  const handleTranslate = async (post: FeedPost) => {
+    if (translated[post.id]) {
+      setTranslated((prev) => { const n = { ...prev }; delete n[post.id]; return n; });
+      return;
+    }
+    if (translatingIds.has(post.id)) return;
+    setTranslatingIds((prev) => new Set(prev).add(post.id));
+    try {
+      const result = await translate(post.caption, 'fr', lang);
+      if (!result.failed && result.text) {
+        setTranslated((prev) => ({ ...prev, [post.id]: result.text }));
+      }
+    } catch {
+      // silent
+    } finally {
+      setTranslatingIds((prev) => { const n = new Set(prev); n.delete(post.id); return n; });
+    }
+  };
 
   useEffect(() => { load(); }, [load]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -84,12 +112,16 @@ export default function SavedScreen() {
 
         {loading ? (
           <View style={s.centered}><ActivityIndicator color={C.copper} /></View>
+        ) : loadError ? (
+          <View style={s.emptyBox}>
+            <Text style={s.emptyTitle}>{t('common.loadError.title')}</Text>
+            <Text style={s.emptySub}>{t('common.loadError.body')}</Text>
+            <PillButton label={t('common.loadError.retry')} variant="primary" onPress={() => { setLoadError(false); setLoading(true); load(); }} style={{ marginTop: Sp.md }} />
+          </View>
         ) : posts.length === 0 ? (
           <View style={s.emptyBox}>
             <Text style={s.emptyTitle}>{t('saved.emptyTitle')}</Text>
-            <Text style={s.emptySub}>
-              Tes inspirations sauvegardées apparaîtront ici. Touche le marque-page sur les publications qui te plaisent.
-            </Text>
+            <Text style={s.emptySub}>{t('saved.emptySub')}</Text>
           </View>
         ) : (
           posts.map((p) => (
@@ -99,7 +131,16 @@ export default function SavedScreen() {
               ) : null}
               <View style={s.cardBody}>
                 <Text style={s.cardAuthor}>{p.display_name ?? (p.user_email?.split('@')[0] ?? t('saved.anonymous'))}</Text>
-                <Text style={s.cardCaption} numberOfLines={4}>{p.caption}</Text>
+                <Text style={s.cardCaption} numberOfLines={4}>{translated[p.id] ?? p.caption}</Text>
+                <Pressable onPress={() => handleTranslate(p)} hitSlop={6}>
+                  <Text style={s.translateBtn}>
+                    {translatingIds.has(p.id)
+                      ? t('community.translating')
+                      : translated[p.id]
+                        ? t('community.showOriginal')
+                        : t('community.translate')}
+                  </Text>
+                </Pressable>
                 <Text style={s.cardMeta}>{relativeTime(p.created_at, lang)}</Text>
               </View>
             </View>
@@ -149,5 +190,6 @@ const s = StyleSheet.create({
     textTransform: 'uppercase',
   },
   cardCaption: { fontSize: 14, color: C.text, lineHeight: 20 },
+  translateBtn: { fontSize: 12, color: C.copper, marginTop: 6, fontWeight: '500' },
   cardMeta: { fontSize: 11, color: C.textSoft, marginTop: 6 },
 });

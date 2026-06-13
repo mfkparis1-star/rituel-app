@@ -262,6 +262,7 @@ export const en: LocaleDict = {
   },
 
   glowTimeline: {
+    emptySub: 'Make your first check-in to open your personal beauty journey.',
     back: 'Back',
     kicker: 'JOURNAL',
     title: 'Your journey',
@@ -474,6 +475,7 @@ export const en: LocaleDict = {
 },
 
   saved: {
+    emptySub: 'Your saved inspirations will appear here. Tap the bookmark on posts you love.',
     needSignIn: 'Sign in to see your favorites.',
     back: 'Back',
     kicker: 'INSPIRATIONS',
@@ -920,6 +922,7 @@ export const en: LocaleDict = {
     },
   },
   common: {
+    loadError: { title: 'Something slipped', body: 'We couldn\'t load this. Check your connection.', retry: 'Try again' },
     time: {
     justNow: 'just now',
     minutesAgo: '{n} min ago',

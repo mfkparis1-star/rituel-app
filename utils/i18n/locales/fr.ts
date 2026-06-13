@@ -265,6 +265,7 @@ export const fr = {
 
   // Glow Timeline (Phase 16D)
   glowTimeline: {
+    emptySub: 'Fais ton premier check-in pour ouvrir ton parcours beauté personnel.',
     back: 'Retour',
     kicker: 'JOURNAL',
     title: 'Ton parcours',
@@ -480,6 +481,7 @@ export const fr = {
 
   // Saved / favorites screen (Phase 19.7)
   saved: {
+    emptySub: 'Tes inspirations sauvegardées apparaîtront ici. Touche le marque-page sur les publications qui te plaisent.',
     needSignIn: 'Connecte-toi pour voir tes favoris.',
     back: 'Retour',
     kicker: 'INSPIRATIONS',
@@ -939,6 +941,7 @@ export const fr = {
     },
   },
   common: {
+    loadError: { title: 'Un instant difficile', body: 'Le chargement n\'a pas abouti. Vérifie ta connexion.', retry: 'Réessayer' },
     time: {
     justNow: 'à l\'instant',
     minutesAgo: 'il y a {n} min',
