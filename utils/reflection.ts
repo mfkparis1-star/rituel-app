@@ -25,13 +25,21 @@
 import { callClaudeProxy, AIProxyError } from './aiProxy';
 import { getMemory, patchMemory, type LastReflection } from './memory';
 
+type Lang = 'fr' | 'en' | 'tr';
+
 const FREE_QUOTA = 1;
 const PREMIUM_QUOTA = 5;
 const FRESHNESS_MS = 24 * 60 * 60 * 1000; // 24h
 const MAX_OUTPUT_TOKENS = 120;
 
-const FALLBACK_LINE =
-  "Prenez un instant pour vous aujourd'hui. Votre rituel est déjà un beau geste.";
+const FALLBACK_LINES: Record<Lang, string> = {
+  fr: "Prends un instant pour toi aujourd'hui. Ton rituel est déjà un beau geste.",
+  en: "Take a moment for yourself today. Your ritual is already a lovely gesture.",
+  tr: "Bugün kendine bir an ayır. Ritüelin başlı başına güzel bir jest.",
+};
+function fallbackLine(lang: Lang): string {
+  return FALLBACK_LINES[lang] ?? FALLBACK_LINES.fr;
+}
 
 // Soft red flags. If the model leaks coaching/medical wording, we
 // substitute the fallback — never display these to the user.
@@ -101,7 +109,7 @@ export async function getQuotaRemaining(userId: string, isPremium: boolean): Pro
   }
 }
 
-function buildPrompt(signals: ReflectionSignals): { system: string; user: string } {
+function buildPrompt(signals: ReflectionSignals, lang: Lang): { system: string; user: string } {
   const emojis = (signals.checkinEmojis ?? []).slice(0, 7);
   const emojiLine = emojis.length > 0 ? emojis.join(' ') : 'aucun récent';
   const concerns = (signals.concerns ?? []).slice(0, 4);
@@ -109,18 +117,45 @@ function buildPrompt(signals: ReflectionSignals): { system: string; user: string
   const skin = signals.skinType ? signals.skinType : 'non renseigné';
   const emotion = signals.lastEmotion ? signals.lastEmotion : 'non renseignée';
 
-  const system = [
-    "Tu es Rituel, un journal de beauté intime et bienveillant.",
-    "Tu observes la peau et le moment de la femme avec douceur.",
-    "",
-    "Règles strictes:",
-    "- Réponds en 1 ou 2 phrases françaises maximum.",
-    "- Jamais de conseil médical, jamais de diagnostic.",
-    "- Jamais de coaching, jamais de jugement.",
-    "- Pas de 'tu devrais', pas de 'tu as échoué'.",
-    "- Ton: intime, féminin, soft, comme une note dans un journal.",
-    "- Pas d'emojis, pas de listes, pas de titres.",
-  ].join('\n');
+  const SYSTEMS: Record<Lang, string> = {
+    fr: [
+      "Tu es Rituel, un journal de beauté intime et bienveillant.",
+      "Tu observes la peau et le moment de la femme avec douceur.",
+      "",
+      "Règles strictes:",
+      "- Réponds en 1 ou 2 phrases françaises maximum.",
+      "- Jamais de conseil médical, jamais de diagnostic.",
+      "- Jamais de coaching, jamais de jugement.",
+      "- Pas de 'tu devrais', pas de 'tu as échoué'.",
+      "- Ton: intime, féminin, soft, comme une note dans un journal.",
+      "- Pas d'emojis, pas de listes, pas de titres.",
+    ].join('\n'),
+    en: [
+      "You are Rituel, an intimate and caring beauty journal.",
+      "You observe a woman's skin and her moment with gentleness.",
+      "",
+      "Strict rules:",
+      "- Reply in 1 or 2 short English sentences maximum.",
+      "- Never medical advice, never a diagnosis.",
+      "- Never coaching, never judgment.",
+      "- No 'you should', no 'you failed'.",
+      "- Tone: intimate, soft, like a note in a journal.",
+      "- No emojis, no lists, no titles.",
+    ].join('\n'),
+    tr: [
+      "Sen Rituel'sin, samimi ve şefkatli bir güzellik günlüğü.",
+      "Bir kadının cildini ve anını yumuşaklıkla gözlemlersin.",
+      "",
+      "Katı kurallar:",
+      "- En fazla 1 veya 2 kısa Türkçe cümleyle yanıtla.",
+      "- Asla tıbbi tavsiye, asla teşhis verme.",
+      "- Asla koçluk, asla yargı yok.",
+      "- 'Yapmalısın', 'başaramadın' yok.",
+      "- Ton: samimi, yumuşak, bir günlük notu gibi.",
+      "- Emoji yok, liste yok, başlık yok.",
+    ].join('\n'),
+  };
+  const system = SYSTEMS[lang] ?? SYSTEMS.fr;
 
   const sensitivity = signals.sensitivity ? signals.sensitivity : null;
   const goal = signals.goal ? signals.goal : null;
@@ -134,7 +169,12 @@ function buildPrompt(signals: ReflectionSignals): { system: string; user: string
   ];
   if (sensitivity) lines.push(`- Sensibilité: ${sensitivity}`);
   if (goal) lines.push(`- Objectif du moment: ${goal}`);
-  lines.push("", "Écris une réflexion en 1 ou 2 phrases.");
+  const TAIL: Record<Lang, string> = {
+    fr: 'Écris une réflexion en 1 ou 2 phrases.',
+    en: 'Write a reflection in 1 or 2 sentences.',
+    tr: '1 veya 2 cümlelik bir yansıma yaz.',
+  };
+  lines.push("", TAIL[lang] ?? TAIL.fr);
   const user = lines.join('\n');
 
   return { system, user };
@@ -171,19 +211,20 @@ function isSafe(text: string): boolean {
 export async function generateReflection(
   userId: string,
   isPremium: boolean,
-  signals: ReflectionSignals
+  signals: ReflectionSignals,
+  lang: Lang = 'fr'
 ): Promise<{ text: string; fromCache: boolean; quotaExceeded: boolean }> {
   const remaining = await getQuotaRemaining(userId, isPremium);
   if (remaining <= 0) {
     const cached = await getCachedReflection(userId);
     return {
-      text: cached?.text ?? FALLBACK_LINE,
+      text: cached?.text ?? fallbackLine(lang),
       fromCache: !!cached,
       quotaExceeded: true,
     };
   }
 
-  const { system, user } = buildPrompt(signals);
+  const { system, user } = buildPrompt(signals, lang);
   const body = {
     model: 'claude-haiku-4-5-20251001',
     max_tokens: MAX_OUTPUT_TOKENS,
@@ -201,7 +242,7 @@ export async function generateReflection(
   }
 
   if (!text || !isSafe(text) || text.length > 280) {
-    text = FALLBACK_LINE;
+    text = fallbackLine(lang);
   }
 
   // Persist to memory: bump counter, freeze timestamp
@@ -226,4 +267,5 @@ export async function generateReflection(
   return { text, fromCache: false, quotaExceeded: false };
 }
 
-export const REFLECTION_FALLBACK = FALLBACK_LINE;
+export const REFLECTION_FALLBACK = FALLBACK_LINES.fr;
+export function reflectionFallback(lang: Lang): string { return fallbackLine(lang); }

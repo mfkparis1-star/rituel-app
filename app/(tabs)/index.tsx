@@ -28,7 +28,7 @@ import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
 import { useRoutineCount } from '../../hooks/useRoutineCount';
 import { useMemory } from '../../hooks/useMemory';
 import { useCheckins } from '../../hooks/useCheckins';
-import { generateReflection, getCachedReflection, getQuotaRemaining, REFLECTION_FALLBACK } from '../../utils/reflection';
+import { generateReflection, getCachedReflection, getQuotaRemaining, reflectionFallback } from '../../utils/reflection';
 import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
@@ -165,13 +165,13 @@ export default function IndexScreen() {
         skinType: memory?.last_analysis_summary?.skinType ?? null,
         concerns: memory?.last_analysis_summary?.issues ?? memory?.concerns_extracted ?? [],
         lastEmotion: null,
-      });
+      }, lang);
       setReflectionText(result.text);
       setReflectionAt(new Date().toISOString());
       const remaining = await getQuotaRemaining(reflectionUserId, isPremium);
       setReflectionRemaining(remaining);
     } catch {
-      setReflectionText(REFLECTION_FALLBACK);
+      setReflectionText(reflectionFallback(lang));
     } finally {
       setReflectionLoading(false);
     }
