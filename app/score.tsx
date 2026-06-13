@@ -13,17 +13,21 @@ import { useScore } from '../hooks/useScore';
 import { safeBack } from '../utils/safeBack';
 import { C, R, Sp, Type } from '../theme';
 import { useLanguage } from '../hooks/useLanguage';
-
-const SIGNAL_DESC: Record<string, string> = {
-  checkins:  'Tes check-ins de la semaine',
-  routine:   'Ton rituel matin et soir',
-  analysis:  'Tes analyses récentes',
-  archive:   'Tes produits actifs',
-  community: 'Ta présence dans la communauté',
-};
+import { router } from 'expo-router';
+import { fr as frDict } from '../utils/i18n/locales/fr';
+import { en as enDict } from '../utils/i18n/locales/en';
+import { tr as trDict } from '../utils/i18n/locales/tr';
 
 export default function ScoreScreen() {
-  const { t } = useLanguage(); // Phase 19.1 wiring smoke; pilot conversion lands in 19.2
+  const { t, lang } = useLanguage();
+  const dict = lang === 'en' ? enDict : lang === 'tr' ? trDict : frDict;
+  const signalRoutes: Record<string, string> = {
+    checkins: '/check-in',
+    routine: '/(tabs)/routine',
+    analysis: '/(tabs)/skin-analysis',
+    archive: '/(tabs)/archive',
+    community: '/(tabs)/community',
+  };
   const { score, loading } = useScore();
 
   return (
@@ -31,20 +35,18 @@ export default function ScoreScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Pressable onPress={() => safeBack('/(tabs)')} style={s.back}>
-          <Text style={s.backTxt}>{'←  Retour'}</Text>
+          <Text style={s.backTxt}>{`←  ${t('score.back')}`}</Text>
         </Pressable>
 
-        <Text style={s.label}>MON ÉNERGIE</Text>
+        <Text style={s.label}>{t('score.kicker')}</Text>
 
         {loading || !score ? (
           <View style={s.centered}><ActivityIndicator color={C.copper} /></View>
         ) : (
           <>
             <Text style={s.bigNumber}>{score.total}</Text>
-            <Text style={s.bigLabel}>{score.label}</Text>
-            <Text style={s.subtitle}>
-              Ce reflet évolue doucement avec ton rituel. Il n’y a pas de mauvaise note, seulement un instant.
-            </Text>
+            <Text style={s.bigLabel}>{dict.score.energyLevels[score.level]}</Text>
+            <Text style={s.subtitle}>{t('score.reflectLine')}</Text>
 
             <View style={s.breakdown}>
               {([
@@ -54,12 +56,16 @@ export default function ScoreScreen() {
                 ['archive', score.archive],
                 ['community', score.community],
               ] as Array<[string, number]>).map(([key, val]) => (
-                <View key={key} style={s.signalRow}>
+                <Pressable
+                  key={key}
+                  style={s.signalRow}
+                  onPress={() => router.push(signalRoutes[key] as any)}
+                >
                   <View style={s.signalText}>
-                    <Text style={s.signalDesc}>{SIGNAL_DESC[key]}</Text>
+                    <Text style={s.signalDesc}>{t(`score.signals.${key}`)}</Text>
                   </View>
                   <Text style={s.signalVal}>{val} / 20</Text>
-                </View>
+                </Pressable>
               ))}
             </View>
           </>

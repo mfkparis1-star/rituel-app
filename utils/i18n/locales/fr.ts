@@ -81,6 +81,11 @@ export const fr = {
   },
 
   score: {
+    kicker: 'MON ÉNERGIE',
+    back: 'Retour',
+    reflectLine: 'Ce reflet évolue doucement avec ton rituel. Il n\'y a pas de mauvaise note, seulement un instant.',
+    energyLevels: ['Repos', 'En éveil', 'Présente', 'Lumineuse', 'Rayonnante'],
+    signals: { checkins: 'Tes check-ins de la semaine', routine: 'Ton rituel matin et soir', analysis: 'Tes analyses récentes', archive: 'Tes produits actifs', community: 'Ta présence dans la communauté' },
     title: 'Rituel Score',
     subtitle: 'Une note douce de ton rythme beauté.',
     levelLabels: {

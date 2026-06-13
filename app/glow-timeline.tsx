@@ -26,6 +26,9 @@ import { Checkin, CHECKIN_EMOJIS, getRecentCheckins, deleteCheckin } from '../ut
 import { fetchOwnPosts, FeedPost, updatePostCaption, deletePost } from '../utils/posts';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
+import { fr as frDict } from '../utils/i18n/locales/fr';
+import { en as enDict } from '../utils/i18n/locales/en';
+import { tr as trDict } from '../utils/i18n/locales/tr';
 import { localeToBcp47, type Lang } from '../utils/i18n';
 import { C, R, Sp, Type } from '../theme';
 
@@ -72,6 +75,7 @@ function dayKey(iso: string): string {
 
 export default function GlowTimelineScreen() {
   const { t, lang } = useLanguage();
+  const scoreDict = lang === 'en' ? enDict : lang === 'tr' ? trDict : frDict;
   const formatDay = useMemo(() => makeFormatDay(t, lang), [t, lang]);
   const formatTime = useMemo(() => makeFormatTime(lang), [lang]);
   const emojiLabel = useMemo(() => makeEmojiLabel(t), [t]);
@@ -248,7 +252,7 @@ export default function GlowTimelineScreen() {
         {score && (
           <View style={s.scoreChip}>
             <Text style={s.scoreChipLabel}>{t('glowTimeline.scoreChipLabel')}</Text>
-            <Text style={s.scoreChipValue}>{score.label}</Text>
+            <Text style={s.scoreChipValue}>{scoreDict.score.energyLevels[score.level]}</Text>
           </View>
         )}
 

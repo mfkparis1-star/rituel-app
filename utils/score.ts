@@ -14,7 +14,8 @@ import { supabase } from '../lib/supabase';
 import { getRecentCheckins } from './checkins';
 import { fetchOwnPosts } from './posts';
 
-export type ScoreLabel = 'Naissant' | 'En éveil' | 'En rituel' | 'Rayonnant';
+/** 0..4 -> i18n score.levels.{n}; display resolved in the screen. */
+export type ScoreLevel = 0 | 1 | 2 | 3 | 4;
 
 export type ScoreBreakdown = {
   checkins: number;     // 0-20
@@ -23,14 +24,15 @@ export type ScoreBreakdown = {
   archive: number;      // 0-20
   community: number;    // 0-20
   total: number;        // 0-100
-  label: ScoreLabel;
+  level: ScoreLevel;
 };
 
-function labelFor(total: number): ScoreLabel {
-  if (total <= 25) return 'Naissant';
-  if (total <= 50) return 'En éveil';
-  if (total <= 75) return 'En rituel';
-  return 'Rayonnant';
+function levelFor(total: number): ScoreLevel {
+  if (total <= 20) return 0; // Repos
+  if (total <= 40) return 1; // En éveil
+  if (total <= 60) return 2; // Présente
+  if (total <= 80) return 3; // Lumineuse
+  return 4;                  // Rayonnante
 }
 
 /**
@@ -54,10 +56,10 @@ export async function computeRitualScore(userId: string): Promise<ScoreBreakdown
   // 2. Routine — morning + evening step counts
   const { data: steps } = await supabase
     .from('routine_steps')
-    .select('time')
+    .select('routine_type')
     .eq('user_id', userId);
-  const morningCount = (steps ?? []).filter((s: { time: string }) => s.time === 'morning').length;
-  const eveningCount = (steps ?? []).filter((s: { time: string }) => s.time === 'evening').length;
+  const morningCount = (steps ?? []).filter((s: { routine_type: string }) => s.routine_type === 'matin').length;
+  const eveningCount = (steps ?? []).filter((s: { routine_type: string }) => s.routine_type === 'soir').length;
   const routineScore = (morningCount > 0 ? 10 : 0) + (eveningCount > 0 ? 10 : 0);
 
   // 3. Analysis — last 30 days
@@ -97,6 +99,6 @@ export async function computeRitualScore(userId: string): Promise<ScoreBreakdown
     archive: archiveScore,
     community: communityScore,
     total,
-    label: labelFor(total),
+    level: levelFor(total),
   };
 }

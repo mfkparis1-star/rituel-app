@@ -81,6 +81,11 @@ export const tr: LocaleDict = {
   },
 
   score: {
+    kicker: 'ENERJİM',
+    back: 'Geri',
+    reflectLine: 'Bu yansıma ritüelinle birlikte usulca değişir. Kötü puan yoktur, yalnızca bir an vardır.',
+    energyLevels: ['Dinlenme', 'Uyanış', 'Var', 'Aydınlık', 'Işıltılı'],
+    signals: { checkins: 'Bu haftaki check-in\'lerin', routine: 'Sabah ve akşam ritüelin', analysis: 'Son analizlerin', archive: 'Aktif ürünlerin', community: 'Topluluktaki varlığın' },
     title: 'Rituel Skoru',
     subtitle: 'Güzellik ritmin üzerine yumuşak bir not.',
     levelLabels: {

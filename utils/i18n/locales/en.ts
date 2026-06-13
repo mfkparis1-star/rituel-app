@@ -81,6 +81,11 @@ export const en: LocaleDict = {
   },
 
   score: {
+    kicker: 'MY ENERGY',
+    back: 'Back',
+    reflectLine: 'This reflection shifts gently with your ritual. There is no bad score, only a moment.',
+    energyLevels: ['Resting', 'Awakening', 'Present', 'Luminous', 'Radiant'],
+    signals: { checkins: 'Your check-ins this week', routine: 'Your morning and evening ritual', analysis: 'Your recent analyses', archive: 'Your active products', community: 'Your presence in the community' },
     title: 'Rituel Score',
     subtitle: 'A soft note on your beauty rhythm.',
     levelLabels: {
