@@ -173,7 +173,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.appBg },
   adaptClose: { alignSelf: 'flex-end', width: 34, height: 34, borderRadius: 17, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', marginTop: Sp.sm, marginBottom: Sp.md },
   adaptCloseTxt: { fontSize: 14, color: C.espresso },
-  adaptEmoji: { fontSize: 54, textAlign: 'center', marginBottom: 4 },
+  adaptEmoji: { fontSize: 30, textAlign: 'center', marginBottom: 8, color: C.copper },
   adaptMood: { fontSize: 26, fontWeight: '300', color: C.espresso, textAlign: 'center' },
   adaptSaved: { fontSize: 13, color: C.textSoft, textAlign: 'center', marginTop: 4, marginBottom: Sp.xl },
   adaptCard: { backgroundColor: C.espresso, borderRadius: R.lg, padding: Sp.md },
