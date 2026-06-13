@@ -265,6 +265,7 @@ export const fr = {
 
   // Glow Timeline (Phase 16D)
   glowTimeline: {
+    back: 'Retour',
     kicker: 'JOURNAL',
     title: 'Ton parcours',
     subtitle: 'Chaque check-in, chaque analyse, chaque rituel partagé. Ton histoire beauté, jour après jour.',
@@ -277,6 +278,7 @@ export const fr = {
       yesterday: 'Hier',
     },
     item: {
+        skinPrefix: 'Peau ',
       kindAnalysis: 'Analyse de peau',
       kindPost: 'Publication',
       hintCheckin: 'Maintiens pour supprimer',

@@ -262,6 +262,7 @@ export const en: LocaleDict = {
   },
 
   glowTimeline: {
+    back: 'Back',
     kicker: 'JOURNAL',
     title: 'Your journey',
     subtitle: 'Every check-in, every analysis, every ritual shared. Your beauty story, day after day.',
@@ -274,6 +275,7 @@ export const en: LocaleDict = {
       yesterday: 'Yesterday',
     },
     item: {
+        skinPrefix: 'Skin ',
       kindAnalysis: 'Skin analysis',
       kindPost: 'Post',
       hintCheckin: 'Hold to delete',

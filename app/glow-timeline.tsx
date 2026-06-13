@@ -231,7 +231,7 @@ export default function GlowTimelineScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
           <Text style={s.muted}>{t('glowTimeline.needSignIn')}</Text>
-          <PillButton label="Retour" variant="primary" onPress={() => safeBack('/(tabs)')} style={{ marginTop: Sp.md }} />
+          <PillButton label={t('glowTimeline.back')} variant="primary" onPress={() => safeBack('/(tabs)')} style={{ marginTop: Sp.md }} />
         </View>
       </SafeAreaView>
     );
@@ -242,7 +242,7 @@ export default function GlowTimelineScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <Pressable onPress={() => safeBack('/(tabs)')} style={s.back}>
-          <Text style={s.backTxt}>{'←  Retour'}</Text>
+          <Text style={s.backTxt}>{`←  ${t('glowTimeline.back')}`}</Text>
         </Pressable>
 
         <Text style={s.label}>{t('glowTimeline.kicker')}</Text>
@@ -305,7 +305,7 @@ export default function GlowTimelineScreen() {
                       </View>
                       {it.data.skinType ? (
                         <Text style={s.itemNote}>
-                          Peau {it.data.skinType}
+                          {t('glowTimeline.item.skinPrefix')}{it.data.skinType}
                           {it.data.issues && it.data.issues.length > 0
                             ? ` · ${it.data.issues.slice(0, 2).join(' · ')}`
                             : ''}

@@ -262,6 +262,7 @@ export const tr: LocaleDict = {
   },
 
   glowTimeline: {
+    back: 'Geri',
     kicker: 'GÜNLÜK',
     title: 'Yolculuğun',
     subtitle: 'Her check-in, her analiz, paylaştığın her ritüel. Güzellik hikâyen, gün gün.',
@@ -274,6 +275,7 @@ export const tr: LocaleDict = {
       yesterday: 'Dün',
     },
     item: {
+        skinPrefix: 'Cilt ',
       kindAnalysis: 'Cilt analizi',
       kindPost: 'Paylaşım',
       hintCheckin: 'Silmek için basılı tut',
