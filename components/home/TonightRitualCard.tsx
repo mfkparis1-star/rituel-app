@@ -26,6 +26,7 @@ type Props = {
   onStart: () => void;
   onCreate: () => void;
   onCheckin: () => void;
+  ritualTime?: string;
 };
 
 function Crescent({ size = 13 }: { size?: number }) {
@@ -70,6 +71,7 @@ export default function TonightRitualCard({
   onStart,
   onCreate,
   onCheckin,
+  ritualTime,
 }: Props) {
   const { t } = useLanguage();
 
@@ -125,7 +127,7 @@ export default function TonightRitualCard({
 
   return (
     <View style={s.card}>
-      <Text style={s.label}>{t('home.tonight.label')}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}><Text style={s.label}>{t('home.tonight.label')}</Text>{ritualTime ? <Text style={s.label}>{ritualTime}</Text> : null}</View>
       {checkinEmoji ? (
         <View style={s.subRow}>
           <Crescent />
