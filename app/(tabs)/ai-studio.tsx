@@ -5,6 +5,9 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import HeroCard from '../../components/ui/HeroCard';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
+import ListRow from '../../components/ui/ListRow';
+import CreditPackModal from '../../components/credits/CreditPackModal';
+import { useCredits } from '../../hooks/useCredits';
 import { useEffect, useState } from 'react';
 import { getRecentAcrossTypes, AnyCacheEntry } from '../../utils/aiCache';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -56,6 +59,8 @@ const TOOLS: { id: string; route: string; Icon: (props: { color: string }) => an
 
 export default function AIStudioScreen() {
   const { t } = useLanguage();
+  const { balance: creditBalance, loading: creditsLoading } = useCredits();
+  const [creditModalOpen, setCreditModalOpen] = useState(false);
   const [recent, setRecent] = useState<AnyCacheEntry[]>([]);
 
   useEffect(() => {
@@ -147,6 +152,18 @@ export default function AIStudioScreen() {
           })}
         </View>
 
+        <ListRow
+          title={t('auth.profile.credits.title')}
+          subtitle={
+            creditsLoading
+              ? t('auth.profile.credits.loading')
+              : (creditBalance === 1
+                  ? t('auth.profile.credits.availableOne').replace('{n}', String(creditBalance))
+                  : t('auth.profile.credits.availableMany').replace('{n}', String(creditBalance)))
+          }
+          onPress={() => setCreditModalOpen(true)}
+        />
+
         <PremiumCard variant="espresso" style={s.premium}>
           <Text style={s.premiumLabel}>{t('aiStudio.premium.label')}</Text>
           <Text style={s.premiumTitle}>{t('aiStudio.premium.title')}</Text>
@@ -162,6 +179,11 @@ export default function AIStudioScreen() {
             style={{ marginTop: Sp.md, backgroundColor: C.white }}
           />
         </PremiumCard>
+
+        <CreditPackModal
+          visible={creditModalOpen}
+          onClose={() => setCreditModalOpen(false)}
+        />
 
         <View style={{ height: Sp.huge }} />
       </ScrollView>
