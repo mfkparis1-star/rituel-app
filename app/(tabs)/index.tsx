@@ -227,10 +227,48 @@ export default function IndexScreen() {
         })()}
         <AphorismCard text={aphorism} />
 
+        {/* Check-in CTA (only when not done today) */}
+        {!hasToday && (
+          <Pressable
+            onPress={() => router.push('/check-in' as any)}
+            style={s.checkinCard}
+          >
+            <Text style={s.checkinLabel}>{t('home.checkin.label')}</Text>
+            <Text style={s.checkinTitle}>{t('home.checkin.title')}</Text>
+            <Text style={s.checkinSub}>{t('home.checkin.subtitle')}</Text>
+          </Pressable>
+        )}
+
+        
+        {/* Cette semaine block */}
+        <View style={s.sectionTitleRow}>
+          <Text style={s.sectionTitle}>{t('home.sections.thisWeek')}</Text>
+          <Pressable onPress={() => router.push('/glow-timeline' as any)} hitSlop={6}>
+            <Text style={s.sectionLink}>{t('home.sections.seeAll')}</Text>
+          </Pressable>
+        </View>
+        <PremiumCard variant="espresso" style={s.blockWeek}>
+          {weekEmojis.length === 0 ? (
+            <>
+              <Text style={s.weekTitle}>{t('home.week.emptyTitle')}</Text>
+              <Text style={s.weekSub}>{t('home.week.emptySub')}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={s.weekTxt}>{weekSummary(weekEmojis, t)}</Text>
+              <View style={s.weekRow}>
+                {weekEmojis.slice(0, 7).map((e, i) => (
+                  <Text key={i} style={s.weekEmoji}>{emojiSymbol(e)}</Text>
+                ))}
+              </View>
+            </>
+          )}
+        </PremiumCard>
+
         {/* Phase 17D — Soft AI Reflection (Home top) */}
         {reflectionUserId ? (
           <View style={[s.reflectionCard, Sh.soft]}>
-            <Text style={s.reflectionLabel}>{t('home.reflection.label')}</Text>
+            <Text style={s.reflectionLabel}>{t('home.reflection.eveningLabel')}</Text>
             {reflectionText ? (
               <Text style={s.reflectionText}>{reflectionText}</Text>
             ) : (
@@ -266,104 +304,6 @@ export default function IndexScreen() {
             )}
           </View>
         ) : null}
-
-        {/* Check-in CTA (only when not done today) */}
-        {!hasToday && (
-          <Pressable
-            onPress={() => router.push('/check-in' as any)}
-            style={s.checkinCard}
-          >
-            <Text style={s.checkinLabel}>{t('home.checkin.label')}</Text>
-            <Text style={s.checkinTitle}>{t('home.checkin.title')}</Text>
-            <Text style={s.checkinSub}>{t('home.checkin.subtitle')}</Text>
-          </Pressable>
-        )}
-
-        {/* Aujourd'hui block */}
-        <Text style={s.sectionTitle}>{t('home.sections.today')}</Text>
-        <PremiumCard variant="cream" style={s.block}>
-          <View style={s.blockRow}>
-            <Text style={s.bigEmoji}>{latestCheckin ? emojiSymbol(latestCheckin) : '·'}</Text>
-            <View style={s.blockText}>
-              <Text style={s.blockTitle}>
-                {latestCheckin
-                  ? t(`checkin.emojis.${latestCheckin}`)
-                  : t('home.today.waiting')}
-              </Text>
-              <Text style={s.blockSub}>{todaySuggestion(latestCheckin, { glowing: t('home.today.advice.glowing'), good: t('home.today.advice.good'), neutral: t('home.today.advice.neutral'), tired: t('home.today.advice.tired'), rough: t('home.today.advice.rough'), none: t('home.today.advice.none') })}</Text>
-            </View>
-          </View>
-        </PremiumCard>
-
-        {/* Cette semaine block */}
-        <View style={s.sectionTitleRow}>
-          <Text style={s.sectionTitle}>{t('home.sections.thisWeek')}</Text>
-          <Pressable onPress={() => router.push('/glow-timeline' as any)} hitSlop={6}>
-            <Text style={s.sectionLink}>{t('home.sections.seeAll')}</Text>
-          </Pressable>
-        </View>
-        <PremiumCard variant="espresso" style={s.blockWeek}>
-          {weekEmojis.length === 0 ? (
-            <>
-              <Text style={s.weekTitle}>{t('home.week.emptyTitle')}</Text>
-              <Text style={s.weekSub}>{t('home.week.emptySub')}</Text>
-            </>
-          ) : (
-            <>
-              <Text style={s.weekTxt}>{weekSummary(weekEmojis, t)}</Text>
-              <View style={s.weekRow}>
-                {weekEmojis.slice(0, 7).map((e, i) => (
-                  <Text key={i} style={s.weekEmoji}>{emojiSymbol(e)}</Text>
-                ))}
-              </View>
-            </>
-          )}
-        </PremiumCard>
-
-        {/* À propos de toi block */}
-        <Text style={s.sectionTitle}>{t('home.sections.aboutYou')}</Text>
-        <PremiumCard variant="cream" style={s.block}>
-          {lastSummary?.skinType ? (
-            <>
-              <Text style={s.aboutLabel}>{t('home.about.skinTypeLabel')}</Text>
-              <Text style={s.aboutValue}>{lastSummary.skinType}</Text>
-              {lastSummary.issues && lastSummary.issues.length > 0 && (
-                <>
-                  <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>{t('home.about.observationsLabel')}</Text>
-                  <Text style={s.aboutValue}>{lastSummary.issues.join(' · ')}</Text>
-                </>
-              )}
-              <Text style={[s.aboutLabel, { marginTop: Sp.md }]}>{t('home.about.routineLabel')}</Text>
-              <Text style={s.aboutValue}>
-                {routineCount > 0 ? (routineCount > 1 ? t('home.about.routineStepsMany') : t('home.about.routineStepsOne')).replace('{n}', String(routineCount)) : t('home.about.routineEmpty')}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={s.blockTitle}>{t('home.about.emptyTitle')}</Text>
-              <Text style={s.blockSub}>{t('home.about.emptySub')}</Text>
-              <PillButton
-                label={t('home.about.analyzeCta')}
-                variant="primary"
-                onPress={() => router.push('/(tabs)/skin-analysis' as any)}
-                style={{ marginTop: Sp.md }}
-              />
-            </>
-          )}
-        </PremiumCard>
-
-        {/* Skin Analysis CTA — always visible, complementary */}
-        {lastSummary?.skinType && (
-          <HeroCard
-            label={t('home.analysisHero.label')}
-            title={t('home.analysisHero.title')}
-            subtitle={t('home.analysisHero.subtitle')}
-            ctaLabel={t('home.analysisHero.cta')}
-            variant="espresso"
-            onPress={() => router.push('/(tabs)/skin-analysis' as any)}
-            style={{ marginBottom: Sp.lg }}
-          />
-        )}
 
         {/* Pour toi — affiliate recommendations */}
         {recommendations.length > 0 && (
@@ -449,7 +389,7 @@ const s = StyleSheet.create({
 
   block: { marginBottom: Sp.md, padding: Sp.lg },
   blockRow: { flexDirection: 'row', alignItems: 'center', gap: Sp.md },
-  bigEmoji: { fontSize: 36 },
+  bigEmoji: { fontSize: 30, color: C.copper },
   blockText: { flex: 1 },
   blockTitle: {
     fontSize: 16,
@@ -469,7 +409,7 @@ const s = StyleSheet.create({
     marginBottom: Sp.md,
   },
   weekRow: { flexDirection: 'row', gap: Sp.xs },
-  weekEmoji: { fontSize: 22 },
+  weekEmoji: { fontSize: 18, color: C.copper },
 
   aboutLabel: {
     fontSize: 10,

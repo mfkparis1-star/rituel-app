@@ -671,6 +671,7 @@ export const en: LocaleDict = {
       cta: 'Start the analysis',
     },
       reflection: {
+      eveningLabel: 'A word for tonight',
       label: 'REFLECTION OF THE DAY',
       prompt: 'Receive a personal reflection on your skin and your ritual.',
       receive: 'Get my reflection',

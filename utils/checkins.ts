@@ -21,11 +21,11 @@ export type Checkin = {
 };
 
 export const CHECKIN_EMOJIS: { id: CheckinEmoji; symbol: string; label_fr: string }[] = [
-  { id: 'glowing', symbol: '✨', label_fr: 'Rayonnante' },
-  { id: 'good',    symbol: '🙂', label_fr: 'Bien' },
-  { id: 'neutral', symbol: '😐', label_fr: 'Neutre' },
-  { id: 'tired',   symbol: '😴', label_fr: 'Fatiguée' },
-  { id: 'rough',   symbol: '😣', label_fr: 'Difficile' },
+  { id: 'glowing', symbol: '●', label_fr: 'Rayonnante' }, // ● full glow
+  { id: 'good',    symbol: '◕', label_fr: 'Bien' },       // ◕
+  { id: 'neutral', symbol: '◑', label_fr: 'Neutre' },     // ◑
+  { id: 'tired',   symbol: '◔', label_fr: 'Fatiguée' },   // ◔
+  { id: 'rough',   symbol: '○', label_fr: 'Difficile' },  // ○ empty
 ];
 
 export async function insertCheckin(

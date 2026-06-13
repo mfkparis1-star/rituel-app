@@ -672,6 +672,7 @@ export const tr: LocaleDict = {
       cta: 'Analizi başlat',
     },
       reflection: {
+      eveningLabel: 'Bu akşam için bir söz',
       label: 'GÜNÜN YANSIMASI',
       prompt: 'Cildin ve ritüelin üzerine kişisel bir yansıma al.',
       receive: 'Yansımamı al',

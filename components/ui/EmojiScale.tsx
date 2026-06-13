@@ -35,7 +35,7 @@ export default function EmojiScale({ value, onChange, disabled, labelMap }: Prop
             style={[s.cell, selected && s.cellSelected]}
             hitSlop={4}
           >
-            <Text style={s.symbol}>{e.symbol}</Text>
+            <Text style={[s.symbol, selected && s.symbolSelected]}>{e.symbol}</Text>
             <Text style={[s.label, selected && s.labelSelected]} numberOfLines={1}>
               {labelMap?.[e.id] ?? e.label_fr}
             </Text>
@@ -67,8 +67,12 @@ const s = StyleSheet.create({
     borderColor: C.copper,
   },
   symbol: {
-    fontSize: 28,
-    marginBottom: 4,
+    fontSize: 24,
+    marginBottom: 6,
+    color: C.copper,
+  },
+  symbolSelected: {
+    color: C.espresso,
   },
   label: {
     fontSize: 10,

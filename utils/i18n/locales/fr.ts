@@ -684,6 +684,7 @@ export const fr = {
       cta: 'Lancer l\u2019analyse',
     },
       reflection: {
+      eveningLabel: 'Un mot pour ce soir',
       label: 'RÉFLEXION DU JOUR',
       prompt: 'Recevez une réflexion personnelle sur votre peau et votre rituel.',
       receive: 'Recevoir ma réflexion',

@@ -392,7 +392,7 @@ const s = StyleSheet.create({
     gap: Sp.sm,
     marginBottom: 6,
   },
-  itemEmoji: { fontSize: 22 },
+  itemEmoji: { fontSize: 18, color: C.copper },
   itemHeaderRight: { flex: 1 },
   itemKind: {
     fontSize: 13,
