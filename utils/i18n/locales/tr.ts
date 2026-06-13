@@ -920,6 +920,7 @@ export const tr: LocaleDict = {
       chooseGallery: 'Galeriden seç',
       cancel: 'İptal',
       chooseOccasionTitle: 'Bir etkinlik seç',
+        chooseOccasionBody: 'Önce aşağıdan bir durum seç.',
     },
   },
   common: {

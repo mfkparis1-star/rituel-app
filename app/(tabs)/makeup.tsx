@@ -163,7 +163,7 @@ export default function MakeupScreen() {
     setSelfieBase64(null);
     setResult(null);
     setErrorMsg('');
-     setUnlocked(false);
+    setUnlocked(false);
     setResultId(null);
     clearAICache('makeup');
   };
@@ -172,7 +172,7 @@ export default function MakeupScreen() {
     if (!occasion) {
       Alert.alert(
         t('makeup.alerts.chooseOccasionTitle'),
-        'Sélectionne d\'abord une occasion ci-dessous.'
+        t('makeup.alerts.chooseOccasionBody')
       );
       return;
     }

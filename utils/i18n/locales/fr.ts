@@ -938,6 +938,7 @@ export const fr = {
       chooseGallery: 'Choisir depuis la galerie',
       cancel: 'Annuler',
       chooseOccasionTitle: 'Choisis un événement',
+        chooseOccasionBody: 'Sélectionne d\'abord une occasion ci-dessous.',
     },
   },
   common: {

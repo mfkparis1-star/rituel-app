@@ -919,6 +919,7 @@ export const en: LocaleDict = {
       chooseGallery: 'Choose from gallery',
       cancel: 'Cancel',
       chooseOccasionTitle: 'Choose an occasion',
+        chooseOccasionBody: 'Pick an occasion below first.',
     },
   },
   common: {
