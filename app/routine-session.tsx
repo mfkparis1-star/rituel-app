@@ -19,6 +19,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { categoryInfo } from '../utils/routineGestures';
+import { markRitualDone, weekLune, luneCount } from '../utils/lune';
 import { C } from '../theme';
 
 const NIGHT = '#1D100A';
@@ -47,6 +48,7 @@ export default function RoutineSessionScreen() {
   const [idx, setIdx] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [luneThisWeek, setLuneThisWeek] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -96,6 +98,7 @@ export default function RoutineSessionScreen() {
       setIdx(idx + 1);
     } else {
       timerRef.current && clearInterval(timerRef.current);
+      markRitualDone().then(() => weekLune()).then((w) => setLuneThisWeek(luneCount(w)));
       setPhase('done');
     }
   };
@@ -219,7 +222,7 @@ export default function RoutineSessionScreen() {
             <Text style={s.doneTitle}>{t('session.doneTitle')}</Text>
             <Text style={s.doneBody}>{t('session.doneBody')}</Text>
             <View style={s.doneLune}>
-              <Text style={s.doneLuneTxt}>☾ +1 · {t('session.luneNote')}</Text>
+              <Text style={s.doneLuneTxt}>☾ {luneThisWeek}/7 · {t('session.luneNote')}</Text>
             </View>
           </View>
           <View style={s.controls}>

@@ -15,10 +15,10 @@
  * If the user is signed out or has no signals, the home gracefully
  * degrades to a clean welcome state with the Skin Analysis CTA.
  */
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import HeroCard from '../../components/ui/HeroCard';
 import PremiumCard from '../../components/ui/PremiumCard';
 import PillButton from '../../components/ui/PillButton';
@@ -32,6 +32,7 @@ import { generateReflection, getCachedReflection, getQuotaRemaining, reflectionF
 import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
+import { weekLune } from '../../utils/lune';
 import AphorismCard from '../../components/home/AphorismCard';
 import TonightRitualCard from '../../components/home/TonightRitualCard';
 import { useRoutineSteps } from '../../hooks/useRoutineSteps';
@@ -112,24 +113,19 @@ export default function IndexScreen() {
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
   const aphorism = aphorisms[dayOfYear % aphorisms.length];
-  const weekCompleted = (() => {
-    const arr = [false, false, false, false, false, false, false];
-    const now = new Date();
-    const todayIdx = (now.getDay() + 6) % 7;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - todayIdx);
-    monday.setHours(0, 0, 0, 0);
-    for (const c of recent) {
-      const d = new Date(c.created_at);
-      const idx = Math.floor((d.getTime() - monday.getTime()) / 86400000);
-      if (idx >= 0 && idx < 7) arr[idx] = true;
-    }
-    return arr;
-  })();
+  const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const lastSummary = memory?.last_analysis_summary ?? null;
 
   // Phase 17D — soft AI reflection
   const { isPremium } = usePremium();
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      weekLune().then((w) => { if (active) setWeekCompleted(w); });
+      return () => { active = false; };
+    }, [])
+  );
   const [reflectionText, setReflectionText] = useState<string | null>(null);
   const [reflectionAt, setReflectionAt] = useState<string | null>(null);
   const [reflectionLoading, setReflectionLoading] = useState(false);
