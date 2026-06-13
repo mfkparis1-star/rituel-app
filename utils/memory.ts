@@ -34,6 +34,7 @@ export type ArchiveSignals = {
 };
 
 export type LastReflection = {
+  lang?: string;        // language the text was generated in
   text: string;
   at: string;             // ISO timestamp
   count_today: number;    // soft per-day quota counter

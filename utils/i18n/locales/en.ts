@@ -592,6 +592,7 @@ export const en: LocaleDict = {
   },
 
   home: {
+    recommend: { subtitle: 'A curated selection to go with your ritual.' },
     weekSummary: { one: '{n} check-in this week. Trend: {sym}', many: '{n} check-ins this week. Trend: {sym}' },
     adapt: {
       saved: 'Noted for tonight.',

@@ -593,6 +593,7 @@ export const tr: LocaleDict = {
   },
 
   home: {
+    recommend: { subtitle: 'Ritüeline eşlik etmesi için seçilmiş ürünler.' },
     weekSummary: { one: 'Bu hafta {n} check-in. Eğilim: {sym}', many: 'Bu hafta {n} check-in. Eğilim: {sym}' },
     adapt: {
       saved: 'Bu akşam için not edildi.',

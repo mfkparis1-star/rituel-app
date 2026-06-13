@@ -33,6 +33,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
 import { weekLune } from '../../utils/lune';
+import { getRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
 import AphorismCard from '../../components/home/AphorismCard';
 import TonightRitualCard from '../../components/home/TonightRitualCard';
 import { useRoutineSteps } from '../../hooks/useRoutineSteps';
@@ -114,6 +115,7 @@ export default function IndexScreen() {
   );
   const aphorism = aphorisms[dayOfYear % aphorisms.length];
   const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
+  const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const lastSummary = memory?.last_analysis_summary ?? null;
 
   // Phase 17D — soft AI reflection
@@ -123,6 +125,7 @@ export default function IndexScreen() {
     useCallback(() => {
       let active = true;
       weekLune().then((w) => { if (active) setWeekCompleted(w); });
+      getRitualTime().then((tm) => { if (active) setRitualTime(tm); });
       return () => { active = false; };
     }, [])
   );
@@ -142,7 +145,7 @@ export default function IndexScreen() {
       if (!uid) return;
       const cached = await getCachedReflection(uid);
       if (!mounted) return;
-      if (cached) {
+      if (cached && (!cached.lang || cached.lang === lang)) {
         setReflectionText(cached.text);
         setReflectionAt(cached.at);
       }
@@ -193,6 +196,7 @@ export default function IndexScreen() {
           onStart={() => router.push('/routine-session' as any)}
           onCreate={() => router.push('/(tabs)/routine' as any)}
           onCheckin={() => router.push('/check-in' as any)}
+          ritualTime={ritualTime}
         />
         <AphorismCard text={aphorism} />
 
@@ -339,7 +343,7 @@ export default function IndexScreen() {
           <View style={s.selectedWrap}>
             <Text style={s.sectionTitle}>{t('home.sections.selectedForYou')}</Text>
             <Text style={s.selectedSubtitle}>
-              Des soins choisis pour accompagner ton rituel.
+              {t('home.recommend.subtitle')}
             </Text>
             {recommendations.slice(0, 3).map((p) => (
               <AffiliateProductCard key={p.id} product={p} />

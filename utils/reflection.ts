@@ -255,6 +255,7 @@ export async function generateReflection(
     await patchMemory(userId, {
       last_reflection: {
         text,
+        lang,
         at: new Date().toISOString(),
         count_today: nextCount,
         count_date: today,
