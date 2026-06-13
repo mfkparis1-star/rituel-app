@@ -19,9 +19,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState, useCallback } from 'react';
-import HeroCard from '../../components/ui/HeroCard';
 import PremiumCard from '../../components/ui/PremiumCard';
-import PillButton from '../../components/ui/PillButton';
 import AffiliateProductCard from '../../components/ui/AffiliateProductCard';
 import { getAffiliateRecommendations } from '../../utils/affiliateRecommendations';
 import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
@@ -57,16 +55,6 @@ function emojiSymbol(id: CheckinEmoji): string {
   return CHECKIN_EMOJIS.find((e) => e.id === id)?.symbol ?? '·';
 }
 
-function todaySuggestion(latest: CheckinEmoji | null, adviceLabels: { glowing: string; good: string; neutral: string; tired: string; rough: string; none: string }): string {
-  switch (latest) {
-    case 'glowing': return adviceLabels.glowing;
-    case 'good':    return adviceLabels.good;
-    case 'neutral': return adviceLabels.neutral;
-    case 'tired':   return adviceLabels.tired;
-    case 'rough':   return adviceLabels.rough;
-    default:        return adviceLabels.none;
-  }
-}
 
 function weekSummary(emojis: CheckinEmoji[], t: (k: string) => string): string {
   if (emojis.length === 0) return '';
@@ -118,7 +106,6 @@ export default function IndexScreen() {
   const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const lastSummary = memory?.last_analysis_summary ?? null;
 
   // Phase 17D — soft AI reflection
   const { isPremium } = usePremium();
