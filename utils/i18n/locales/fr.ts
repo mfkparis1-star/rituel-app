@@ -600,6 +600,7 @@ export const fr = {
 
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
+    weekSummary: { one: '{n} check-in cette semaine. Tendance : {sym}', many: '{n} check-ins cette semaine. Tendance : {sym}' },
     adapt: {
       saved: 'C\'est noté pour ce soir.',
       label: 'TON RITUEL S\'ADAPTE',

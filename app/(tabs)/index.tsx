@@ -65,14 +65,15 @@ function todaySuggestion(latest: CheckinEmoji | null, adviceLabels: { glowing: s
   }
 }
 
-function weekSummary(emojis: CheckinEmoji[]): string {
+function weekSummary(emojis: CheckinEmoji[], t: (k: string) => string): string {
   if (emojis.length === 0) return '';
   const counts: Record<string, number> = {};
   emojis.forEach((e) => { counts[e] = (counts[e] ?? 0) + 1; });
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   const dominant = top[0] as CheckinEmoji;
   const sym = emojiSymbol(dominant);
-  return `${emojis.length} check-in${emojis.length > 1 ? 's' : ''} cette semaine. Tendance : ${sym}`;
+  const key = emojis.length > 1 ? 'home.weekSummary.many' : 'home.weekSummary.one';
+  return t(key).replace('{n}', String(emojis.length)).replace('{sym}', sym);
 }
 
 export default function IndexScreen() {
@@ -282,7 +283,7 @@ export default function IndexScreen() {
             </>
           ) : (
             <>
-              <Text style={s.weekTxt}>{weekSummary(weekEmojis)}</Text>
+              <Text style={s.weekTxt}>{weekSummary(weekEmojis, t)}</Text>
               <View style={s.weekRow}>
                 {weekEmojis.slice(0, 7).map((e, i) => (
                   <Text key={i} style={s.weekEmoji}>{emojiSymbol(e)}</Text>

@@ -588,6 +588,7 @@ export const tr: LocaleDict = {
   },
 
   home: {
+    weekSummary: { one: 'Bu hafta {n} check-in. Eğilim: {sym}', many: 'Bu hafta {n} check-in. Eğilim: {sym}' },
     adapt: {
       saved: 'Bu akşam için not edildi.',
       label: 'RİTÜELİN UYARLANIYOR',

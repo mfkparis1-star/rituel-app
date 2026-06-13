@@ -587,6 +587,7 @@ export const en: LocaleDict = {
   },
 
   home: {
+    weekSummary: { one: '{n} check-in this week. Trend: {sym}', many: '{n} check-ins this week. Trend: {sym}' },
     adapt: {
       saved: 'Noted for tonight.',
       label: 'YOUR RITUAL ADAPTS',
