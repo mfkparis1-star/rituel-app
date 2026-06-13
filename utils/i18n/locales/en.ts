@@ -376,6 +376,9 @@ export const en: LocaleDict = {
         restoreLoading: 'Restoring...',
       },
       sections: {
+      mySkin: 'MY SKIN',
+      mySpace: 'MY SPACE',
+      account: 'ACCOUNT',
         subscription: 'SUBSCRIPTION',
         forYou: 'FOR YOU',
         inMyRitual: 'IN MY RITUAL',

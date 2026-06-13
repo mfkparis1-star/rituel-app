@@ -630,9 +630,6 @@ export default function AuthScreen() {
               <Text style={s.premiumBadgeTxt}>{t('auth.profile.premiumBadge')}</Text>
             </View>
           )}
-          {profile?.skin_type && (
-            <Text style={s.skinTypeTxt}>{t('auth.profile.skinTypePrefix')}{profile.skin_type}</Text>
-          )}
         </View>
 
         <View style={s.statsRow}>
@@ -642,51 +639,6 @@ export default function AuthScreen() {
           <View style={s.gap} />
           <StatCard label={t('auth.profile.stats.routine')} value={routineCount} />
         </View>
-
-        <HeroCard
-          label={t('auth.profile.analysis.kicker')}
-          title={t('auth.profile.analysis.title')}
-          subtitle={t('auth.profile.analysis.subtitle')}
-          ctaLabel={t('auth.profile.analysis.cta')}
-          variant="espresso"
-          onPress={() => router.push('/(tabs)/skin-analysis' as any)}
-          style={{ marginBottom: Sp.lg }}
-        />
-
-        <ListRow
-          title={t('auth.profile.credits.title')}
-          subtitle={
-            creditsLoading
-              ? t('auth.profile.credits.loading')
-              : (creditBalance === 1
-                  ? t('auth.profile.credits.availableOne').replace('{n}', String(creditBalance))
-                  : t('auth.profile.credits.availableMany').replace('{n}', String(creditBalance)))
-          }
-          onPress={() => setCreditModalOpen(true)}
-        />
-
-        {!isPremium && (
-          <>
-            <PremiumCard variant="espresso" style={s.premium}>
-              <Text style={s.premiumLabel}>{t('auth.profile.premium.kicker')}</Text>
-              <Text style={s.premiumTitle}>{t('auth.profile.premium.title')}</Text>
-              <Text style={s.premiumSub}>{t('auth.profile.premium.subtitle')}</Text>
-              <PillButton
-                label={t('auth.profile.premium.cta')}
-                variant="primary"
-                size="md"
-                onPress={() => router.push('/paywall' as any)}
-                textColor={C.espresso}
-                style={{ marginTop: Sp.md, backgroundColor: C.white }}
-              />
-            </PremiumCard>
-            <ListRow
-              title={t('auth.profile.premium.restoreTitle')}
-              subtitle={restoring ? t('auth.profile.premium.restoreLoading') : t('auth.profile.premium.restoreSubtitle')}
-              onPress={handleRestore}
-            />
-          </>
-        )}
 
         {isPremium && (
           <>
@@ -700,14 +652,6 @@ export default function AuthScreen() {
             />
           </>
         )}
-
-        <Text style={s.section}>{t('auth.profile.sections.forYou')}</Text>
-
-        <PremiumCard variant="cream" style={{ marginBottom: Sp.sm }}>
-          <Text style={s.recoLabel}>{t('auth.profile.reco.kicker')}</Text>
-          <Text style={s.recoTitle}>{t('auth.profile.reco.title')}</Text>
-          <Text style={s.recoSub}>{t('auth.profile.reco.subtitle')}</Text>
-        </PremiumCard>
 
 {favoriteProducts.length > 0 ? (
           <View style={s.ritualSection}>
@@ -727,7 +671,7 @@ export default function AuthScreen() {
           </View>
         ) : null}
 <View style={s.skinQuizSection}>
-                  <Text style={s.section}>{t('auth.profile.sections.discoverSkin')}</Text>
+                  <Text style={s.section}>{t('auth.profile.sections.mySkin')}</Text>
                   {(() => {
                     const sp = memory?.skin_profile;
                     const hasProfile = !!(sp?.skin_type || sp?.sensitivity || sp?.goal);
@@ -776,7 +720,7 @@ export default function AuthScreen() {
                   })()}
                 </View>
 
-                                <Text style={s.section}>{t('auth.profile.sections.quickAccess')}</Text>
+                                <Text style={s.section}>{t('auth.profile.sections.mySpace')}</Text>
         <ListRow
           title={t('auth.profile.rows.journal.title')}
           subtitle={t('auth.profile.rows.journal.subtitle')}
@@ -793,16 +737,7 @@ export default function AuthScreen() {
           onPress={() => router.push('/saved' as any)}
         />
 
-        <ListRow
-          title={t('auth.profile.rows.archive.title')}
-          subtitle={t('auth.profile.rows.archive.subtitle')}
-          onPress={() => router.push('/(tabs)/archive' as any)}
-        />
-        <ListRow
-          title={t('auth.profile.rows.ritual.title')}
-          subtitle={t('auth.profile.rows.ritual.subtitle')}
-          onPress={() => router.push('/(tabs)/routine' as any)}
-        />
+        <Text style={s.section}>{t('auth.profile.sections.account')}</Text>
         <ListRow
           title={t('auth.profile.rows.signOut.title')}
           subtitle={t('auth.profile.rows.signOut.subtitle')}

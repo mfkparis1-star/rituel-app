@@ -377,6 +377,9 @@ export const tr: LocaleDict = {
         restoreLoading: 'Geri yükleniyor...',
       },
       sections: {
+      mySkin: 'CİLDİM',
+      mySpace: 'ALANIM',
+      account: 'HESAP',
         subscription: 'ABONELİK',
         forYou: 'SANA ÖZEL',
         inMyRitual: 'RİTÜELİMDE',

@@ -381,6 +381,9 @@ export const fr = {
         restoreLoading: 'Restauration en cours...',
       },
       sections: {
+      mySkin: 'MA PEAU',
+      mySpace: 'MON ESPACE',
+      account: 'COMPTE',
         subscription: 'ABONNEMENT',
         forYou: 'POUR TOI',
         inMyRitual: 'DANS MON RITUEL',
