@@ -47,3 +47,4 @@ app.json.bak
 # supabase local artifacts (CLI cache, generated types, link state)
 supabase/.temp/
 supabase/.branches/
+*.disabled
