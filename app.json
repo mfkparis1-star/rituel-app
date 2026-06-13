@@ -53,7 +53,14 @@
           "cameraPermission": "Rituel utilise la caméra pour scanner vos produits."
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "color": "#C08A6A"
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "router": {},

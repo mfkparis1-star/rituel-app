@@ -33,7 +33,8 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
 import { weekLune } from '../../utils/lune';
-import { getRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
+import { getRitualTime, setRitualTime as persistRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
+import { scheduleEveningReminder } from '../../utils/notify';
 import AphorismCard from '../../components/home/AphorismCard';
 import TonightRitualCard from '../../components/home/TonightRitualCard';
 import { useRoutineSteps } from '../../hooks/useRoutineSteps';
@@ -116,6 +117,7 @@ export default function IndexScreen() {
   const aphorism = aphorisms[dayOfYear % aphorisms.length];
   const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const lastSummary = memory?.last_analysis_summary ?? null;
 
   // Phase 17D — soft AI reflection
@@ -197,7 +199,32 @@ export default function IndexScreen() {
           onCreate={() => router.push('/(tabs)/routine' as any)}
           onCheckin={() => router.push('/check-in' as any)}
           ritualTime={ritualTime}
+          onEditTime={() => setShowTimePicker(true)}
         />
+        {showTimePicker && (() => {
+          let DateTimePicker: any = null;
+          try { DateTimePicker = require('@react-native-community/datetimepicker').default; } catch { DateTimePicker = null; }
+          if (!DateTimePicker) { return null; }
+          return (
+          <DateTimePicker
+            value={(() => { const [h, m] = ritualTime.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); return d; })()}
+            mode="time"
+            is24Hour
+            display="spinner"
+            onChange={(event: any, date?: Date) => {
+              setShowTimePicker(false);
+              if (event.type === 'set' && date) {
+                const hh = String(date.getHours()).padStart(2, '0');
+                const mm = String(date.getMinutes()).padStart(2, '0');
+                const next = `${hh}:${mm}`;
+                setRitualTime(next);
+                persistRitualTime(next);
+                scheduleEveningReminder(next, t('home.notify.title'), t('home.notify.body'));
+              }
+            }}
+          />
+          );
+        })()}
         <AphorismCard text={aphorism} />
 
         {/* Phase 17D — Soft AI Reflection (Home top) */}

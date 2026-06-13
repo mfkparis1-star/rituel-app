@@ -605,6 +605,7 @@ export const fr = {
 
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
+    notify: { title: 'Ton rituel du soir t\'attend ☾', body: 'Quelques minutes douces, rien que pour toi.' },
     recommend: { subtitle: 'Des soins choisis pour accompagner ton rituel.' },
     weekSummary: { one: '{n} check-in cette semaine. Tendance : {sym}', many: '{n} check-ins cette semaine. Tendance : {sym}' },
     adapt: {
