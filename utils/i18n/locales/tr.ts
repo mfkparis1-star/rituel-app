@@ -588,6 +588,21 @@ export const tr: LocaleDict = {
   },
 
   home: {
+    adapt: {
+      saved: 'Bu akşam için not edildi.',
+      label: 'RİTÜELİN UYARLANIYOR',
+      kept: 'kaldı',
+      softened: 'dinleniyor',
+      headline: {
+        glowing: 'Cildin ışıldıyor. Tam ritüelini koruyoruz.',
+        good: 'Güzel bir gün. Ritüelin aynen kalıyor.',
+        neutral: 'Sakin bir gün. Temel adımlar, fazlası yok.',
+        tired: 'Bu akşam hafifletiyoruz. Yumuşaklık ve nem, aktif yok.',
+        rough: 'Zor bir gün. Nazik kalıyoruz, fazlası yok.',
+      },
+      startCta: 'Ritüele başla',
+      seeHome: 'Ana sayfama dön',
+    },
     gestures: {
       nettoyant: 'Nemli cilde, masaj yaparak',
       tonique: 'Pamuk veya avuçla, hafifçe bastır',

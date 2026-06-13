@@ -600,6 +600,21 @@ export const fr = {
 
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
+    adapt: {
+      saved: 'C\'est noté pour ce soir.',
+      label: 'TON RITUEL S\'ADAPTE',
+      kept: 'gardé',
+      softened: 'au repos',
+      headline: {
+        glowing: 'Ta peau rayonne. On garde ton rituel complet.',
+        good: 'Belle journée. Ton rituel reste tel quel.',
+        neutral: 'Journée tranquille. L\'essentiel, sans excès.',
+        tired: 'Ce soir, on allège. Douceur et hydratation, sans actifs.',
+        rough: 'Journée difficile. On reste doux, rien de plus.',
+      },
+      startCta: 'Commencer le rituel',
+      seeHome: 'Voir mon accueil',
+    },
     gestures: {
       nettoyant: 'Sur peau humide, en massant',
       tonique: 'Sur coton ou paume, tapoter',

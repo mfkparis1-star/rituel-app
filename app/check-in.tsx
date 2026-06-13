@@ -19,6 +19,9 @@ import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
 import { CHECKIN_EMOJIS } from '../utils/checkins';
 import { C, R, Sp, Type } from '../theme';
+import { supabase } from '../lib/supabase';
+import { adaptRitual } from '../utils/ritualAdapt';
+import { categoryInfo } from '../utils/routineGestures';
 
 export default function CheckinScreen() {
   const { t } = useLanguage();
@@ -31,6 +34,8 @@ export default function CheckinScreen() {
   const [emoji, setEmoji] = useState<CheckinEmoji | null>(null);
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState<CheckinEmoji | null>(null);
+  const [adaptSteps, setAdaptSteps] = useState<{ id: string; product_name: string; category: string | null; duration: string }[]>([]);
 
   const canSubmit = !!emoji && !submitting;
 
@@ -38,16 +43,80 @@ export default function CheckinScreen() {
     if (!canSubmit || !emoji) return;
     setSubmitting(true);
     const ok = await submit(emoji, note.trim() || undefined);
-    setSubmitting(false);
     if (!ok) {
-      Alert.alert(
-        t('checkin.error.title'),
-        t('checkin.error.body')
-      );
+      setSubmitting(false);
+      Alert.alert(t('checkin.error.title'), t('checkin.error.body'));
       return;
     }
-    safeBack('/(tabs)');
+    // load tonight's steps to show the adaptation
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user?.id;
+      if (uid) {
+        const { data } = await supabase
+          .from('routine_steps')
+          .select('id, product_name, category, duration')
+          .eq('user_id', uid)
+          .eq('routine_type', 'soir')
+          .order('step_order', { ascending: true });
+        if (data) setAdaptSteps(data as any);
+      }
+    } catch {
+      // proceed with empty list
+    }
+    setSubmitting(false);
+    setSubmitted(emoji);
   };
+
+  if (submitted) {
+    const adaptation = adaptRitual(submitted, adaptSteps);
+    const emojiObj = CHECKIN_EMOJIS.find((e) => e.id === submitted);
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <SafeAreaView style={s.root} edges={['top']}>
+          <ScrollView contentContainerStyle={s.scroll}>
+            <Pressable onPress={() => router.replace('/(tabs)' as any)} style={s.adaptClose} hitSlop={10}>
+              <Text style={s.adaptCloseTxt}>✕</Text>
+            </Pressable>
+
+            <Text style={s.adaptEmoji}>{emojiObj?.symbol ?? ''}</Text>
+            <Text style={s.adaptMood}>{emojiLabelMap[submitted]}</Text>
+            <Text style={s.adaptSaved}>{t('home.adapt.saved')}</Text>
+
+            {adaptSteps.length > 0 && (
+              <View style={s.adaptCard}>
+                <Text style={s.adaptCardLabel}>{t('home.adapt.label')}</Text>
+                <Text style={s.adaptHeadline}>{t(adaptation.headlineKey)}</Text>
+                {adaptation.steps.map(({ step, softened }) => (
+                  <View key={step.id} style={s.adaptRow}>
+                    <View style={softened ? s.adaptStrike : s.adaptDot} />
+                    <Text style={[s.adaptStepTxt, softened && s.adaptStepSoft]}>
+                      {step.product_name}
+                    </Text>
+                    <Text style={s.adaptTag}>
+                      {softened ? t('home.adapt.softened') : t('home.adapt.kept')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <PillButton
+              label={t('home.adapt.startCta')}
+              variant="primary"
+              fullWidth
+              onPress={() => router.replace('/routine-session' as any)}
+              style={{ marginTop: Sp.lg }}
+            />
+            <Pressable onPress={() => router.replace('/(tabs)' as any)} hitSlop={8}>
+              <Text style={s.adaptSeeHome}>{t('home.adapt.seeHome')}</Text>
+            </Pressable>
+          </ScrollView>
+        </SafeAreaView>
+      </>
+    );
+  }
 
   return (
     <>
@@ -102,6 +171,21 @@ export default function CheckinScreen() {
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.appBg },
+  adaptClose: { alignSelf: 'flex-end', width: 34, height: 34, borderRadius: 17, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', marginTop: Sp.sm, marginBottom: Sp.md },
+  adaptCloseTxt: { fontSize: 14, color: C.espresso },
+  adaptEmoji: { fontSize: 54, textAlign: 'center', marginBottom: 4 },
+  adaptMood: { fontSize: 26, fontWeight: '300', color: C.espresso, textAlign: 'center' },
+  adaptSaved: { fontSize: 13, color: C.textSoft, textAlign: 'center', marginTop: 4, marginBottom: Sp.xl },
+  adaptCard: { backgroundColor: C.espresso, borderRadius: R.lg, padding: Sp.md },
+  adaptCardLabel: { fontSize: 10, letterSpacing: 1.6, color: C.copper },
+  adaptHeadline: { fontSize: 15, color: C.cream, marginTop: 6, marginBottom: Sp.sm, lineHeight: 21 },
+  adaptRow: { flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 9, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#4A352A' },
+  adaptDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.copper },
+  adaptStrike: { width: 6, height: 6, borderRadius: 3, borderWidth: 1, borderColor: C.textMid },
+  adaptStepTxt: { flex: 1, fontSize: 13, color: C.cream },
+  adaptStepSoft: { color: '#7C6456', textDecorationLine: 'line-through' },
+  adaptTag: { fontSize: 10, color: C.copper },
+  adaptSeeHome: { fontSize: 13, color: C.textSoft, textAlign: 'center', marginTop: Sp.md },
   scroll: { paddingHorizontal: Sp.lg, paddingTop: Sp.sm, paddingBottom: Sp.huge },
   back: { paddingVertical: Sp.sm, marginBottom: Sp.md },
   backTxt: { fontSize: 14, color: C.textMid },

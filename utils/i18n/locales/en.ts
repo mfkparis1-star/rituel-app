@@ -587,6 +587,21 @@ export const en: LocaleDict = {
   },
 
   home: {
+    adapt: {
+      saved: 'Noted for tonight.',
+      label: 'YOUR RITUAL ADAPTS',
+      kept: 'kept',
+      softened: 'resting',
+      headline: {
+        glowing: 'Your skin is glowing. We keep your full ritual.',
+        good: 'Good day. Your ritual stays as is.',
+        neutral: 'Quiet day. The essentials, nothing more.',
+        tired: 'Lighter tonight. Softness and hydration, no actives.',
+        rough: 'Rough day. We stay gentle, nothing more.',
+      },
+      startCta: 'Begin the ritual',
+      seeHome: 'See my home',
+    },
     gestures: {
       nettoyant: 'On damp skin, massaging gently',
       tonique: 'On a cotton pad or palm, pat in',
