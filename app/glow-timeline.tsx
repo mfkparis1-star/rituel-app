@@ -226,7 +226,7 @@ export default function GlowTimelineScreen() {
       [
         { text: t('glowTimeline.actions.post.edit'), onPress: () => handleEditPost(post) },
         { text: t('glowTimeline.actions.post.delete'), style: 'destructive', onPress: () => handleDeletePost(post) },
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('glowTimeline.actions.post.cancel'), style: 'cancel' },
       ]
     );
   };

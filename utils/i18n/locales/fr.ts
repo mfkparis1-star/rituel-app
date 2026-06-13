@@ -60,6 +60,7 @@ export const fr = {
     },
   },
   onboarding: {
+    swipeHint: 'Glissez pour découvrir',
     skip: 'Passer',
     next: 'Continuer',
     start: 'Commencer',
@@ -771,6 +772,7 @@ export const fr = {
       'Énergisant': 'Énergisant', Fragile: 'Fragile', Doux: 'Doux',
     },
     alerts: {
+        saveError: 'Erreur lors de l\'enregistrement. Réessayez.',
       permissionTitle: 'Accès aux photos refusé',
       permissionBody: 'Active l\u2019accès aux photos dans Réglages pour ajouter une image à ta publication.',
       permissionCancel: 'Annuler',
@@ -942,6 +944,7 @@ export const fr = {
     },
   },
   common: {
+    genericError: 'Une erreur est survenue. Réessayez.',
     loadError: { title: 'Un instant difficile', body: 'Le chargement n\'a pas abouti. Vérifie ta connexion.', retry: 'Réessayer' },
     time: {
     justNow: 'à l\'instant',

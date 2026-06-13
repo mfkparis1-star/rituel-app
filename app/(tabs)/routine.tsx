@@ -179,7 +179,7 @@ export default function RoutineScreen() {
     });
     setSaving(false);
     if (err) {
-      setError('Erreur lors de l\'enregistrement. Réessayez.');
+      setError(t('routine.alerts.saveError'));
       return;
     }
     setModalOpen(false);
@@ -255,7 +255,7 @@ export default function RoutineScreen() {
       setOptimizeResult(r);
       saveAICache('routine', { result: r });
     } catch (e: any) {
-      setOptimizeError(e?.message || 'Une erreur est survenue. Réessayez.');
+      setOptimizeError(e?.message || t('common.genericError'));
     } finally {
       setOptimizing(false);
     }

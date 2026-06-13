@@ -60,6 +60,7 @@ export const en: LocaleDict = {
     },
   },
   onboarding: {
+    swipeHint: 'Swipe to discover',
     skip: 'Skip',
     next: 'Continue',
     start: 'Begin',
@@ -752,6 +753,7 @@ export const en: LocaleDict = {
       'Énergisant': 'Energizing', Fragile: 'Fragile', Doux: 'Gentle',
     },
     alerts: {
+        saveError: 'Could not save. Please try again.',
       permissionTitle: 'Photo access denied',
       permissionBody: 'Enable photo access in Settings to add an image to your post.',
       permissionCancel: 'Cancel',
@@ -923,6 +925,7 @@ export const en: LocaleDict = {
     },
   },
   common: {
+    genericError: 'Something went wrong. Please try again.',
     loadError: { title: 'Something slipped', body: 'We couldn\'t load this. Check your connection.', retry: 'Try again' },
     time: {
     justNow: 'just now',

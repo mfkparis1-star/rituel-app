@@ -151,7 +151,7 @@ export default function MakeupScreen() {
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
-      const msg = e?.message || 'Une erreur est survenue. Réessayez.';
+      const msg = e?.message || t('common.genericError');
       setErrorMsg(msg);
       setStep('error');
     }

@@ -257,7 +257,7 @@ export default function CommunityScreen() {
       [
         { text: t('community.alerts.editCaption'), onPress: () => handleEditCaption(post) },
         { text: t('community.alerts.delete'), style: 'destructive', onPress: () => handleDeletePost(post) },
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('community.alerts.cancel'), style: 'cancel' },
       ]
     );
   };

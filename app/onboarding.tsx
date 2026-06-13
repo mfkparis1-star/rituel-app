@@ -133,7 +133,7 @@ export default function OnboardingScreen() {
           </View>
         ) : (
           <View style={s.ctaWrap}>
-            <Text style={s.hint}>Glissez pour découvrir</Text>
+            <Text style={s.hint}>{t('onboarding.swipeHint')}</Text>
           </View>
         )}
       </SafeAreaView>

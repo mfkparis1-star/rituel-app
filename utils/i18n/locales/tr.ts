@@ -60,6 +60,7 @@ export const tr: LocaleDict = {
     },
   },
   onboarding: {
+    swipeHint: 'Keşfetmek için kaydır',
     skip: 'Atla',
     next: 'Devam et',
     start: 'Başla',
@@ -753,6 +754,7 @@ export const tr: LocaleDict = {
       'Énergisant': 'Enerjik', Fragile: 'Kırılgan', Doux: 'Yumuşak',
     },
     alerts: {
+        saveError: 'Kaydedilemedi. Tekrar dene.',
       permissionTitle: 'Fotoğraf erişimi reddedildi',
       permissionBody: 'Paylaşımına görsel eklemek için Ayarlar\'dan fotoğraf erişimini aç.',
       permissionCancel: 'İptal',
@@ -924,6 +926,7 @@ export const tr: LocaleDict = {
     },
   },
   common: {
+    genericError: 'Bir hata oluştu. Tekrar dene.',
     loadError: { title: 'Bir aksilik oldu', body: 'Yüklenemedi. Bağlantını kontrol et.', retry: 'Tekrar dene' },
     time: {
     justNow: 'az önce',
