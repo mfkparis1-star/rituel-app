@@ -66,18 +66,18 @@ export const fr = {
     start: 'Commencer',
     slide1: {
       kicker: 'BIENVENUE',
-      headline: 'Votre journal de beauté\nvous attend.',
-      subtitle: "Un espace intime, pensé pour vous. Pas un coach, pas un réseau social — juste votre histoire, jour après jour.",
+      headline: 'Un rituel qui te\nressemble.',
+      subtitle: 'Rituel apprend ta peau, ton rythme, tes envies — et t\'accompagne avec des conseils pensés pour toi seule.',
     },
     slide2: {
-      kicker: 'VOTRE RYTHME',
-      headline: 'Chaque check-in\ncompte.',
-      subtitle: 'Un emoji, une note libre. Rituel se rappelle de chaque instant pour mieux vous accompagner. La Glow Timeline garde votre histoire.',
+      kicker: 'CHAQUE JOUR',
+      headline: 'Quelques minutes,\nrien que pour toi.',
+      subtitle: 'Un check-in, un geste, un instant. Rituel se souvient de chaque soir et adapte ton rituel à ton énergie du moment.',
     },
     slide3: {
-      kicker: 'COMMUNAUTÉ',
-      headline: 'Inspirée par celles\nqui vous ressemblent.',
-      subtitle: "Partagez vos rituels, sauvegardez vos inspirations. Pas de comparaisons, pas d'algorithme agressif — un journal collectif.",
+      kicker: 'TON ESPACE',
+      headline: 'Ton histoire,\njour après jour.',
+      subtitle: 'Pas de comparaisons, pas d\'algorithme. Juste ton journal intime — et, si tu veux, une communauté douce qui te ressemble.',
     },
   },
 

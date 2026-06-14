@@ -66,7 +66,10 @@ export default function OnboardingScreen() {
 
   const finish = async () => {
     await markOnboarded();
-    router.replace('/(tabs)');
+    // Lead straight into the skin quiz so the first run personalizes
+    // and shows value, instead of dropping onto an empty Accueil. The
+    // quiz is fully skippable and exits to Accueil when reached this way.
+    router.replace('/profile/skin-quiz?from=onboarding' as any);
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {

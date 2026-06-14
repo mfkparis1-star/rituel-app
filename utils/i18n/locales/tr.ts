@@ -66,18 +66,18 @@ export const tr: LocaleDict = {
     start: 'Başla',
     slide1: {
       kicker: 'HOŞ GELDİN',
-      headline: 'Güzellik günlüğün\nseni bekliyor.',
-      subtitle: 'Sana özel, samimi bir alan. Bir koç değil, bir sosyal medya değil — sadece senin hikâyen, gün gün.',
+      headline: 'Sana benzeyen\nbir ritüel.',
+      subtitle: 'Rituel cildini, ritmini, isteklerini öğrenir — ve yalnızca sana özel önerilerle sana eşlik eder.',
     },
     slide2: {
-      kicker: 'KENDİ RİTMİN',
-      headline: 'Her check-in\nönemli.',
-      subtitle: 'Bir emoji, kısa bir not. Rituel her anı hatırlar, sana daha iyi eşlik etmek için. Glow Timeline hikâyeni saklar.',
+      kicker: 'HER GÜN',
+      headline: 'Yalnızca sana ait\nbirkaç dakika.',
+      subtitle: 'Bir check-in, bir dokunuş, bir an. Rituel her akşamı hatırlar ve ritüelini o anki enerjine göre uyarlar.',
     },
     slide3: {
-      kicker: 'TOPLULUK',
-      headline: 'Sana benzeyenlerden\nilham al.',
-      subtitle: 'Rituellerini paylaş, ilham aldıklarını sakla. Karşılaştırma yok, agresif algoritma yok — ortak bir günlük.',
+      kicker: 'SENİN ALANIN',
+      headline: 'Senin hikâyen,\ngün be gün.',
+      subtitle: 'Kıyas yok, algoritma yok. Sadece senin özel günlüğün — ve istersen, sana benzeyen nazik bir topluluk.',
     },
   },
 

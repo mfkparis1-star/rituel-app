@@ -16,7 +16,7 @@
  * Downstream effect: utils/reflection.ts reads skin_profile in
  * buildPrompt for richer personalized output (Phase 17D).
  */
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -115,6 +115,15 @@ const QUESTIONS: Question[] = [
 const MAX_NOTE = 140;
 
 export default function SkinQuizScreen() {
+  const params = useLocalSearchParams<{ from?: string }>();
+  const fromOnboarding = params.from === 'onboarding';
+  // When reached from onboarding there's no back-stack to auth, and we
+  // want the first run to end on a populated Accueil, not the auth tab.
+  const exitQuiz = () => {
+    if (fromOnboarding) { router.replace('/(tabs)' as any); }
+    else { safeBack('/(tabs)/auth'); }
+  };
+
   const { t } = useLanguage();
   const { memory, patch, loading: memLoading } = useMemory();
   const { isPremium } = usePremium();
@@ -184,7 +193,7 @@ export default function SkinQuizScreen() {
       },
     });
     setSubmitting(false);
-    safeBack('/(tabs)/auth');
+    exitQuiz();
   };
 
   const handleAiAnalysis = async () => {
@@ -213,7 +222,7 @@ export default function SkinQuizScreen() {
   };
 
   const handleExit = () => {
-    safeBack('/(tabs)/auth');
+    exitQuiz();
   };
 
   // ----- Summary view -----

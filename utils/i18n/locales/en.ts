@@ -66,18 +66,18 @@ export const en: LocaleDict = {
     start: 'Begin',
     slide1: {
       kicker: 'WELCOME',
-      headline: 'Your beauty journal\nawaits.',
-      subtitle: 'An intimate space, made for you. Not a coach, not a social feed — just your story, day after day.',
+      headline: 'A ritual that\nfeels like you.',
+      subtitle: 'Rituel learns your skin, your rhythm, your wishes — and guides you with advice meant for you alone.',
     },
     slide2: {
-      kicker: 'YOUR RHYTHM',
-      headline: 'Every check-in\nmatters.',
-      subtitle: 'One emoji, one free note. Rituel remembers each moment to accompany you better. The Glow Timeline holds your story.',
+      kicker: 'EVERY DAY',
+      headline: 'A few minutes,\njust for you.',
+      subtitle: 'A check-in, a gesture, a moment. Rituel remembers each evening and adapts your ritual to how you feel.',
     },
     slide3: {
-      kicker: 'COMMUNITY',
-      headline: 'Inspired by those\nlike you.',
-      subtitle: "Share your rituals, save what moves you. No comparison, no aggressive algorithm — a collective journal.",
+      kicker: 'YOUR SPACE',
+      headline: 'Your story,\nday after day.',
+      subtitle: 'No comparisons, no algorithm. Just your private journal — and, if you like, a gentle community that feels like you.',
     },
   },
 
