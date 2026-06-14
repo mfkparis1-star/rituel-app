@@ -1,4 +1,5 @@
 import { type Session } from '@supabase/supabase-js';
+import { identifyUser, resetAnalytics } from '../../utils/analytics';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -100,6 +101,7 @@ export default function AuthScreen() {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (newSession?.user?.id) { identifyUser(newSession.user.id); }
       if (!mounted) return;
       setSession(newSession);
       setMode(newSession ? 'profile' : 'signin');
@@ -275,6 +277,7 @@ export default function AuthScreen() {
           onPress: async () => {
             setSubmitting(true);
             await supabase.auth.signOut();
+            resetAnalytics();
             setEmail('');
             setPassword('');
             setName('');

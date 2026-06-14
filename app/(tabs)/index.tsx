@@ -33,6 +33,7 @@ import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
 import { weekLune, luneCount, weekStreak } from '../../utils/lune';
 import { captureAndShare } from '../../utils/shareCard';
+import { trackEvent } from '../../utils/analytics';
 import GlowShareCard from '../../components/share/GlowShareCard';
 import { getRitualTime, setRitualTime as persistRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
 import { scheduleEveningReminder } from '../../utils/notify';
@@ -190,7 +191,7 @@ export default function IndexScreen() {
           return (
             <Pressable
               style={s.glowStreak}
-              onPress={() => { captureAndShare(glowCardRef, 'rituel-glow'); }}
+              onPress={() => { trackEvent('glow_streak_shared', { count, streak }); captureAndShare(glowCardRef, 'rituel-glow'); }}
               hitSlop={10}
             >
               <Text style={s.glowStreakTxt}>

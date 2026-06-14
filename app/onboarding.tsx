@@ -8,6 +8,7 @@
  * Triggered from the root layout when profile.onboarded === false.
  */
 import { useEffect, useRef, useState } from 'react';
+import { trackEvent } from '../utils/analytics';
 import {
   Dimensions,
   Pressable,
@@ -65,6 +66,7 @@ export default function OnboardingScreen() {
   const { markOnboarded } = useOnboarded(session?.user?.id);
 
   const finish = async () => {
+    trackEvent('onboarding_completed');
     await markOnboarded();
     // Lead straight into the skin quiz so the first run personalizes
     // and shows value, instead of dropping onto an empty Accueil. The

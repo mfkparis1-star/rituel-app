@@ -3,8 +3,13 @@ import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
+import { initAnalytics } from '../utils/analytics';
 
 export default function RootLayout() {
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
   useEffect(() => {
     // Tapping the evening reminder should open the guided ritual, not
     // just the app. Lazy require so a missing native module (older

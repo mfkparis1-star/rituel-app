@@ -11,6 +11,7 @@ import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
 import { saveSkinAnalysis, getSkinHistory, computeGlowTrend, type GlowTrend } from '../../utils/skinHistory';
+import { trackEvent } from '../../utils/analytics';
 import { useLanguage } from '../../hooks/useLanguage';
 import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
@@ -149,9 +150,14 @@ export default function SkinAnalysisScreen() {
       saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence });
+      trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       // Load the journey trend (compares with the previous analysis).
-      getSkinHistory(5).then((h) => setTrend(computeGlowTrend(h))).catch(() => {});
+      getSkinHistory(5).then((h) => {
+        const tr = computeGlowTrend(h);
+        setTrend(tr);
+        if (tr.hasPrevious) { trackEvent('skin_evolution_shown', { daysSince: tr.daysSincePrevious, issuesDelta: tr.issuesDelta }); }
+      }).catch(() => {});
       setStep('result');
     } catch (e: any) {
       const msg = e?.message || t('skinAnalysis.errorFallback');
