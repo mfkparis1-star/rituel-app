@@ -600,7 +600,8 @@ export const en: LocaleDict = {
   },
 
   home: {
-    notify: { title: 'Your evening ritual awaits ☾', body: 'A few gentle minutes, just for you.' },
+    notify: {
+        pickerTitle: 'Ritual time', title: 'Your evening ritual awaits ☾', body: 'A few gentle minutes, just for you.' },
     recommend: { subtitle: 'A curated selection to go with your ritual.' },
     weekSummary: { one: '{n} check-in this week. Trend: {sym}', many: '{n} check-ins this week. Trend: {sym}' },
     adapt: {

@@ -77,7 +77,7 @@ export async function scheduleEveningReminder(
   try {
     await cancelEveningReminder();
     await N.scheduleNotificationAsync({
-      content: { title, body, sound: false },
+      content: { title, body, sound: false, data: { route: '/routine-session' } },
       trigger: {
         type: N.SchedulableTriggerInputTypes.DAILY,
         hour,

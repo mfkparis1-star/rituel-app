@@ -16,10 +16,11 @@
  * degrades to a clean welcome state with the Skin Analysis CTA.
  */
 import { router, useFocusEffect } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState, useCallback } from 'react';
 import PremiumCard from '../../components/ui/PremiumCard';
+import PillButton from '../../components/ui/PillButton';
 import AffiliateProductCard from '../../components/ui/AffiliateProductCard';
 import { getAffiliateRecommendations } from '../../utils/affiliateRecommendations';
 import type { AffiliateProduct } from '../../utils/affiliateRecommendations';
@@ -106,6 +107,7 @@ export default function IndexScreen() {
   const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [tempTime, setTempTime] = useState<Date | null>(null);
 
   // Phase 17D — soft AI reflection
   const { isPremium } = usePremium();
@@ -192,24 +194,65 @@ export default function IndexScreen() {
           let DateTimePicker: any = null;
           try { DateTimePicker = require('@react-native-community/datetimepicker').default; } catch { DateTimePicker = null; }
           if (!DateTimePicker) { return null; }
+
+          const initial = tempTime ?? (() => {
+            const [h, m] = ritualTime.split(':').map(Number);
+            const d = new Date(); d.setHours(h, m, 0, 0); return d;
+          })();
+
+          const commit = (date: Date) => {
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            const next = `${hh}:${mm}`;
+            setRitualTime(next);
+            persistRitualTime(next);
+            scheduleEveningReminder(next, t('home.notify.title'), t('home.notify.body'));
+          };
+
+          const closePicker = () => { setShowTimePicker(false); setTempTime(null); };
+
+          // Android: native dialog handles confirm/cancel via onChange.
+          if (Platform.OS === 'android') {
+            return (
+              <DateTimePicker
+                value={initial}
+                mode="time"
+                is24Hour
+                display="spinner"
+                onChange={(event: any, date?: Date) => {
+                  closePicker();
+                  if (event.type === 'set' && date) commit(date);
+                }}
+              />
+            );
+          }
+
+          // iOS: keep the spinner open inside a modal; only Confirmer saves.
           return (
-          <DateTimePicker
-            value={(() => { const [h, m] = ritualTime.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); return d; })()}
-            mode="time"
-            is24Hour
-            display="spinner"
-            onChange={(event: any, date?: Date) => {
-              setShowTimePicker(false);
-              if (event.type === 'set' && date) {
-                const hh = String(date.getHours()).padStart(2, '0');
-                const mm = String(date.getMinutes()).padStart(2, '0');
-                const next = `${hh}:${mm}`;
-                setRitualTime(next);
-                persistRitualTime(next);
-                scheduleEveningReminder(next, t('home.notify.title'), t('home.notify.body'));
-              }
-            }}
-          />
+            <Modal transparent animationType="fade" visible onRequestClose={closePicker}>
+              <Pressable style={s.pickerBackdrop} onPress={closePicker}>
+                <Pressable style={s.pickerSheet} onPress={(e) => e.stopPropagation()}>
+                  <Text style={s.pickerTitle}>{t('home.notify.pickerTitle')}</Text>
+                  <DateTimePicker
+                    value={initial}
+                    mode="time"
+                    is24Hour
+                    display="spinner"
+                    onChange={(_event: any, date?: Date) => { if (date) setTempTime(date); }}
+                  />
+                  <View style={s.pickerActions}>
+                    <Pressable onPress={closePicker} hitSlop={10} style={s.pickerCancel}>
+                      <Text style={s.pickerCancelTxt}>{t('common.cancel')}</Text>
+                    </Pressable>
+                    <PillButton
+                      label={t('common.confirm')}
+                      variant="primary"
+                      onPress={() => { commit(initial); closePicker(); }}
+                    />
+                  </View>
+                </Pressable>
+              </Pressable>
+            </Modal>
           );
         })()}
         <AphorismCard text={aphorism} />
@@ -503,4 +546,42 @@ const s = StyleSheet.create({
     color: '#A99583',
     marginTop: 4,
     letterSpacing: 0.3,
+  },
+  pickerBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(42,20,16,0.35)',
+    justifyContent: 'flex-end',
+  },
+  pickerSheet: {
+    backgroundColor: '#F6F1EC',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 34,
+    alignItems: 'center',
+  },
+  pickerTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: '#C08A6A',
+    marginBottom: 6,
+  },
+  pickerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+    gap: 16,
+  },
+  pickerCancel: {
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+  },
+  pickerCancelTxt: {
+    fontSize: 15,
+    color: '#9C8576',
   },});
