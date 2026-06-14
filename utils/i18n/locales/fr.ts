@@ -744,6 +744,7 @@ export const fr = {
     focus: { label: 'TON SEUL FOCUS' },
     strength: { label: 'TA FORCE' },
     evolution: {
+      glowUp: 'Ton glow a gagné +{n} ✦',
       label: 'TON ÉVOLUTION',
       since: 'Depuis ton analyse il y a {n} jours',
       fewer: 'Une observation de moins — ta peau s\'apaise ✦',

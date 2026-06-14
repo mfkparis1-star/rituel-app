@@ -60,12 +60,14 @@ export type GlowTrend = {
   daysSincePrevious: number | null;
   issuesDelta: number | null;   // negative = fewer issues now (improvement)
   confidenceDelta: number | null;
+  glowScoreDelta: number | null;
+  latestGlowScore: number | null;
 };
 
 /** Compare the two most recent analyses into a simple trend. */
 export function computeGlowTrend(history: SkinAnalysisRecord[]): GlowTrend {
   if (!history || history.length < 2) {
-    return { hasPrevious: false, daysSincePrevious: null, issuesDelta: null, confidenceDelta: null };
+    return { hasPrevious: false, daysSincePrevious: null, issuesDelta: null, confidenceDelta: null, glowScoreDelta: null, latestGlowScore: history && history[0] ? (history[0].glow_score ?? null) : null };
   }
   const [current, previous] = history;
   const ms = new Date(current.created_at).getTime() - new Date(previous.created_at).getTime();
@@ -75,5 +77,9 @@ export function computeGlowTrend(history: SkinAnalysisRecord[]): GlowTrend {
     current.confidence != null && previous.confidence != null
       ? Number((current.confidence - previous.confidence).toFixed(2))
       : null;
-  return { hasPrevious: true, daysSincePrevious: days, issuesDelta, confidenceDelta };
+  const glowScoreDelta =
+    current.glow_score != null && previous.glow_score != null
+      ? current.glow_score - previous.glow_score
+      : null;
+  return { hasPrevious: true, daysSincePrevious: days, issuesDelta, confidenceDelta, glowScoreDelta, latestGlowScore: current.glow_score ?? null };
 }

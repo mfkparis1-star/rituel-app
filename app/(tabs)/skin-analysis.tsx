@@ -335,6 +335,9 @@ export default function SkinAnalysisScreen() {
                 <Text style={s.evolutionDays}>
                   {t('skinAnalysis.evolution.since').replace('{n}', String(trend.daysSincePrevious ?? 0))}
                 </Text>
+                {trend.glowScoreDelta != null && trend.glowScoreDelta > 0 && (
+                  <Text style={s.evolutionUp}>{t('skinAnalysis.evolution.glowUp').replace('{n}', String(trend.glowScoreDelta))}</Text>
+                )}
                 {trend.issuesDelta != null && trend.issuesDelta < 0 && (
                   <Text style={s.evolutionUp}>{t('skinAnalysis.evolution.fewer')}</Text>
                 )}

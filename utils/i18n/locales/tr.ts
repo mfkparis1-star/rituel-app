@@ -729,6 +729,7 @@ export const tr: LocaleDict = {
     focus: { label: 'TEK ODAĞIN' },
     strength: { label: 'GÜCÜN' },
     evolution: {
+      glowUp: 'Glow’un +{n} yükseldi ✦',
       label: 'GELİŞİMİN',
       since: '{n} gün önceki analizinden bu yana',
       fewer: 'Bir gözlem daha az — cildin rahatlıyor ✦',

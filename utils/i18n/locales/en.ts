@@ -728,6 +728,7 @@ export const en: LocaleDict = {
     focus: { label: 'YOUR ONE FOCUS' },
     strength: { label: 'YOUR STRENGTH' },
     evolution: {
+      glowUp: 'Your glow rose +{n} ✦',
       label: 'YOUR JOURNEY',
       since: 'Since your analysis {n} days ago',
       fewer: 'One less observation — your skin is settling ✦',
