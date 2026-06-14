@@ -38,6 +38,11 @@ export class AIProxyError extends Error {
 
 export function localizedAIError(code: string, lang: Lang): string {
   const messages: Record<string, Record<Lang, string>> = {
+    OFFLINE: {
+      fr: 'Pas de connexion internet. Vérifie ton réseau.',
+      tr: 'İnternet bağlantısı yok. Ağını kontrol et.',
+      en: 'No internet connection. Check your network.',
+    },
     NO_SESSION: {
       fr: 'Connectez-vous pour continuer.',
       tr: 'Devam etmek için oturum açın.',
