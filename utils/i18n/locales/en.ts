@@ -722,6 +722,11 @@ export const en: LocaleDict = {
 },
 
   skinAnalysis: {
+    glow: { kicker: 'YOUR GLOW TODAY', caption: 'Your skin is radiant today', sub: 'A snapshot, not a grade — it evolves with you' },
+    character: { label: 'YOUR SKIN CHARACTER' },
+    noticed: { label: '✦ WHAT I NOTICED' },
+    focus: { label: 'YOUR ONE FOCUS' },
+    strength: { label: 'YOUR STRENGTH' },
     evolution: {
       label: 'YOUR JOURNEY',
       since: 'Since your analysis {n} days ago',

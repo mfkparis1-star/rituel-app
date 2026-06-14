@@ -723,6 +723,11 @@ export const tr: LocaleDict = {
 },
 
   skinAnalysis: {
+    glow: { kicker: 'BUGÜNKÜ GLOW\'UN', caption: 'Cildin bugün ışıldıyor', sub: 'Bir an, bir not değil — seninle değişir' },
+    character: { label: 'CİLT KARAKTERİN' },
+    noticed: { label: '✦ FARK ETTİĞİM' },
+    focus: { label: 'TEK ODAĞIN' },
+    strength: { label: 'GÜCÜN' },
     evolution: {
       label: 'GELİŞİMİN',
       since: '{n} gün önceki analizinden bu yana',

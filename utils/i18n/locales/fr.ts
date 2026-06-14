@@ -738,6 +738,11 @@ export const fr = {
   // AI result content + skin-type label come from utils/skinAnalysis.ts
   // (already FR/EN/TR aware via the lang param).
   skinAnalysis: {
+    glow: { kicker: 'TON GLOW DU JOUR', caption: 'Ta peau rayonne aujourd\'hui', sub: 'Un instantané, pas une note — il évolue avec toi' },
+    character: { label: 'TON CARACTÈRE DE PEAU' },
+    noticed: { label: '✦ CE QUE J\'AI REMARQUÉ' },
+    focus: { label: 'TON SEUL FOCUS' },
+    strength: { label: 'TA FORCE' },
     evolution: {
       label: 'TON ÉVOLUTION',
       since: 'Depuis ton analyse il y a {n} jours',

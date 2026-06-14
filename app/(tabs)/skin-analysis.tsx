@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Circle } from 'react-native-svg';
 import PillButton from '../../components/ui/PillButton';
 import PremiumCard from '../../components/ui/PremiumCard';
 import LockedAICard from '../../components/credits/LockedAICard';
@@ -23,6 +23,11 @@ type SkinResult = {
   issues: string[];
   recommendations: string[];
   missingCategories?: string[];
+  glowScore?: number;
+  skinCharacter?: string;
+  noticed?: string;
+  focus?: string;
+  strength?: string;
 };
 
 const TIP_KEYS = ['light', 'noMakeup', 'centered'] as const;
@@ -144,10 +149,15 @@ export default function SkinAnalysisScreen() {
         issues: parsed.issues,
         recommendations: parsed.recommendations,
         missingCategories: parsed.missingCategories,
+        glowScore: parsed.glowScore,
+        skinCharacter: parsed.skinCharacter,
+        noticed: parsed.noticed,
+        focus: parsed.focus,
+        strength: parsed.strength,
       });
       const newResultId = `skin_${Date.now()}`;
       setResultId(newResultId);
-      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence }, resultId: newResultId });
+      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
       trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
@@ -280,9 +290,44 @@ export default function SkinAnalysisScreen() {
               </View>
             )}
 
+            {result.glowScore != null && (
+              <View style={s.glowBlock}>
+                <Text style={s.glowKicker}>{t('skinAnalysis.glow.kicker')}</Text>
+                <View style={s.glowRing}>
+                  <Svg width={150} height={150} viewBox="0 0 150 150">
+                    <Circle cx={75} cy={75} r={66} fill="none" stroke="#ECE0D6" strokeWidth={8} />
+                    <Circle cx={75} cy={75} r={66} fill="none" stroke="#C08A6A" strokeWidth={8} strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 66}
+                      strokeDashoffset={(2 * Math.PI * 66) * (1 - (result.glowScore / 100))}
+                      transform="rotate(-90 75 75)" />
+                  </Svg>
+                  <View style={s.glowNumWrap}>
+                    <Text style={s.glowNum}>{result.glowScore}</Text>
+                    <Text style={s.glowStar}>✦</Text>
+                  </View>
+                </View>
+                <Text style={s.glowCaption}>{t('skinAnalysis.glow.caption')}</Text>
+                <Text style={s.glowSub}>{t('skinAnalysis.glow.sub')}</Text>
+              </View>
+            )}
+
             <View style={s.skinTypeBadge}>
               <Text style={s.skinTypeBadgeTxt}>{t('skinAnalysis.skinTypePrefix')}{result.skinType}</Text>
             </View>
+
+            {result.skinCharacter && (
+              <View style={s.characterCard}>
+                <Text style={s.cardKicker}>{t('skinAnalysis.character.label')}</Text>
+                <Text style={s.characterBody}>{result.skinCharacter}</Text>
+              </View>
+            )}
+
+            {result.noticed && (
+              <View style={s.noticedCard}>
+                <Text style={s.noticedKicker}>{t('skinAnalysis.noticed.label')}</Text>
+                <Text style={s.noticedBody}>{result.noticed}</Text>
+              </View>
+            )}
 
             {trend?.hasPrevious && (
               <View style={s.evolutionCard}>
@@ -309,6 +354,13 @@ export default function SkinAnalysisScreen() {
                 <Text style={s.issueText}>{issue}</Text>
               </View>
             ))}
+
+            {result.focus && (
+              <View style={s.focusCard}>
+                <Text style={s.focusKicker}>{t('skinAnalysis.focus.label')}</Text>
+                <Text style={s.focusBody}>{result.focus}</Text>
+              </View>
+            )}
             {(unlocked || isPremium) ? (
               <>
                 <Text style={s.sectionTitle}>{t('skinAnalysis.sections.recommendations')}</Text>
@@ -336,6 +388,13 @@ export default function SkinAnalysisScreen() {
                   onUnlocked={() => setUnlocked(true)}
                 />
               )
+            )}
+
+            {result.strength && (
+              <View style={s.strengthCard}>
+                <Text style={s.strengthKicker}>{t('skinAnalysis.strength.label')}</Text>
+                <Text style={s.strengthBody}>{result.strength}</Text>
+              </View>
             )}
 
             <PillButton
@@ -490,6 +549,26 @@ const s = StyleSheet.create({
     borderRadius: R.full,
     marginBottom: Sp.lg,
   },
+  glowBlock: { alignItems: 'center', marginBottom: Sp.lg },
+  glowKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 2, color: C.copper, marginBottom: 8 },
+  glowRing: { width: 150, height: 150, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  glowNumWrap: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
+  glowNum: { fontSize: 46, fontWeight: '300', color: C.espresso, lineHeight: 50 },
+  glowStar: { fontSize: 14, color: C.copper, marginTop: -2 },
+  glowCaption: { fontSize: 15, fontWeight: '600', color: '#A66E4F', textAlign: 'center', marginBottom: 2 },
+  glowSub: { fontSize: 11, color: C.textSoft, fontStyle: 'italic', textAlign: 'center' },
+  characterCard: { backgroundColor: C.white, borderRadius: R.lg, padding: Sp.md, marginBottom: Sp.sm },
+  cardKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 6 },
+  characterBody: { fontSize: 14, lineHeight: 21, color: C.espresso },
+  noticedCard: { backgroundColor: '#FBF4EC', borderRadius: R.lg, padding: Sp.md, marginBottom: Sp.lg, borderWidth: 1, borderColor: C.border },
+  noticedKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 5 },
+  noticedBody: { fontSize: 13, lineHeight: 19, color: C.textMid, fontStyle: 'italic' },
+  focusCard: { backgroundColor: C.cream, borderRadius: R.lg, padding: Sp.md, marginTop: Sp.sm, marginBottom: Sp.sm },
+  focusKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 6 },
+  focusBody: { fontSize: 14, lineHeight: 21, color: C.espresso },
+  strengthCard: { backgroundColor: '#EDF4EE', borderRadius: R.lg, padding: Sp.md, marginTop: Sp.md, marginBottom: Sp.sm },
+  strengthKicker: { fontSize: 10, letterSpacing: 1.4, color: '#5B9B6B', fontWeight: '700', marginBottom: 4 },
+  strengthBody: { fontSize: 14, lineHeight: 21, color: '#3E6E4C' },
   skinTypeBadgeTxt: {
     color: C.white,
     fontSize: 12,
