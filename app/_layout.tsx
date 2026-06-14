@@ -4,8 +4,19 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { initAnalytics } from '../utils/analytics';
+import * as Sentry from '@sentry/react-native';
 
-export default function RootLayout() {
+const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    // Capture a fraction of transactions for performance; crashes are
+    // always captured. Tune later if volume grows.
+    tracesSampleRate: 0.2,
+  });
+}
+
+function RootLayout() {
   useEffect(() => {
     initAnalytics();
   }, []);
@@ -40,3 +51,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(RootLayout);
