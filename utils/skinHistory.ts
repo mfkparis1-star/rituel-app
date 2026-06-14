@@ -13,12 +13,13 @@ export type SkinAnalysisRecord = {
   issues: string[];
   recommendations: string[];
   confidence: number | null;
+  glow_score: number | null;
   created_at: string;
 };
 
 /** Fire-and-forget save. Never throws. */
 export async function saveSkinAnalysis(
-  result: Pick<SkinAnalysisResult, 'skinType' | 'issues' | 'recommendations' | 'confidence'>
+  result: Pick<SkinAnalysisResult, 'skinType' | 'issues' | 'recommendations' | 'confidence' | 'glowScore'>
 ): Promise<void> {
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -29,6 +30,7 @@ export async function saveSkinAnalysis(
       issues: result.issues ?? [],
       recommendations: result.recommendations ?? [],
       confidence: result.confidence ?? null,
+      glow_score: result.glowScore ?? null,
     });
   } catch {
     // non-fatal: journey tracking is a bonus, never blocks analysis
@@ -42,7 +44,7 @@ export async function getSkinHistory(limit = 10): Promise<SkinAnalysisRecord[]> 
     if (!session) return [];
     const { data, error } = await supabase
       .from('skin_analyses')
-      .select('id, skin_type, issues, recommendations, confidence, created_at')
+      .select('id, skin_type, issues, recommendations, confidence, glow_score, created_at')
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false })
       .limit(limit);

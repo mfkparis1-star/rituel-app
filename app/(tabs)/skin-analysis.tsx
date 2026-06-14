@@ -149,7 +149,7 @@ export default function SkinAnalysisScreen() {
       setResultId(newResultId);
       saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
-      saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence });
+      saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
       trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       // Load the journey trend (compares with the previous analysis).
