@@ -18,7 +18,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import PremiumCard from '../../components/ui/PremiumCard';
 import PillButton from '../../components/ui/PillButton';
 import AffiliateProductCard from '../../components/ui/AffiliateProductCard';
@@ -32,6 +32,8 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
 import { weekLune, luneCount, weekStreak } from '../../utils/lune';
+import { captureAndShare } from '../../utils/shareCard';
+import GlowShareCard from '../../components/share/GlowShareCard';
 import { getRitualTime, setRitualTime as persistRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
 import { scheduleEveningReminder } from '../../utils/notify';
 import AphorismCard from '../../components/home/AphorismCard';
@@ -108,6 +110,7 @@ export default function IndexScreen() {
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [streak, setStreak] = useState(0);
+  const glowCardRef = useRef<any>(null);
   const [tempTime, setTempTime] = useState<Date | null>(null);
 
   // Phase 17D — soft AI reflection
@@ -185,12 +188,28 @@ export default function IndexScreen() {
           const count = luneCount(weekCompleted);
           if (count === 0 && streak === 0) return null;
           return (
-            <View style={s.glowStreak}>
+            <Pressable
+              style={s.glowStreak}
+              onPress={() => { captureAndShare(glowCardRef, 'rituel-glow'); }}
+              hitSlop={10}
+            >
               <Text style={s.glowStreakTxt}>
                 {t('home.glow.thisWeek').replace('{n}', String(count))}
                 {streak >= 2 ? '  ·  ' + t('home.glow.streak').replace('{n}', String(streak)) : ''}
               </Text>
-            </View>
+              <Text style={s.glowShareHint}>{t('home.glow.shareHint')}</Text>
+              <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
+                <GlowShareCard
+                  ref={glowCardRef}
+                  kind={t('home.glow.cardKind')}
+                  ritualCount={count}
+                  streakWeeks={streak}
+                  countLabel={t('home.glow.cardCount')}
+                  streakLabel={t('home.glow.streak').replace('{n}', String(streak))}
+                  tagline={t('home.glow.cardTagline')}
+                />
+              </View>
+            </Pressable>
           );
         })()}
         <TonightRitualCard
@@ -609,4 +628,10 @@ const s = StyleSheet.create({
     color: '#C08A6A',
     letterSpacing: 0.3,
     fontStyle: 'italic',
+  },
+  glowShareHint: {
+    fontSize: 10,
+    color: '#C9A98E',
+    letterSpacing: 0.5,
+    marginTop: 2,
   },});

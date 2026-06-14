@@ -614,6 +614,10 @@ export const fr = {
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
     glow: {
+      shareHint: 'Touche pour partager ton glow',
+      cardKind: 'MON GLOW',
+      cardCount: 'soirs de rituel',
+      cardTagline: 'Ma peau, jour après jour',
       thisWeek: 'Cette semaine : {n} soirs de rituel',
       streak: 'série de {n} semaines ✦',
     },
