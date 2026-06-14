@@ -60,7 +60,16 @@
           "color": "#C08A6A"
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#F6F1EC",
+          "imageWidth": 180
+        }
+      ]
     ],
     "extra": {
       "router": {},
