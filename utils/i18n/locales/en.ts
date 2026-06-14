@@ -600,6 +600,10 @@ export const en: LocaleDict = {
   },
 
   home: {
+    glow: {
+      thisWeek: 'This week: {n} evening rituals',
+      streak: '{n}-week streak ✦',
+    },
     notify: {
         pickerTitle: 'Ritual time', title: 'Your evening ritual awaits ☾', body: 'A few gentle minutes, just for you.' },
     recommend: { subtitle: 'A curated selection to go with your ritual.' },

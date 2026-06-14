@@ -601,6 +601,10 @@ export const tr: LocaleDict = {
   },
 
   home: {
+    glow: {
+      thisWeek: 'Bu hafta: {n} akşam ritüeli',
+      streak: '{n} haftalık seri ✦',
+    },
     notify: {
         pickerTitle: 'Ritüel saati', title: 'Akşam ritüelin seni bekliyor ☾', body: 'Yalnızca sana ait birkaç nazik dakika.' },
     recommend: { subtitle: 'Ritüeline eşlik etmesi için seçilmiş ürünler.' },

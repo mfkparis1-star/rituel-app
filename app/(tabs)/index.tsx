@@ -31,7 +31,7 @@ import { generateReflection, getCachedReflection, getQuotaRemaining, reflectionF
 import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
-import { weekLune } from '../../utils/lune';
+import { weekLune, luneCount, weekStreak } from '../../utils/lune';
 import { getRitualTime, setRitualTime as persistRitualTime, DEFAULT_RITUAL_TIME } from '../../utils/ritualTime';
 import { scheduleEveningReminder } from '../../utils/notify';
 import AphorismCard from '../../components/home/AphorismCard';
@@ -107,6 +107,7 @@ export default function IndexScreen() {
   const [weekCompleted, setWeekCompleted] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [streak, setStreak] = useState(0);
   const [tempTime, setTempTime] = useState<Date | null>(null);
 
   // Phase 17D — soft AI reflection
@@ -116,6 +117,7 @@ export default function IndexScreen() {
     useCallback(() => {
       let active = true;
       weekLune().then((w) => { if (active) setWeekCompleted(w); });
+      weekStreak().then((s) => { if (active) setStreak(s); });
       getRitualTime().then((tm) => { if (active) setRitualTime(tm); });
       return () => { active = false; };
     }, [])
@@ -179,6 +181,18 @@ export default function IndexScreen() {
 
         {/* Phase 1.1d — week strip + tonight ritual + aphorism */}
         <WeekStrip dayLabels={dayLabels} completed={weekCompleted} />
+        {(() => {
+          const count = luneCount(weekCompleted);
+          if (count === 0 && streak === 0) return null;
+          return (
+            <View style={s.glowStreak}>
+              <Text style={s.glowStreakTxt}>
+                {t('home.glow.thisWeek').replace('{n}', String(count))}
+                {streak >= 2 ? '  ·  ' + t('home.glow.streak').replace('{n}', String(streak)) : ''}
+              </Text>
+            </View>
+          );
+        })()}
         <TonightRitualCard
           steps={tonightSteps}
           checkinEmoji={tonightEmoji}
@@ -584,4 +598,15 @@ const s = StyleSheet.create({
   pickerCancelTxt: {
     fontSize: 15,
     color: '#9C8576',
+  },
+  glowStreak: {
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  glowStreakTxt: {
+    fontSize: 12,
+    color: '#C08A6A',
+    letterSpacing: 0.3,
+    fontStyle: 'italic',
   },});

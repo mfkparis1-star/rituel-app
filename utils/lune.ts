@@ -66,3 +66,43 @@ export async function weekLune(): Promise<boolean[]> {
 export function luneCount(week: boolean[]): number {
   return week.filter(Boolean).length;
 }
+
+/**
+ * Consecutive-week streak: how many weeks in a row (this week back)
+ * have at least one completed ritual. The current week counts as soon
+ * as it has one stamp. A fully empty week breaks the streak. Gentle,
+ * not punishing — it only ever celebrates continuity.
+ */
+export async function weekStreak(maxWeeks = 52): Promise<number> {
+  const now = new Date();
+  const todayIdx = (now.getDay() + 6) % 7; // 0 = Monday
+  const thisMonday = new Date(now);
+  thisMonday.setDate(now.getDate() - todayIdx);
+  thisMonday.setHours(0, 0, 0, 0);
+
+  try {
+    let streak = 0;
+    for (let w = 0; w < maxWeeks; w++) {
+      const monday = new Date(thisMonday);
+      monday.setDate(thisMonday.getDate() - w * 7);
+      const keys = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return PREFIX + ymd(d);
+      });
+      const pairs = await AsyncStorage.multiGet(keys);
+      const hasAny = pairs.some(([, v]) => v === '1');
+      if (hasAny) {
+        streak++;
+      } else {
+        // current week (w === 0) with no stamp yet shouldn't break a
+        // past streak — skip it; any past empty week ends the streak.
+        if (w === 0) continue;
+        break;
+      }
+    }
+    return streak;
+  } catch {
+    return 0;
+  }
+}
