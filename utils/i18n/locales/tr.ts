@@ -715,6 +715,13 @@ export const tr: LocaleDict = {
 },
 
   skinAnalysis: {
+    evolution: {
+      label: 'GELİŞİMİN',
+      since: '{n} gün önceki analizinden bu yana',
+      fewer: 'Bir gözlem daha az — cildin rahatlıyor ✦',
+      stable: 'Cildin dengeli görünüyor',
+      evolving: 'Cildin değişiyor — bu da yolculuğun parçası',
+    },
     title: 'Cildinin AI analizi',
     tipsLabel: 'DAHA İYİ SONUÇ İÇİN',
     tips: { light: 'Doğal ışık', noMakeup: 'Makyajsız', centered: 'Yüz ortada' },

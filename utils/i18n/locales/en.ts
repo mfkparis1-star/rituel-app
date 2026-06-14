@@ -714,6 +714,13 @@ export const en: LocaleDict = {
 },
 
   skinAnalysis: {
+    evolution: {
+      label: 'YOUR JOURNEY',
+      since: 'Since your analysis {n} days ago',
+      fewer: 'One less observation — your skin is settling ✦',
+      stable: 'Your skin looks balanced',
+      evolving: 'Your skin is evolving — part of the journey',
+    },
     title: 'AI analysis of your skin',
     tipsLabel: 'FOR A BETTER RESULT',
     tips: { light: 'Natural light', noMakeup: 'No makeup', centered: 'Face centered' },

@@ -10,7 +10,7 @@ import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
-import { saveSkinAnalysis } from '../../utils/skinHistory';
+import { saveSkinAnalysis, getSkinHistory, computeGlowTrend, type GlowTrend } from '../../utils/skinHistory';
 import { useLanguage } from '../../hooks/useLanguage';
 import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
 import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
@@ -53,6 +53,7 @@ export default function SkinAnalysisScreen() {
   const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('skin_analysis');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [trend, setTrend] = useState<GlowTrend | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -149,6 +150,8 @@ export default function SkinAnalysisScreen() {
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
+      // Load the journey trend (compares with the previous analysis).
+      getSkinHistory(5).then((h) => setTrend(computeGlowTrend(h))).catch(() => {});
       setStep('result');
     } catch (e: any) {
       const msg = e?.message || t('skinAnalysis.errorFallback');
@@ -274,6 +277,24 @@ export default function SkinAnalysisScreen() {
             <View style={s.skinTypeBadge}>
               <Text style={s.skinTypeBadgeTxt}>{t('skinAnalysis.skinTypePrefix')}{result.skinType}</Text>
             </View>
+
+            {trend?.hasPrevious && (
+              <View style={s.evolutionCard}>
+                <Text style={s.evolutionLabel}>{t('skinAnalysis.evolution.label')}</Text>
+                <Text style={s.evolutionDays}>
+                  {t('skinAnalysis.evolution.since').replace('{n}', String(trend.daysSincePrevious ?? 0))}
+                </Text>
+                {trend.issuesDelta != null && trend.issuesDelta < 0 && (
+                  <Text style={s.evolutionUp}>{t('skinAnalysis.evolution.fewer')}</Text>
+                )}
+                {trend.issuesDelta != null && trend.issuesDelta === 0 && (
+                  <Text style={s.evolutionStable}>{t('skinAnalysis.evolution.stable')}</Text>
+                )}
+                {trend.issuesDelta != null && trend.issuesDelta > 0 && (
+                  <Text style={s.evolutionStable}>{t('skinAnalysis.evolution.evolving')}</Text>
+                )}
+              </View>
+            )}
 
             <Text style={s.sectionTitle}>{t('skinAnalysis.sections.issues')}</Text>
             {result.issues.map((issue, i) => (
@@ -468,6 +489,40 @@ const s = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
+  },
+  evolutionCard: {
+    alignSelf: 'stretch',
+    backgroundColor: C.cream,
+    borderRadius: R.lg,
+    paddingHorizontal: Sp.lg,
+    paddingVertical: Sp.md,
+    marginBottom: Sp.lg,
+    alignItems: 'center',
+  },
+  evolutionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: C.copper,
+    marginBottom: 4,
+  },
+  evolutionDays: {
+    fontSize: 13,
+    color: C.espresso,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  evolutionUp: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#5B9B6B',
+    textAlign: 'center',
+  },
+  evolutionStable: {
+    fontSize: 13,
+    color: '#9C8576',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   sectionTitle: {
     ...Type.h3,

@@ -730,6 +730,13 @@ export const fr = {
   // AI result content + skin-type label come from utils/skinAnalysis.ts
   // (already FR/EN/TR aware via the lang param).
   skinAnalysis: {
+    evolution: {
+      label: 'TON ÉVOLUTION',
+      since: 'Depuis ton analyse il y a {n} jours',
+      fewer: 'Une observation de moins — ta peau s\'apaise ✦',
+      stable: 'Ta peau semble équilibrée',
+      evolving: 'Ta peau évolue — ça fait partie du voyage',
+    },
     title: 'Analyse IA de votre peau',
     tipsLabel: 'POUR UN MEILLEUR RÉSULTAT',
     tips: { light: 'Lumière naturelle', noMakeup: 'Sans maquillage', centered: 'Visage centré' },
