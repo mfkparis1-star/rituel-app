@@ -251,7 +251,7 @@ export default function RoutineScreen() {
         time: (st.routine_type === 'matin' ? 'morning' : 'evening') as 'morning' | 'evening',
       }));
 
-      const r = await optimizeRoutine(stepsForAI, skinType, 'fr');
+      const r = await optimizeRoutine(stepsForAI, skinType, lang);
       setOptimizeResult(r);
       saveAICache('routine', { result: r });
     } catch (e: any) {
