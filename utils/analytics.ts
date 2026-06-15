@@ -23,6 +23,7 @@ export type EventName =
   | 'skin_evolution_shown'
   // Ton Glow viral loop
   | 'glow_streak_shared'
+  | 'makeup_look_shared'
   | 'onboarding_completed';
 
 const KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY;

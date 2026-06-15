@@ -945,6 +945,9 @@ export const fr = {
     },
     generating: 'Création de tes looks...',
     result: {
+      share: 'Partager ce look',
+      cardKind: 'MON LOOK',
+      cardTagline: 'Mon maquillage, signé Rituel',
       title: 'Tes 3 looks',
       lookPrefix: 'LOOK',
       steps: 'ÉTAPES',

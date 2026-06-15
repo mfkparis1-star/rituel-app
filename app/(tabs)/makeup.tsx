@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -8,6 +8,9 @@ import HeroCard from '../../components/ui/HeroCard';
 import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import PillButton from '../../components/ui/PillButton';
+import MakeupShareCard from '../../components/share/MakeupShareCard';
+import { captureAndShare } from '../../utils/shareCard';
+import { trackEvent } from '../../utils/analytics';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -15,6 +18,7 @@ import {
   generateMakeupLooks,
   MAKEUP_OCCASIONS,
   MakeupResult,
+  MakeupStyle,
   OccasionId,
 } from '../../utils/makeupAI';
 import { saveAICache, loadAICache, clearAICache } from '../../utils/aiCache';
@@ -62,6 +66,8 @@ export default function MakeupScreen() {
   const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
   const [result, setResult] = useState<MakeupResult | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
+  const [shareLook, setShareLook] = useState<MakeupStyle | null>(null);
+  const makeupCardRef = useRef<any>(null);
   const [unlocked, setUnlocked] = useState(false);
   const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('makeup_full');
   const [errorMsg, setErrorMsg] = useState('');
@@ -285,6 +291,16 @@ export default function MakeupScreen() {
               <Text style={s.lookNumber}>{t('makeup.result.lookPrefix')} {i + 1}</Text>
               <Text style={s.lookName}>{look.name}</Text>
               <Text style={s.lookDescription}>{look.description}</Text>
+              {look.personalNote ? (
+                <Text style={s.lookPersonalNote}>{look.personalNote}</Text>
+              ) : null}
+              {look.colors && look.colors.length > 0 && (
+                <View style={s.lookColorsRow}>
+                  {look.colors.slice(0, 4).map((c, ci) => (
+                    <Text key={ci} style={s.lookColorChip}>{c}</Text>
+                  ))}
+                </View>
+              )}
 
               <Text style={s.lookSectionLabel}>{t('makeup.result.steps')}</Text>
               {look.steps.map((stepTxt, j) => (
@@ -319,9 +335,34 @@ export default function MakeupScreen() {
                   </View>
                 </>
               )}
+
+              <PillButton
+                label={t('makeup.result.share')}
+                variant="ghost"
+                size="sm"
+                onPress={() => {
+                  setShareLook(look);
+                  trackEvent('makeup_look_shared', { occasion: occasion ?? 'unknown', look: look.name });
+                  setTimeout(() => captureAndShare(makeupCardRef, 'rituel-makeup'), 60);
+                }}
+                style={{ marginTop: 12 }}
+              />
             </View>
             );
           })}
+
+          <View style={{ position: 'absolute', left: -9999, top: -9999 }} pointerEvents="none">
+            <MakeupShareCard
+              ref={makeupCardRef}
+              kind={t('makeup.result.cardKind')}
+              lookName={shareLook?.name ?? ''}
+              occasion={occLabel}
+              colors={shareLook?.colors}
+              personalNote={shareLook?.personalNote}
+              products={shareLook?.productsNeeded}
+              tagline={t('makeup.result.cardTagline')}
+            />
+          </View>
           {!unlocked && !isPremium && resultId && result.styles.length > 1 && (
             <LockedAICard
               scope="makeup_full"
@@ -639,6 +680,28 @@ const s = StyleSheet.create({
     color: C.textMid,
     lineHeight: 19,
     marginBottom: Sp.md,
+  },
+  lookPersonalNote: {
+    fontSize: 13,
+    color: '#A66E4F',
+    fontStyle: 'italic',
+    lineHeight: 19,
+    marginBottom: Sp.sm,
+  },
+  lookColorsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: Sp.md,
+  },
+  lookColorChip: {
+    fontSize: 11,
+    color: C.espresso,
+    backgroundColor: C.cream,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    overflow: 'hidden',
   },
   lookSectionLabel: {
     fontSize: 10,
