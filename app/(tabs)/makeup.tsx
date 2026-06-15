@@ -186,7 +186,7 @@ export default function MakeupScreen() {
         occasion,
         skipSelfie ? null : selfieBase64,
         [],
-        'fr'
+        lang
       );
       setResult(r);
       const newResultId = `makeup_${Date.now()}`;
