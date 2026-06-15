@@ -746,7 +746,7 @@ export const en: LocaleDict = {
     errorFallback: 'Something went wrong. Please try again.',
     retry: 'Try again',
     skinTypePrefix: 'Skin: ',
-    sections: { issues: 'Detected concerns', recommendations: 'Recommendations', missing: 'Missing products' },
+    sections: { issues: 'What your skin tells us', recommendations: 'Recommendations', missing: 'Missing products' },
     newAnalysis: 'New analysis',
     permission: {
       title: 'Permission required',

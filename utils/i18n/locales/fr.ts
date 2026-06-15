@@ -762,7 +762,7 @@ export const fr = {
     errorFallback: 'Une erreur est survenue. Réessayez.',
     retry: 'Réessayer',
     skinTypePrefix: 'Peau ',
-    sections: { issues: 'Problèmes détectés', recommendations: 'Recommandations', missing: 'Produits manquants' },
+    sections: { issues: 'Ce que ta peau raconte', recommendations: 'Recommandations', missing: 'Produits manquants' },
     newAnalysis: 'Nouvelle analyse',
     permission: {
       title: 'Permission requise',

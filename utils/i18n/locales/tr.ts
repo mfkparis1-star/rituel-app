@@ -747,7 +747,7 @@ export const tr: LocaleDict = {
     errorFallback: 'Bir hata oluştu. Lütfen tekrar dene.',
     retry: 'Tekrar dene',
     skinTypePrefix: 'Cilt: ',
-    sections: { issues: 'Tespit edilen noktalar', recommendations: 'Öneriler', missing: 'Eksik ürünler' },
+    sections: { issues: 'Cildinin anlattıkları', recommendations: 'Öneriler', missing: 'Eksik ürünler' },
     newAnalysis: 'Yeni analiz',
     permission: {
       title: 'İzin gerekli',

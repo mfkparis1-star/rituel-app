@@ -350,6 +350,13 @@ export default function SkinAnalysisScreen() {
               </View>
             )}
 
+            {result.focus && (
+              <View style={s.focusCard}>
+                <Text style={s.focusKicker}>{t('skinAnalysis.focus.label')}</Text>
+                <Text style={s.focusBody}>{result.focus}</Text>
+              </View>
+            )}
+
             <Text style={s.sectionTitle}>{t('skinAnalysis.sections.issues')}</Text>
             {result.issues.map((issue, i) => (
               <View key={i} style={s.issueRow}>
@@ -357,13 +364,6 @@ export default function SkinAnalysisScreen() {
                 <Text style={s.issueText}>{issue}</Text>
               </View>
             ))}
-
-            {result.focus && (
-              <View style={s.focusCard}>
-                <Text style={s.focusKicker}>{t('skinAnalysis.focus.label')}</Text>
-                <Text style={s.focusBody}>{result.focus}</Text>
-              </View>
-            )}
             {(unlocked || isPremium) ? (
               <>
                 <Text style={s.sectionTitle}>{t('skinAnalysis.sections.recommendations')}</Text>
