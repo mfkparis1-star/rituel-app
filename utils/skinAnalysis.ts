@@ -73,7 +73,7 @@ export async function analyzeSkin(
 
   const body = {
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1536,
+    max_tokens: 2048,
     system: `${SYSTEM_PROMPT} ${langInstruction} ${ownedContext}`.trim(),
     messages: [
       {
@@ -97,12 +97,25 @@ export async function analyzeSkin(
     throw new Error(localizedAIError(code, lang));
   }
 
-  const text = data?.content?.[0]?.text || '';
+  let text = data?.content?.[0]?.text || '';
+  // Strip markdown code fences the model sometimes adds despite instructions.
+  text = text.replace(/^[\s\S]*?```(?:json)?\s*/i, '').replace(/```[\s\S]*$/, '').trim();
+  // Fallback: if no fences, slice from first { to last }.
+  if (!text.startsWith('{')) {
+    const a = text.indexOf('{'); const b = text.lastIndexOf('}');
+    if (a !== -1 && b !== -1 && b > a) text = text.slice(a, b + 1);
+  }
   const parsed = safeJsonParse<SkinAnalysisResult>(text);
 
-  if (!parsed || !parsed.skinType || !Array.isArray(parsed.issues)) {
+  if (!parsed || !parsed.skinType) {
     throw new Error(localizedAIError('INVALID_RESPONSE', lang));
   }
+  // issues is now optional (insights carries the depth). Guarantee arrays
+  // so the result screen never crashes on .map().
+  if (!Array.isArray(parsed.issues)) parsed.issues = [];
+  if (!Array.isArray(parsed.recommendations)) parsed.recommendations = [];
+  if (!Array.isArray(parsed.missingCategories)) parsed.missingCategories = [];
+  if (parsed.insights && !Array.isArray(parsed.insights)) parsed.insights = undefined;
 
   return parsed;
 }
