@@ -601,6 +601,7 @@ export const en: LocaleDict = {
 
   home: {
     glow: {
+      cardScoreLabel: 'glow',
       shareHint: 'Tap to share your glow',
       cardKind: 'MY GLOW',
       cardCount: 'evening rituals',

@@ -602,6 +602,7 @@ export const tr: LocaleDict = {
 
   home: {
     glow: {
+      cardScoreLabel: 'glow',
       shareHint: 'Glow’unu paylaşmak için dokun',
       cardKind: 'GLOW’UM',
       cardCount: 'akşam ritüeli',

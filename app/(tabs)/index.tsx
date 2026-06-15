@@ -32,6 +32,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium } from '../../hooks/usePremium';
 import WeekStrip from '../../components/home/WeekStrip';
 import { weekLune, luneCount, weekStreak } from '../../utils/lune';
+import { getSkinHistory } from '../../utils/skinHistory';
 import { captureAndShare } from '../../utils/shareCard';
 import { trackEvent } from '../../utils/analytics';
 import GlowShareCard from '../../components/share/GlowShareCard';
@@ -111,6 +112,7 @@ export default function IndexScreen() {
   const [ritualTime, setRitualTime] = useState(DEFAULT_RITUAL_TIME);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [latestGlow, setLatestGlow] = useState<number | null>(null);
   const glowCardRef = useRef<any>(null);
   const [tempTime, setTempTime] = useState<Date | null>(null);
 
@@ -122,6 +124,7 @@ export default function IndexScreen() {
       let active = true;
       weekLune().then((w) => { if (active) setWeekCompleted(w); });
       weekStreak().then((s) => { if (active) setStreak(s); });
+      getSkinHistory(1).then((h) => { if (active && h[0]) setLatestGlow(h[0].glow_score ?? null); }).catch(() => {});
       getRitualTime().then((tm) => { if (active) setRitualTime(tm); });
       return () => { active = false; };
     }, [])
@@ -203,6 +206,8 @@ export default function IndexScreen() {
                 <GlowShareCard
                   ref={glowCardRef}
                   kind={t('home.glow.cardKind')}
+                  glowScore={latestGlow}
+                  scoreLabel={t('home.glow.cardScoreLabel')}
                   ritualCount={count}
                   streakWeeks={streak}
                   countLabel={t('home.glow.cardCount')}

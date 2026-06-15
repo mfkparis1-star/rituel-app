@@ -614,6 +614,7 @@ export const fr = {
   // Home / dashboard (Phase 19.10) — built across 3 slices.
   home: {
     glow: {
+      cardScoreLabel: 'de glow',
       shareHint: 'Touche pour partager ton glow',
       cardKind: 'MON GLOW',
       cardCount: 'soirs de rituel',

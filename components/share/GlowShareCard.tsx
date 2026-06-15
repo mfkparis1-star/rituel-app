@@ -15,6 +15,8 @@ import { C } from '../../theme';
 import ShareCardFrame from './ShareCardFrame';
 
 type Props = {
+  glowScore?: number | null;  // hero number when present
+  scoreLabel?: string;        // e.g. "de glow"
   ritualCount: number;   // rituals this period
   streakWeeks: number;   // consecutive-week streak
   countLabel: string;    // e.g. "soirs de rituel ce mois-ci"
@@ -24,30 +26,49 @@ type Props = {
 };
 
 const GlowShareCard = forwardRef<View, Props>(function GlowShareCard(
-  { ritualCount, streakWeeks, countLabel, streakLabel, tagline, kind },
+  { glowScore, scoreLabel, ritualCount, streakWeeks, countLabel, streakLabel, tagline, kind },
   ref
 ) {
   return (
     <ShareCardFrame ref={ref} kind={kind}>
       <View style={s.center}>
-        <Text style={s.bigNumber}>{ritualCount}</Text>
-        <Text style={s.countLabel}>{countLabel}</Text>
+        {glowScore != null ? (
+          <>
+            <View style={s.scoreRing}>
+              <Svg width={300} height={300} viewBox="0 0 300 300">
+                <Circle cx={150} cy={150} r={132} fill="none" stroke="#ECE0D6" strokeWidth={14} />
+                <Circle cx={150} cy={150} r={132} fill="none" stroke={C.copper} strokeWidth={14} strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 132}
+                  strokeDashoffset={(2 * Math.PI * 132) * (1 - (glowScore / 100))}
+                  transform="rotate(-90 150 150)" />
+              </Svg>
+              <View style={s.scoreNumWrap}>
+                <Text style={s.scoreNum}>{glowScore}</Text>
+                <Text style={s.scoreStar}>✦</Text>
+              </View>
+            </View>
+            {scoreLabel ? <Text style={s.countLabel}>{scoreLabel}</Text> : null}
+          </>
+        ) : (
+          <>
+            <Text style={s.bigNumber}>{ritualCount}</Text>
+            <Text style={s.countLabel}>{countLabel}</Text>
+            <View style={s.curveWrap}>
+              <Svg width={520} height={220} viewBox="0 0 520 220">
+                <Polyline points="20,190 110,170 200,140 290,95 380,55 500,28" fill="none" stroke={C.copper} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+                <Circle cx={500} cy={28} r={12} fill={C.copper} />
+              </Svg>
+            </View>
+          </>
+        )}
 
-        <View style={s.curveWrap}>
-          <Svg width={520} height={220} viewBox="0 0 520 220">
-            <Polyline
-              points="20,190 110,170 200,140 290,95 380,55 500,28"
-              fill="none"
-              stroke={C.copper}
-              strokeWidth={6}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <Circle cx={500} cy={28} r={12} fill={C.copper} />
-          </Svg>
-        </View>
-
-        {streakWeeks >= 2 && (
+        {glowScore != null && (
+          <Text style={s.subInfo}>
+            {countLabel ? ritualCount + ' ' + countLabel : ''}
+            {streakWeeks >= 2 ? '   ·   ' + streakLabel : ''}
+          </Text>
+        )}
+        {glowScore == null && streakWeeks >= 2 && (
           <Text style={s.streak}>{streakLabel}</Text>
         )}
 
@@ -93,4 +114,9 @@ const s = StyleSheet.create({
     color: '#9C8576',
     textAlign: 'center',
   },
+  scoreRing: { width: 300, height: 300, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  scoreNumWrap: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
+  scoreNum: { fontSize: 120, fontWeight: '300', color: C.espresso, fontFamily: 'Didot', lineHeight: 128 },
+  scoreStar: { fontSize: 34, color: C.copper, marginTop: -4 },
+  subInfo: { fontSize: 32, color: C.espresso, letterSpacing: 1, marginBottom: 50, marginTop: 8, textAlign: 'center' },
 });
