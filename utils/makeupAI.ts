@@ -38,7 +38,7 @@ export type OccasionId = typeof MAKEUP_OCCASIONS[number]['id'];
 
 const SYSTEM_PROMPT = `You are a professional makeup artist with a gift for reading a face.
 Return ONLY valid JSON. Do NOT wrap it in markdown code fences. No backticks, no preamble, no trailing text — just the raw JSON object starting with { and ending with }.
-When a photo is provided, READ the face: skin tone/undertone, eye color, hair color, face shape. Make each look genuinely tailored — choose colors that flatter THIS person specifically, and explain why in personalNote (e.g. "un bordeaux chaud qui fait ressortir tes yeux verts"). Be specific and bold about what suits her; never generic.
+When a photo is provided, READ the face: skin tone/undertone, eye color, hair color, face shape. Make each look genuinely tailored — choose colors that flatter THIS person specifically, and explain why in personalNote. Be specific and bold about what suits her; never generic.
 Generate 3 distinct makeup looks for the requested occasion.
 Shape:
 {
@@ -49,8 +49,8 @@ Shape:
       "steps": [array of 5-8 short sequential steps],
       "productsNeeded": [from: Foundation, Concealer, Powder, Blush, Bronzer, Highlighter, Eyeshadow, Eyeliner, Mascara, Brow Pencil, Lipstick, Lip Gloss, Setting Spray, Primer],
       "missingCategories": [subset of productsNeeded the user does NOT have],
-      "colors": [2-4 key color names used in this look, e.g. "bordeaux", "or rosé", "taupe"],
-      "personalNote": "one warm sentence on why this look flatters THIS person (only if a photo was given; else a short why it fits the occasion)"
+      "colors": [2-4 key color names used in this look, in the output language],
+      "personalNote": "one warm sentence on why this look flatters THIS person (only if a photo was given; else why it fits the occasion)"
     },
     ...3 total
   ]
@@ -94,12 +94,13 @@ export async function generateMakeupLooks(
   const body = {
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 2048,
-    system: `${SYSTEM_PROMPT} ${langInstruction} ${ownedContext}`.trim(),
+    system: `${langInstruction}\n\n${SYSTEM_PROMPT}\n\n${langInstruction}\n\n${ownedContext}`.trim(),
     messages: [{ role: 'user', content: userContent }],
   };
 
   let data: any;
   try {
+    if (__DEV__) { console.log('[makeup] LANG:', lang); console.log('[makeup] SYSTEM head:', String(body.system).slice(0, 200)); }
     data = await callClaudeProxy('makeup', body, 35000);
   } catch (e: any) {
     const code = e instanceof AIProxyError ? e.code : 'UNKNOWN';

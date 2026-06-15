@@ -11,6 +11,7 @@ import PillButton from '../../components/ui/PillButton';
 import MakeupShareCard from '../../components/share/MakeupShareCard';
 import { captureAndShare } from '../../utils/shareCard';
 import { trackEvent } from '../../utils/analytics';
+import { translate } from '../../utils/translate';
 import PremiumCard from '../../components/ui/PremiumCard';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -80,6 +81,31 @@ export default function MakeupScreen() {
   const [resultId, setResultId] = useState<string | null>(null);
   const [shareLook, setShareLook] = useState<MakeupStyle | null>(null);
   const makeupCardRef = useRef<any>(null);
+  const [translatedResult, setTranslatedResult] = useState<MakeupResult | null>(null);
+  const [translating, setTranslating] = useState(false);
+
+  const handleTranslateResult = async () => {
+    if (translatedResult) { setTranslatedResult(null); return; }  // toggle off
+    if (!result) return;
+    setTranslating(true);
+    try {
+      const tr = async (s: string) => (s ? (await translate(s, 'fr', lang)).text : s);
+      const styles = await Promise.all(result.styles.map(async (look) => ({
+        ...look,
+        name: await tr(look.name),
+        description: await tr(look.description),
+        personalNote: look.personalNote ? await tr(look.personalNote) : look.personalNote,
+        steps: await Promise.all(look.steps.map(tr)),
+      })));
+      setTranslatedResult({ styles });
+    } catch {
+      // fallback: leave original
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  const displayResult = translatedResult ?? result;
   const [unlocked, setUnlocked] = useState(false);
   const { isUnlocked: isAIUnlocked, isPremium } = useAIUnlock('makeup_full');
   const [errorMsg, setErrorMsg] = useState('');
@@ -294,7 +320,16 @@ export default function MakeupScreen() {
           <Text style={s.label}>{occLabel.toUpperCase()}</Text>
           <Text style={s.title}>{t('makeup.result.title')}</Text>
 
-          {result.styles.map((look, i) => {
+          <PillButton
+            label={translating ? t('makeup.result.translating') : (translatedResult ? t('makeup.result.showOriginal') : t('makeup.result.translate'))}
+            variant="ghost"
+            size="sm"
+            loading={translating}
+            onPress={handleTranslateResult}
+            style={{ alignSelf: 'center', marginBottom: Sp.md }}
+          />
+
+          {displayResult!.styles.map((look, i) => {
             if (i > 0 && !unlocked && !isPremium) {
               return null;
             }

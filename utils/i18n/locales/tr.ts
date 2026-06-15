@@ -927,6 +927,9 @@ export const tr: LocaleDict = {
     },
     generating: 'Lookların oluşturuluyor...',
     result: {
+      translate: 'Çevir',
+      translating: 'Çevriliyor…',
+      showOriginal: 'Orijinali göster',
       share: 'Bu look’u paylaş',
       cardKind: 'LOOK’UM',
       cardTagline: 'Makyajım, Rituel imzasıyla',

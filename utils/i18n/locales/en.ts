@@ -926,6 +926,9 @@ export const en: LocaleDict = {
     },
     generating: 'Creating your looks...',
     result: {
+      translate: 'Translate',
+      translating: 'Translating…',
+      showOriginal: 'Show original',
       share: 'Share this look',
       cardKind: 'MY LOOK',
       cardTagline: 'My makeup, by Rituel',
