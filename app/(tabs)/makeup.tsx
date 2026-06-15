@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Circle, Line } from 'react-native-svg';
 import HeroCard from '../../components/ui/HeroCard';
 import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
@@ -55,6 +55,18 @@ function BackArrow({ color }: { color: string }) {
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <Path d="M19 12H5" />
       <Path d="M12 19l-7-7 7-7" />
+    </Svg>
+  );
+}
+
+function ShareIcon({ color = '#2A1410' }: { color?: string }) {
+  return (
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={18} cy={5} r={3} />
+      <Circle cx={6} cy={12} r={3} />
+      <Circle cx={18} cy={19} r={3} />
+      <Line x1={8.6} y1={13.5} x2={15.4} y2={17.5} />
+      <Line x1={15.4} y1={6.5} x2={8.6} y2={10.5} />
     </Svg>
   );
 }
@@ -338,14 +350,15 @@ export default function MakeupScreen() {
 
               <PillButton
                 label={t('makeup.result.share')}
-                variant="ghost"
+                variant="secondary"
                 size="sm"
+                leftIcon={<ShareIcon color={C.espresso} />}
                 onPress={() => {
                   setShareLook(look);
                   trackEvent('makeup_look_shared', { occasion: occasion ?? 'unknown', look: look.name });
                   setTimeout(() => captureAndShare(makeupCardRef, 'rituel-makeup'), 60);
                 }}
-                style={{ marginTop: 12 }}
+                style={{ marginTop: 16, alignSelf: 'center' }}
               />
             </View>
             );
