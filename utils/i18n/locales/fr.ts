@@ -742,6 +742,7 @@ export const fr = {
     glow: { kicker: 'TON GLOW DU JOUR', caption: 'Ta peau rayonne aujourd\'hui', sub: 'Un instantané, pas une note — il évolue avec toi' },
     character: { label: 'TON CARACTÈRE DE PEAU' },
     noticed: { label: '✦ CE QUE J\'AI REMARQUÉ' },
+    insights: { label: 'CE QUE TON MIROIR NE TE DIT PAS' },
     focus: { label: 'TON SEUL FOCUS' },
     strength: { label: 'TA FORCE' },
     evolution: {

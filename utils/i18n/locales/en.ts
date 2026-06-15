@@ -726,6 +726,7 @@ export const en: LocaleDict = {
     glow: { kicker: 'YOUR GLOW TODAY', caption: 'Your skin is radiant today', sub: 'A snapshot, not a grade — it evolves with you' },
     character: { label: 'YOUR SKIN CHARACTER' },
     noticed: { label: '✦ WHAT I NOTICED' },
+    insights: { label: 'WHAT YOUR MIRROR DOESN’T TELL YOU' },
     focus: { label: 'YOUR ONE FOCUS' },
     strength: { label: 'YOUR STRENGTH' },
     evolution: {

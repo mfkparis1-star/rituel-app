@@ -26,6 +26,7 @@ type SkinResult = {
   glowScore?: number;
   skinCharacter?: string;
   noticed?: string;
+  insights?: string[];
   focus?: string;
   strength?: string;
 };
@@ -152,12 +153,13 @@ export default function SkinAnalysisScreen() {
         glowScore: parsed.glowScore,
         skinCharacter: parsed.skinCharacter,
         noticed: parsed.noticed,
+        insights: parsed.insights,
         focus: parsed.focus,
         strength: parsed.strength,
       });
       const newResultId = `skin_${Date.now()}`;
       setResultId(newResultId);
-      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
+      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, insights: parsed.insights, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
       trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
@@ -326,6 +328,18 @@ export default function SkinAnalysisScreen() {
               <View style={s.noticedCard}>
                 <Text style={s.noticedKicker}>{t('skinAnalysis.noticed.label')}</Text>
                 <Text style={s.noticedBody}>{result.noticed}</Text>
+              </View>
+            )}
+
+            {result.insights && result.insights.length > 0 && (
+              <View style={s.insightsCard}>
+                <Text style={s.insightsKicker}>{t('skinAnalysis.insights.label')}</Text>
+                {result.insights.map((ins, i) => (
+                  <View key={i} style={s.insightRow}>
+                    <Text style={s.insightStar}>✦</Text>
+                    <Text style={s.insightText}>{ins}</Text>
+                  </View>
+                ))}
               </View>
             )}
 
@@ -566,6 +580,11 @@ const s = StyleSheet.create({
   noticedCard: { backgroundColor: '#FBF4EC', borderRadius: R.lg, padding: Sp.md, marginBottom: Sp.lg, borderWidth: 1, borderColor: C.border },
   noticedKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 5 },
   noticedBody: { fontSize: 13, lineHeight: 19, color: C.textMid, fontStyle: 'italic' },
+  insightsCard: { backgroundColor: C.white, borderRadius: R.lg, padding: Sp.md, marginBottom: Sp.lg, borderWidth: 1, borderColor: C.border },
+  insightsKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 10 },
+  insightRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, gap: 8 },
+  insightStar: { fontSize: 13, color: C.copper, marginTop: 1 },
+  insightText: { flex: 1, fontSize: 13.5, lineHeight: 20, color: C.espresso },
   focusCard: { backgroundColor: C.cream, borderRadius: R.lg, padding: Sp.md, marginTop: Sp.sm, marginBottom: Sp.sm },
   focusKicker: { fontSize: 10, letterSpacing: 1.4, color: C.copper, fontWeight: '700', marginBottom: 6 },
   focusBody: { fontSize: 14, lineHeight: 21, color: C.espresso },

@@ -727,6 +727,7 @@ export const tr: LocaleDict = {
     glow: { kicker: 'BUGÜNKÜ GLOW\'UN', caption: 'Cildin bugün ışıldıyor', sub: 'Bir an, bir not değil — seninle değişir' },
     character: { label: 'CİLT KARAKTERİN' },
     noticed: { label: '✦ FARK ETTİĞİM' },
+    insights: { label: 'AYNANIN SÖYLEMEDİKLERİ' },
     focus: { label: 'TEK ODAĞIN' },
     strength: { label: 'GÜCÜN' },
     evolution: {
