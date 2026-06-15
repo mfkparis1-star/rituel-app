@@ -65,12 +65,8 @@ export async function generateMakeupLooks(
   const occ = MAKEUP_OCCASIONS.find((o) => o.id === occasion);
   const occLabel = occ?.labels[lang] ?? occasion;
 
-  const langInstruction =
-    lang === 'fr'
-      ? 'Write all text fields in French.'
-      : lang === 'tr'
-      ? 'Write all text fields in Turkish.'
-      : 'Write all text fields in English.';
+  const langName = lang === 'fr' ? 'French (Français)' : lang === 'tr' ? 'Turkish (Türkçe)' : 'English';
+  const langInstruction = `CRITICAL: Write EVERY text field (name, description, steps, personalNote, colors) ONLY in ${langName}. Do not use any other language. This overrides any language seen in examples.`;
 
   const ownedContext =
     ownedCategories.length > 0
@@ -86,12 +82,12 @@ export async function generateMakeupLooks(
     });
     userContent.push({
       type: 'text',
-      text: `Generate 3 makeup looks for: ${occLabel}. Read this face carefully — skin tone, eye color, hair, face shape — and tailor every look to flatter this specific person. Fill personalNote with the reason each look suits them.`,
+      text: `Generate 3 makeup looks for: ${occLabel}. Read this face carefully — skin tone, eye color, hair, face shape — and tailor every look to flatter this specific person. Fill personalNote with the reason each look suits them. ${langInstruction}`,
     });
   } else {
     userContent.push({
       type: 'text',
-      text: `Generate 3 makeup looks for: ${occLabel}.`,
+      text: `Generate 3 makeup looks for: ${occLabel}. ${langInstruction}`,
     });
   }
 

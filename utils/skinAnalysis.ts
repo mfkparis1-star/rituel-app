@@ -57,12 +57,8 @@ export async function analyzeSkin(
   lang: Lang,
   ownedCategories: string[] = []
 ): Promise<SkinAnalysisResult> {
-  const langInstruction =
-    lang === 'fr'
-      ? 'Write all text fields in French.'
-      : lang === 'tr'
-      ? 'Write all text fields in Turkish.'
-      : 'Write all text fields in English.';
+  const langName = lang === 'fr' ? 'French (Français)' : lang === 'tr' ? 'Turkish (Türkçe)' : 'English';
+  const langInstruction = `CRITICAL: Write EVERY text field (skinCharacter, insights, noticed, focus, issues, recommendations, strength) ONLY in ${langName}. Do not use any other language. This overrides any language seen in examples.`;
 
   const ownedContext =
     ownedCategories.length > 0
@@ -83,7 +79,7 @@ export async function analyzeSkin(
             type: 'image',
             source: { type: 'base64', media_type: 'image/jpeg', data: base64Data },
           },
-          { type: 'text', text: 'Analyze the skin in this photo and return the JSON.' },
+          { type: 'text', text: `Analyze the skin in this photo and return the JSON. ${langInstruction}` },
         ],
       },
     ],
