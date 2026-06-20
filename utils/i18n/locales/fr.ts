@@ -994,6 +994,7 @@ export const fr = {
     optional: 'Facultatif',
     edit: 'Modifier',
     done: 'Terminé',
+    share: 'Partager',
   },
 } as const;
 

@@ -976,5 +976,6 @@ export const tr: LocaleDict = {
     optional: 'İsteğe bağlı',
     edit: 'Düzenle',
     done: 'Tamam',
+    share: 'Paylaş',
   },
 };

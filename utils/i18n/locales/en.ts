@@ -975,5 +975,6 @@ export const en: LocaleDict = {
     optional: 'Optional',
     edit: 'Edit',
     done: 'Done',
+    share: 'Share',
   },
 };
