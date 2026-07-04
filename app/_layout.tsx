@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { initAnalytics } from '../utils/analytics';
 import * as Sentry from '@sentry/react-native';
+import { LanguageProvider } from '../hooks/useLanguage';
 
 const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
 if (SENTRY_DSN) {
@@ -40,14 +41,16 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="paywall" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-          <Stack.Screen name="add-product" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-        </Stack>
-      </SafeAreaProvider>
+      <LanguageProvider>
+        <SafeAreaProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="paywall" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="add-product" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+          </Stack>
+        </SafeAreaProvider>
+      </LanguageProvider>
     </GestureHandlerRootView>
   );
 }
