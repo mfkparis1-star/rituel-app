@@ -734,11 +734,16 @@ export default function AuthScreen() {
           subtitle={t('auth.profile.rows.energy.subtitle')}
           onPress={() => router.push('/score' as any)}
         />
+        {/* Saved posts live in the community feed, which is hidden for now,
+            so this row would lead to an empty screen. Restore it together
+            with the community tab. */}
+        {false && (
         <ListRow
           title={t('auth.profile.rows.favorites.title')}
           subtitle={t('auth.profile.rows.favorites.subtitle')}
           onPress={() => router.push('/saved' as any)}
         />
+        )}
 
         <Text style={s.section}>{t('auth.profile.sections.account')}</Text>
         <ListRow

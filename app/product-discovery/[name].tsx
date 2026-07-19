@@ -67,7 +67,7 @@ export default function ProductDiscoveryScreen() {
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <View style={s.header}>
-        <Pressable onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/(tabs)/community' as any); }} hitSlop={10} style={s.backBtn}>
+        <Pressable onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/(tabs)/ai-studio' as any); }} hitSlop={10} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </Pressable>
         <View style={s.headerCenter}>

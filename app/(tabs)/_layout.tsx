@@ -96,9 +96,12 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: ({ color }) => <HomeIcon color={color} /> }} />
       <Tabs.Screen name="archive" options={{ title: t('tabs.products'), tabBarIcon: ({ color }) => <ArchiveIcon color={color} /> }} />
       <Tabs.Screen name="ai-studio" options={{ title: t('tabs.studio'), tabBarIcon: ({ color }) => <StudioIcon color={color} /> }} />
-      <Tabs.Screen name="community" options={{ title: t('tabs.community'), tabBarIcon: ({ color }) => <CommunityIcon color={color} /> }} />
       <Tabs.Screen name="auth" options={{ title: t('tabs.profile'), tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }} />
 
+      {/* Community is hidden until there are enough members for the feed to
+          feel alive — an empty feed reads as an abandoned app. The screen and
+          its code stay intact; drop the href:null line to bring the tab back. */}
+      <Tabs.Screen name="community" options={{ href: null }} />
       <Tabs.Screen name="skin-analysis" options={{ href: null }} />
       <Tabs.Screen name="makeup" options={{ href: null }} />
       <Tabs.Screen name="routine" options={{ href: null }} />
