@@ -26,29 +26,8 @@ import { AI_DISCLAIMER, COSMETIC_DISCLAIMER } from '../../utils/legal';
 
 type Step = 'pick_occasion' | 'selfie' | 'generating' | 'result' | 'error';
 
-type FeatureRow = {
-  label: string;
-  title: string;
-  description: string;
-};
-
-const FEATURES: FeatureRow[] = [
-  {
-    label: 'ARCHIVE',
-    title: 'Utilise ton archive',
-    description: 'L\'IA suggère des looks à partir de tes produits.',
-  },
-  {
-    label: 'COMPLET',
-    title: 'Produits manquants',
-    description: 'Découvre ce qu\'il te faut pour réaliser le look.',
-  },
-  {
-    label: 'PERSONNALISÉ',
-    title: 'Adapté à l\'événement',
-    description: 'Chaque suggestion correspond à ton occasion.',
-  },
-];
+// Labels/titles/descriptions live in i18n (makeup.features.*); this drives the row count.
+const FEATURE_INDEXES = [0, 1, 2];
 
 function BackArrow({ color }: { color: string }) {
   return (
@@ -483,7 +462,7 @@ export default function MakeupScreen() {
 
         <Text style={s.sectionTitle}>{t('makeup.howItWorks')}</Text>
 
-        {FEATURES.map((f, i) => (
+        {FEATURE_INDEXES.map((i) => (
           <View key={i} style={[s.featureRow, Sh.soft]}>
             <View style={s.featureNumber}>
               <Text style={s.featureNumberTxt}>{i + 1}</Text>

@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
 import { supabase } from '../../lib/supabase';
 import { safeBack } from '../../utils/safeBack';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sp, Type } from '../../theme';
 
 type ProductStatus = 'active' | 'finished' | 'stocked';
@@ -42,13 +43,10 @@ const CATEGORIES = [
   'Autre',
 ];
 
-const STATUSES: { id: ProductStatus; label: string }[] = [
-  { id: 'active',   label: 'En cours' },
-  { id: 'stocked',  label: 'En stock' },
-  { id: 'finished', label: 'Terminé' },
-];
+const STATUS_IDS: ProductStatus[] = ['active', 'stocked', 'finished'];
 
 export default function ProductDetailScreen() {
+  const { t } = useLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [session, setSession] = useState<Session | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -136,7 +134,7 @@ export default function ProductDetailScreen() {
       .eq('user_id', session.user.id);
     setSubmitting(false);
     if (error) {
-      Alert.alert('Erreur', 'Mise à jour impossible. Réessaye dans un instant.');
+      Alert.alert(t('productEdit.errorTitle'), t('productEdit.errorBody'));
       return;
     }
     safeBack('/(tabs)/archive');
@@ -148,9 +146,9 @@ export default function ProductDetailScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
-          <Text style={s.muted}>Connecte-toi pour voir ce produit.</Text>
+          <Text style={s.muted}>{t('productEdit.needSignIn')}</Text>
           <PillButton
-            label="Retour"
+            label={t('productEdit.back')}
             variant="primary"
             onPress={() => safeBack('/(tabs)/archive')}
             style={{ marginTop: Sp.md }}
@@ -176,12 +174,12 @@ export default function ProductDetailScreen() {
       <SafeAreaView style={s.root} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={s.centered}>
-          <Text style={s.title}>Produit introuvable</Text>
+          <Text style={s.title}>{t('productEdit.notFoundTitle')}</Text>
           <Text style={[s.muted, { marginTop: Sp.xs }]}>
-            Ce produit a peut-être été supprimé.
+            {t('productEdit.notFoundBody')}
           </Text>
           <PillButton
-            label="Retour à l’archive"
+            label={t('productEdit.backToArchive')}
             variant="primary"
             onPress={() => safeBack('/(tabs)/archive')}
             style={{ marginTop: Sp.md }}
@@ -200,14 +198,14 @@ export default function ProductDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable onPress={() => safeBack('/(tabs)/archive')} style={s.back}>
-          <Text style={s.backTxt}>{'←  Retour'}</Text>
+          <Text style={s.backTxt}>{`←  ${t('productEdit.back')}`}</Text>
         </Pressable>
 
-        <Text style={s.label}>PRODUIT</Text>
-        <Text style={s.title}>Modifier</Text>
-        <Text style={s.subtitle}>Mets à jour les informations de ton produit.</Text>
+        <Text style={s.label}>{t('productEdit.kicker')}</Text>
+        <Text style={s.title}>{t('productEdit.title')}</Text>
+        <Text style={s.subtitle}>{t('productEdit.subtitle')}</Text>
 
-        <Text style={s.fieldLabel}>Marque</Text>
+        <Text style={s.fieldLabel}>{t('productEdit.brandLabel')}</Text>
         <TextInput
           value={brand}
           onChangeText={setBrand}
@@ -217,7 +215,7 @@ export default function ProductDetailScreen() {
           editable={!submitting}
         />
 
-        <Text style={s.fieldLabel}>Nom</Text>
+        <Text style={s.fieldLabel}>{t('productEdit.nameLabel')}</Text>
         <TextInput
           value={name}
           onChangeText={setName}
@@ -227,7 +225,7 @@ export default function ProductDetailScreen() {
           editable={!submitting}
         />
 
-        <Text style={s.fieldLabel}>Catégorie</Text>
+        <Text style={s.fieldLabel}>{t('productEdit.categoryLabel')}</Text>
         <View style={s.chipsWrap}>
           {CATEGORIES.map((cat) => {
             const active = category === cat;
@@ -237,30 +235,30 @@ export default function ProductDetailScreen() {
                 onPress={() => !submitting && setCategory(cat)}
                 style={[s.chip, active && s.chipActive]}
               >
-                <Text style={[s.chipTxt, active && s.chipTxtActive]}>{cat}</Text>
+                <Text style={[s.chipTxt, active && s.chipTxtActive]}>{t(`addProduct.categories.${cat}`)}</Text>
               </Pressable>
             );
           })}
         </View>
 
-        <Text style={s.fieldLabel}>Statut</Text>
+        <Text style={s.fieldLabel}>{t('productEdit.statusLabel')}</Text>
         <View style={s.statusRow}>
-          {STATUSES.map((st) => {
-            const active = status === st.id;
+          {STATUS_IDS.map((st) => {
+            const active = status === st;
             return (
               <Pressable
-                key={st.id}
-                onPress={() => !submitting && setStatus(st.id)}
+                key={st}
+                onPress={() => !submitting && setStatus(st)}
                 style={[s.statusChip, active && s.statusChipActive]}
               >
-                <Text style={[s.statusTxt, active && s.statusTxtActive]}>{st.label}</Text>
+                <Text style={[s.statusTxt, active && s.statusTxtActive]}>{t(`addProduct.statuses.${st}`)}</Text>
               </Pressable>
             );
           })}
         </View>
 
         <PillButton
-          label="Enregistrer"
+          label={t('productEdit.save')}
           variant="primary"
           fullWidth
           disabled={!canSave}

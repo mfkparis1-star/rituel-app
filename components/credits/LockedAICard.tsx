@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAIUnlock, AIScope } from '../../hooks/useAIUnlock';
 import CreditPackModal from './CreditPackModal';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, G, R, Sh, Sp, Type } from '../../theme';
 
 type Props = {
@@ -13,21 +14,6 @@ type Props = {
   onUnlocked: () => void;
   title?: string;
   description?: string;
-};
-
-const COPY: Record<AIScope, { title: string; description: string }> = {
-  skin_analysis: {
-    title: 'Analyse complète',
-    description: 'Débloque les recommandations détaillées et les catégories manquantes.',
-  },
-  routine_optimize: {
-    title: 'Optimisation IA',
-    description: 'Débloque les améliorations personnalisées de ta routine.',
-  },
-  makeup_full: {
-    title: 'Looks complets',
-    description: 'Débloque tous les looks personnalisés pour cette occasion.',
-  },
 };
 
 function SparkleIcon({ color }: { color: string }) {
@@ -40,12 +26,12 @@ function SparkleIcon({ color }: { color: string }) {
 
 export default function LockedAICard({ scope, resultId, onUnlocked, title, description }: Props) {
   const { unlock, balance, isPremium } = useAIUnlock(scope);
+  const { t } = useLanguage();
   const [unlocking, setUnlocking] = useState(false);
   const [packsVisible, setPacksVisible] = useState(false);
 
-  const copy = COPY[scope];
-  const displayTitle = title || copy.title;
-  const displayDesc = description || copy.description;
+  const displayTitle = title || t(`lockedAI.scopes.${scope}.title`);
+  const displayDesc = description || t(`lockedAI.scopes.${scope}.description`);
 
   const handleUnlock = async () => {
     if (unlocking) return;
@@ -62,8 +48,8 @@ export default function LockedAICard({ scope, resultId, onUnlocked, title, descr
         setPacksVisible(true);
       } else {
         Alert.alert(
-          'Erreur',
-          'Impossible de débloquer pour le moment. Réessaye dans un instant.'
+          t('lockedAI.errorTitle'),
+          t('lockedAI.errorBody')
         );
       }
     } finally {
@@ -82,7 +68,7 @@ export default function LockedAICard({ scope, resultId, onUnlocked, title, descr
           <SparkleIcon color={C.copper} />
         </View>
 
-        <Text style={s.label}>RITUEL IA</Text>
+        <Text style={s.label}>{t('lockedAI.label')}</Text>
         <Text style={s.title}>{displayTitle}</Text>
         <Text style={s.desc}>{displayDesc}</Text>
 
@@ -99,7 +85,7 @@ export default function LockedAICard({ scope, resultId, onUnlocked, title, descr
             <ActivityIndicator color={C.espresso} />
           ) : (
             <Text style={s.ctaTxt}>
-              {isPremium ? 'Débloquer' : `Débloquer · 1 crédit`}
+              {isPremium ? t('lockedAI.unlockPremium') : t('lockedAI.unlockCredit')}
             </Text>
           )}
         </Pressable>
@@ -107,10 +93,10 @@ export default function LockedAICard({ scope, resultId, onUnlocked, title, descr
         {!isPremium && (
           <>
             <Text style={s.balanceTxt}>
-              Solde : {balance} crédit{balance > 1 ? 's' : ''}
+              {t('lockedAI.balancePrefix')} : {balance} {balance > 1 ? t('lockedAI.creditMany') : t('lockedAI.creditOne')}
             </Text>
             <Pressable onPress={handlePremium} hitSlop={8}>
-              <Text style={s.premiumLink}>Devenir Premium · accès illimité</Text>
+              <Text style={s.premiumLink}>{t('lockedAI.premiumLink')}</Text>
             </Pressable>
           </>
         )}

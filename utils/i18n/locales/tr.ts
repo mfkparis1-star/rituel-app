@@ -531,7 +531,81 @@ export const tr: LocaleDict = {
       Nettoyant: 'Temizleyici', Hydratant: 'Nemlendirici', 'Sérum': 'Serum',
       SPF: 'SPF', Tonique: 'Tonik', Masque: 'Maske',
       Maquillage: 'Makyaj', Parfum: 'Parfüm', Corps: 'Vücut', Cheveux: 'Saç',
+      'Contour des yeux': 'Göz çevresi', Exfoliant: 'Peeling', Autre: 'Diğer',
     },
+  },
+
+  // Locked AI unlock card (credits / premium gate)
+  lockedAI: {
+    label: 'RITUEL YZ',
+    scopes: {
+      skin_analysis: {
+        title: 'Tam analiz',
+        description: 'Ayrıntılı önerileri ve eksik kategorileri aç.',
+      },
+      routine_optimize: {
+        title: 'YZ optimizasyonu',
+        description: 'Rutinine özel iyileştirmeleri aç.',
+      },
+      makeup_full: {
+        title: 'Tüm looklar',
+        description: 'Bu etkinlik için sana özel tüm lookları aç.',
+      },
+    },
+    unlockPremium: 'Aç',
+    unlockCredit: 'Aç · 1 kredi',
+    balancePrefix: 'Bakiye',
+    creditOne: 'kredi',
+    creditMany: 'kredi',
+    premiumLink: 'Premium ol · sınırsız erişim',
+    errorTitle: 'Bir sorun oldu',
+    errorBody: 'Şu an açılamadı. Birazdan tekrar dene.',
+  },
+
+  // Credit pack purchase modal
+  creditPack: {
+    label: 'YZ KREDİLERİ',
+    title: 'YZ analizlerini aç',
+    subtitle: 'Tek seferlik satın alma. Abonelik yok. Krediler süresiz geçerli.',
+    balancePrefix: 'Güncel bakiye',
+    creditOne: 'kredi',
+    creditMany: 'kredi',
+    badgePopular: 'POPÜLER',
+    badgeBest: 'EN İYİ TEKLİF',
+    buy: 'Satın al',
+    buying: 'İşleniyor...',
+    note: 'Premium = sınırsız erişim (krediye gerek yok).',
+    addedTitle: 'Krediler eklendi',
+    addedBodyOne: 'Hesabına {n} kredi eklendi.',
+    addedBodyMany: 'Hesabına {n} kredi eklendi.',
+    pendingTitle: 'Satın alma alındı',
+    pendingBody: 'Bağlantı geri geldiğinde kredilerin eklenecek.',
+    errorTitle: 'Satın alma başarısız',
+    errorBody: 'Bir sorun oluştu. Birazdan tekrar dene.',
+  },
+
+  // Product detail / edit screen
+  productEdit: {
+    needSignIn: 'Bu ürünü görmek için giriş yap.',
+    back: 'Geri',
+    notFoundTitle: 'Ürün bulunamadı',
+    notFoundBody: 'Bu ürün silinmiş olabilir.',
+    backToArchive: 'Arşive dön',
+    kicker: 'ÜRÜN',
+    title: 'Düzenle',
+    subtitle: 'Ürün bilgilerini güncelle.',
+    brandLabel: 'Marka',
+    nameLabel: 'Ad',
+    categoryLabel: 'Kategori',
+    statusLabel: 'Durum',
+    save: 'Kaydet',
+    errorTitle: 'Hata',
+    errorBody: 'Güncelleme başarısız. Birazdan tekrar dene.',
+  },
+
+  // Affiliate link disclosure
+  affiliate: {
+    disclosure: 'Ortak bağlantılar. Bu bağlantılar üzerinden yapılan satın almalardan, sizin için ek bir maliyet olmadan komisyon alabiliriz.',
   },
 
   paywall: {

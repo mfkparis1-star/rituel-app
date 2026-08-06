@@ -5,6 +5,7 @@ import PillButton from '../ui/PillButton';
 import { CREDIT_PACKS } from '../../utils/credits';
 import { useCredits } from '../../hooks/useCredits';
 import { purchaseProduct, addPendingGrant } from '../../utils/purchases';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 type Props = {
@@ -23,8 +24,11 @@ function CloseIcon({ color }: { color: string }) {
 
 export default function CreditPackModal({ visible, onClose, onSuccess }: Props) {
   const { add, balance } = useCredits();
+  const { t } = useLanguage();
 
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
+
+  const creditUnit = (n: number) => (n > 1 ? t('creditPack.creditMany') : t('creditPack.creditOne'));
 
   const handleBuy = async (productId: string, amount: number) => {
     if (purchasingId) return;
@@ -35,32 +39,31 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
         const grantResult = await add(amount, productId);
         if (grantResult.ok) {
           Alert.alert(
-            'Crédits ajoutés',
-            `${amount} crédit${amount > 1 ? 's' : ''} ajouté${amount > 1 ? 's' : ''} à ton compte.`
+            t('creditPack.addedTitle'),
+            t(amount > 1 ? 'creditPack.addedBodyMany' : 'creditPack.addedBodyOne').replace('{n}', String(amount))
           );
           onSuccess?.(amount);
           onClose();
         } else {
           await addPendingGrant({ productId, amount, timestamp: Date.now() });
           Alert.alert(
-            'Achat reçu',
-            'Tes crédits seront ajoutés dès que la connexion sera rétablie.'
+            t('creditPack.pendingTitle'),
+            t('creditPack.pendingBody')
           );
           onClose();
         }
       } else if ('userCancelled' in result && result.userCancelled) {
         // silent
       } else {
-        const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
-          'Achat impossible (debug)',
-          'Une erreur est survenue. Réessaie dans un instant.'
+          t('creditPack.errorTitle'),
+          t('creditPack.errorBody')
         );
       }
     } catch (e: any) {
       Alert.alert(
-        'Achat impossible (catch)',
-        'Une erreur est survenue. Réessaie dans un instant.'
+        t('creditPack.errorTitle'),
+        t('creditPack.errorBody')
       );
     } finally {
       setPurchasingId(null);
@@ -83,13 +86,13 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
           </View>
 
           <View style={s.header}>
-            <Text style={s.label}>CRÉDITS IA</Text>
-            <Text style={s.title}>Débloquez des analyses IA</Text>
+            <Text style={s.label}>{t('creditPack.label')}</Text>
+            <Text style={s.title}>{t('creditPack.title')}</Text>
             <Text style={s.subtitle}>
-              Achat unique. Pas d'abonnement. Crédits valables sans limite de temps.
+              {t('creditPack.subtitle')}
             </Text>
             <Text style={s.balance}>
-              Solde actuel : {balance} crédit{balance > 1 ? 's' : ''}
+              {t('creditPack.balancePrefix')} : {balance} {creditUnit(balance)}
             </Text>
           </View>
 
@@ -97,24 +100,24 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
             <View key={p.id} style={[s.packCard, Sh.soft]}>
               {p.popular && (
                 <View style={s.badge}>
-                  <Text style={s.badgeTxt}>POPULAIRE</Text>
+                  <Text style={s.badgeTxt}>{t('creditPack.badgePopular')}</Text>
                 </View>
               )}
               {p.best && (
                 <View style={[s.badge, s.badgeBest]}>
-                  <Text style={s.badgeTxt}>MEILLEURE OFFRE</Text>
+                  <Text style={s.badgeTxt}>{t('creditPack.badgeBest')}</Text>
                 </View>
               )}
 
               <View style={s.packLeft}>
                 <Text style={s.packAmount}>
-                  {p.amount} crédit{p.amount > 1 ? 's' : ''}
+                  {p.amount} {creditUnit(p.amount)}
                 </Text>
                 <Text style={s.packPrice}>{p.priceLabel}</Text>
               </View>
 
               <PillButton
-                label={purchasingId === p.id ? 'En cours...' : 'Acheter'}
+                label={purchasingId === p.id ? t('creditPack.buying') : t('creditPack.buy')}
                 variant="primary"
                 size="sm"
                 disabled={purchasingId !== null}
@@ -124,7 +127,7 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
           ))}
 
           <Text style={s.note}>
-            Premium = accès illimité (les crédits ne sont pas nécessaires).
+            {t('creditPack.note')}
           </Text>
 
           <View style={{ height: Sp.huge }} />

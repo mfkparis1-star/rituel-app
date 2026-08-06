@@ -540,7 +540,81 @@ export const fr = {
       Nettoyant: 'Nettoyant', Hydratant: 'Hydratant', 'Sérum': 'Sérum',
       SPF: 'SPF', Tonique: 'Tonique', Masque: 'Masque',
       Maquillage: 'Maquillage', Parfum: 'Parfum', Corps: 'Corps', Cheveux: 'Cheveux',
+      'Contour des yeux': 'Contour des yeux', Exfoliant: 'Exfoliant', Autre: 'Autre',
     },
+  },
+
+  // Locked AI unlock card (credits / premium gate)
+  lockedAI: {
+    label: 'RITUEL IA',
+    scopes: {
+      skin_analysis: {
+        title: 'Analyse complète',
+        description: 'Débloque les recommandations détaillées et les catégories manquantes.',
+      },
+      routine_optimize: {
+        title: 'Optimisation IA',
+        description: 'Débloque les améliorations personnalisées de ta routine.',
+      },
+      makeup_full: {
+        title: 'Looks complets',
+        description: 'Débloque tous les looks personnalisés pour cette occasion.',
+      },
+    },
+    unlockPremium: 'Débloquer',
+    unlockCredit: 'Débloquer · 1 crédit',
+    balancePrefix: 'Solde',
+    creditOne: 'crédit',
+    creditMany: 'crédits',
+    premiumLink: 'Devenir Premium · accès illimité',
+    errorTitle: 'Erreur',
+    errorBody: 'Impossible de débloquer pour le moment. Réessaye dans un instant.',
+  },
+
+  // Credit pack purchase modal
+  creditPack: {
+    label: 'CRÉDITS IA',
+    title: 'Débloquez des analyses IA',
+    subtitle: 'Achat unique. Pas d\'abonnement. Crédits valables sans limite de temps.',
+    balancePrefix: 'Solde actuel',
+    creditOne: 'crédit',
+    creditMany: 'crédits',
+    badgePopular: 'POPULAIRE',
+    badgeBest: 'MEILLEURE OFFRE',
+    buy: 'Acheter',
+    buying: 'En cours...',
+    note: 'Premium = accès illimité (les crédits ne sont pas nécessaires).',
+    addedTitle: 'Crédits ajoutés',
+    addedBodyOne: '{n} crédit ajouté à ton compte.',
+    addedBodyMany: '{n} crédits ajoutés à ton compte.',
+    pendingTitle: 'Achat reçu',
+    pendingBody: 'Tes crédits seront ajoutés dès que la connexion sera rétablie.',
+    errorTitle: 'Achat impossible',
+    errorBody: 'Une erreur est survenue. Réessaie dans un instant.',
+  },
+
+  // Product detail / edit screen
+  productEdit: {
+    needSignIn: 'Connecte-toi pour voir ce produit.',
+    back: 'Retour',
+    notFoundTitle: 'Produit introuvable',
+    notFoundBody: 'Ce produit a peut-être été supprimé.',
+    backToArchive: 'Retour à l’archive',
+    kicker: 'PRODUIT',
+    title: 'Modifier',
+    subtitle: 'Mets à jour les informations de ton produit.',
+    brandLabel: 'Marque',
+    nameLabel: 'Nom',
+    categoryLabel: 'Catégorie',
+    statusLabel: 'Statut',
+    save: 'Enregistrer',
+    errorTitle: 'Erreur',
+    errorBody: 'Mise à jour impossible. Réessaye dans un instant.',
+  },
+
+  // Affiliate link disclosure
+  affiliate: {
+    disclosure: 'Liens partenaires. Nous pouvons recevoir une commission sur les achats effectués via ces liens, sans coût supplémentaire pour vous.',
   },
 
   // Paywall / premium upsell (Phase 19.7)

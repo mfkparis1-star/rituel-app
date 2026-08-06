@@ -46,13 +46,6 @@ function displayName(post: Post, memberLabel: string): string {
   return post.display_name || (post.user_email ? post.user_email.split('@')[0] : memberLabel);
 }
 
-const SKIN_LABEL: Record<Exclude<SkinFilter, 'all'>, string> = {
-  dry: 'Peau sèche',
-  oily: 'Peau grasse',
-  combination: 'Peau mixte',
-  normal: 'Peau normale',
-};
-
 export default function CommunityScreen() {
   const { t, lang } = useLanguage();
   const [filter, setFilter] = useState<SkinFilter>('all');

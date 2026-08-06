@@ -1,21 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sp } from '../../theme';
 
-type Props = {
-  lang?: 'fr' | 'en' | 'tr';
-};
-
-export default function AffiliateDisclosure({ lang = 'fr' }: Props) {
-  const text =
-    lang === 'fr'
-      ? 'Liens partenaires. Nous pouvons recevoir une commission sur les achats effectués via ces liens, sans coût supplémentaire pour vous.'
-      : lang === 'tr'
-      ? 'Ortak bağlantılar. Bu bağlantılar üzerinden yapılan satın almalardan, sizin için ek bir maliyet olmadan komisyon alabiliriz.'
-      : 'Affiliate links. We may earn a commission on purchases made through these links at no extra cost to you.';
+export default function AffiliateDisclosure() {
+  const { t } = useLanguage();
 
   return (
     <View style={s.box}>
-      <Text style={s.text}>{text}</Text>
+      <Text style={s.text}>{t('affiliate.disclosure')}</Text>
     </View>
   );
 }

@@ -530,7 +530,81 @@ export const en: LocaleDict = {
       Nettoyant: 'Cleanser', Hydratant: 'Moisturizer', 'Sérum': 'Serum',
       SPF: 'SPF', Tonique: 'Toner', Masque: 'Mask',
       Maquillage: 'Makeup', Parfum: 'Fragrance', Corps: 'Body', Cheveux: 'Hair',
+      'Contour des yeux': 'Eye contour', Exfoliant: 'Exfoliant', Autre: 'Other',
     },
+  },
+
+  // Locked AI unlock card (credits / premium gate)
+  lockedAI: {
+    label: 'RITUEL AI',
+    scopes: {
+      skin_analysis: {
+        title: 'Full analysis',
+        description: 'Unlock the detailed recommendations and the missing categories.',
+      },
+      routine_optimize: {
+        title: 'AI optimization',
+        description: 'Unlock personalized improvements to your routine.',
+      },
+      makeup_full: {
+        title: 'Complete looks',
+        description: 'Unlock every personalized look for this occasion.',
+      },
+    },
+    unlockPremium: 'Unlock',
+    unlockCredit: 'Unlock · 1 credit',
+    balancePrefix: 'Balance',
+    creditOne: 'credit',
+    creditMany: 'credits',
+    premiumLink: 'Go Premium · unlimited access',
+    errorTitle: 'Something went wrong',
+    errorBody: 'We couldn\'t unlock this right now. Please try again in a moment.',
+  },
+
+  // Credit pack purchase modal
+  creditPack: {
+    label: 'AI CREDITS',
+    title: 'Unlock AI analyses',
+    subtitle: 'One-time purchase. No subscription. Credits never expire.',
+    balancePrefix: 'Current balance',
+    creditOne: 'credit',
+    creditMany: 'credits',
+    badgePopular: 'POPULAR',
+    badgeBest: 'BEST VALUE',
+    buy: 'Buy',
+    buying: 'Processing...',
+    note: 'Premium = unlimited access (no credits needed).',
+    addedTitle: 'Credits added',
+    addedBodyOne: '{n} credit added to your account.',
+    addedBodyMany: '{n} credits added to your account.',
+    pendingTitle: 'Purchase received',
+    pendingBody: 'Your credits will be added as soon as the connection is back.',
+    errorTitle: 'Purchase failed',
+    errorBody: 'Something went wrong. Please try again in a moment.',
+  },
+
+  // Product detail / edit screen
+  productEdit: {
+    needSignIn: 'Sign in to view this product.',
+    back: 'Back',
+    notFoundTitle: 'Product not found',
+    notFoundBody: 'This product may have been deleted.',
+    backToArchive: 'Back to archive',
+    kicker: 'PRODUCT',
+    title: 'Edit',
+    subtitle: 'Update your product details.',
+    brandLabel: 'Brand',
+    nameLabel: 'Name',
+    categoryLabel: 'Category',
+    statusLabel: 'Status',
+    save: 'Save',
+    errorTitle: 'Error',
+    errorBody: 'Update failed. Please try again in a moment.',
+  },
+
+  // Affiliate link disclosure
+  affiliate: {
+    disclosure: 'Affiliate links. We may earn a commission on purchases made through these links at no extra cost to you.',
   },
 
   paywall: {
