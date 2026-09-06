@@ -17,6 +17,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { supabase } from '../lib/supabase';
+import { noteHappyMoment } from '../utils/reviewPrompt';
 import { useLanguage } from '../hooks/useLanguage';
 import { categoryInfo } from '../utils/routineGestures';
 import { markRitualDone, weekLune, luneCount } from '../utils/lune';
@@ -99,7 +100,7 @@ export default function RoutineSessionScreen() {
     } else {
       timerRef.current && clearInterval(timerRef.current);
       markRitualDone().then(() => weekLune()).then((w) => setLuneThisWeek(luneCount(w)));
-      setPhase('done');
+      setPhase('done'); noteHappyMoment('ritual');
     }
   };
 

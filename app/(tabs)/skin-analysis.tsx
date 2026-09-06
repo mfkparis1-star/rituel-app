@@ -10,6 +10,7 @@ import LockedAICard from '../../components/credits/LockedAICard';
 import { useAIUnlock } from '../../hooks/useAIUnlock';
 import { C, R, Sh, Sp, Type } from '../../theme';
 import { analyzeSkin, getSkinTypeLabel } from '../../utils/skinAnalysis';
+import { noteHappyMoment } from '../../utils/reviewPrompt';
 import { saveSkinAnalysis, getSkinHistory, computeGlowTrend, type GlowTrend } from '../../utils/skinHistory';
 import { trackEvent } from '../../utils/analytics';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -162,6 +163,7 @@ export default function SkinAnalysisScreen() {
       saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, insights: parsed.insights, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
+      noteHappyMoment('analysis');
       trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       // Load the journey trend (compares with the previous analysis).
