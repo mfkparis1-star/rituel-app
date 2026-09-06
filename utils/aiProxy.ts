@@ -87,6 +87,22 @@ export function localizedAIError(code: string, lang: Lang): string {
   return (messages[code] || messages.UNKNOWN)[lang];
 }
 
+/**
+ * Fast offline check before any AI call. Lazy-required so an older
+ * binary without the native module can't crash; on any doubt
+ * (module missing, state unknown) we let the call proceed — the
+ * existing timeout still catches dead connections.
+ */
+async function isOffline(): Promise<boolean> {
+  try {
+    const NetInfo = require('@react-native-community/netinfo').default;
+    const state = await NetInfo.fetch();
+    return state.isConnected === false;
+  } catch {
+    return false;
+  }
+}
+
 export async function callClaudeProxy(
   endpoint: Endpoint,
   body: any,
@@ -102,6 +118,10 @@ export async function callClaudeProxy(
   }
 
   const controller = new AbortController();
+  if (await isOffline()) {
+    throw new AIProxyError('OFFLINE', 'No internet connection');
+  }
+
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
