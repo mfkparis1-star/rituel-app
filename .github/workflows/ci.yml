@@ -2,7 +2,7 @@ name: Quality checks
 
 on:
   push:
-    branches: [phase15-rebuild]
+    branches: [phase15-rebuild, ai-studio/mobile-release-validation]
   pull_request:
     branches: [phase15-rebuild]
 
