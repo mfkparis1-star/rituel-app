@@ -625,6 +625,7 @@ export const tr: LocaleDict = {
     },
     priceLoading: 'Fiyat yükleniyor…',
     priceUnavailable: 'Kullanılamıyor',
+    signIn: 'Abone olmak için giriş yap',
     retryPrices: 'Fiyatları yeniden yükle',
     continue: 'Devam',
     restore: 'Satın alımlarımı geri yükle',

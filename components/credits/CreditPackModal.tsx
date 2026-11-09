@@ -23,7 +23,7 @@ function CloseIcon({ color }: { color: string }) {
 }
 
 export default function CreditPackModal({ visible, onClose, onSuccess }: Props) {
-  const { add, balance } = useCredits();
+  const { add, balance, userId } = useCredits();
   const { t } = useLanguage();
 
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
@@ -31,10 +31,10 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
   const creditUnit = (n: number) => (n > 1 ? t('creditPack.creditMany') : t('creditPack.creditOne'));
 
   const handleBuy = async (productId: string, amount: number) => {
-    if (purchasingId) return;
+    if (purchasingId || !userId) return;
     setPurchasingId(productId);
     try {
-      const result = await purchaseProduct(productId);
+      const result = await purchaseProduct(productId, userId);
       if (result.ok) {
         const grantResult = await add(amount, productId);
         if (grantResult.ok) {

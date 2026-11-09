@@ -635,6 +635,7 @@ export const fr = {
     },
     priceLoading: 'Chargement du prix…',
     priceUnavailable: 'Indisponible',
+    signIn: 'Se connecter pour s’abonner',
     retryPrices: 'Recharger les prix',
     continue: 'Continuer',
     restore: 'Restaurer mes achats',

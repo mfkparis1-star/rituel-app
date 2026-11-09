@@ -89,7 +89,7 @@ export default function PaywallScreen() {
     setPurchasing(true);
     trackEvent('paywall_cta_clicked', { plan: selected });
     try {
-      const result = await purchaseStorePackage(selectedPackage);
+      const result = await purchaseStorePackage(selectedPackage, userId);
       if (result.ok) {
         const premium = hasActivePremium(result.customerInfo);
         if (premium) {
@@ -131,12 +131,12 @@ export default function PaywallScreen() {
   };
 
   const handleRestore = async () => {
-    if (initializing || paymentInProgress.current) return;
+    if (!userId || initializing || paymentInProgress.current) return;
     paymentInProgress.current = true;
     setRestoring(true);
     trackEvent('restore_clicked');
     try {
-      const customerInfo = await restorePurchases();
+      const customerInfo = await restorePurchases(userId);
       const premium = hasActivePremium(customerInfo);
       if (premium) {
         trackEvent('restore_success');
@@ -223,12 +223,17 @@ export default function PaywallScreen() {
           </View>
 
           <PillButton
-            label={t(!pricesPending && !selectedPackage ? 'paywall.retryPrices' : 'paywall.continue')}
+            label={t(!userId ? 'paywall.signIn' :
+              !pricesPending && !selectedPackage ? 'paywall.retryPrices' : 'paywall.continue')}
             variant="primary"
             fullWidth
             loading={purchasing}
-            disabled={pricesPending || restoring}
-            onPress={selectedPackage ? handlePurchase : () => setRetry((value) => value + 1)}
+            disabled={initializing || (!!userId && pricesPending) || restoring}
+            onPress={() => {
+              if (!userId) router.replace('/(tabs)/auth');
+              else if (selectedPackage) void handlePurchase();
+              else setRetry((value) => value + 1);
+            }}
             style={{ marginTop: Sp.sm }}
           />
 
@@ -237,7 +242,7 @@ export default function PaywallScreen() {
             variant="ghost"
             fullWidth
             loading={restoring}
-            disabled={initializing || purchasing}
+            disabled={!userId || initializing || purchasing}
             onPress={handleRestore}
             style={{ marginTop: Sp.xs }}
           />

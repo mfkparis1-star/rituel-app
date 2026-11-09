@@ -624,6 +624,7 @@ export const en: LocaleDict = {
     },
     priceLoading: 'Loading price…',
     priceUnavailable: 'Unavailable',
+    signIn: 'Sign in to subscribe',
     retryPrices: 'Retry prices',
     continue: 'Continue',
     restore: 'Restore my purchases',

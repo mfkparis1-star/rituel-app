@@ -23,8 +23,23 @@ export type PendingGrant = {
 };
 
 let configured = false;
+let desiredAccount: string | null | undefined;
+let verifiedAccount: string | null | undefined;
+let operations: Promise<unknown> = Promise.resolve();
 
-export async function configurePurchases(userId: string | null): Promise<boolean> {
+function enqueue<T>(operation: () => Promise<T>): Promise<T> {
+  const next = operations.then(operation);
+  operations = next.catch(() => undefined);
+  return next;
+}
+
+export function configurePurchases(userId: string | null): Promise<boolean> {
+  desiredAccount = userId;
+  return enqueue(() => synchronizeAccount(userId));
+}
+
+async function synchronizeAccount(userId: string | null): Promise<boolean> {
+  if (desiredAccount !== userId) return false;
   try {
     const apiKey = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY;
     if (!apiKey || !apiKey.startsWith('appl_')) {
@@ -38,11 +53,16 @@ export async function configurePurchases(userId: string | null): Promise<boolean
     if (!configured) {
       Purchases.configure({ apiKey, appUserID: userId || undefined });
       configured = true;
-    } else if (userId) {
-      await Purchases.logIn(userId);
     }
-    return true;
+    if (userId !== null) {
+      if (await Purchases.getAppUserID() !== userId) await Purchases.logIn(userId);
+    } else if (!await Purchases.isAnonymous()) {
+      await Purchases.logOut();
+    }
+    verifiedAccount = userId;
+    return desiredAccount === userId;
   } catch (e) {
+    verifiedAccount = undefined;
     console.warn('[purchases] configure failed', e);
     return false;
   }
@@ -69,12 +89,21 @@ export async function findPackageByProductId(
   return pkg ?? null;
 }
 
-export async function purchaseProduct(productId: string): Promise<PurchaseResult> {
+export async function purchaseProduct(productId: string, account: string | null): Promise<PurchaseResult> {
   const pkg = await findPackageByProductId(productId);
-  return pkg ? purchaseStorePackage(pkg) : { ok: false, error: 'product_not_found' };
+  return pkg ? purchaseStorePackage(pkg, account) : { ok: false, error: 'product_not_found' };
 }
 
-export async function purchaseStorePackage(pkg: PurchasesPackage): Promise<PurchaseResult> {
+export function purchaseStorePackage(pkg: PurchasesPackage, account: string | null): Promise<PurchaseResult> {
+  return enqueue(async () => {
+    if (!account || desiredAccount !== account || verifiedAccount !== account) {
+      return { ok: false, error: 'account_unavailable' };
+    }
+    return performPurchase(pkg);
+  });
+}
+
+async function performPurchase(pkg: PurchasesPackage): Promise<PurchaseResult> {
   try {
     const { customerInfo, productIdentifier } = await Purchases.purchasePackage(pkg);
     return { ok: true, customerInfo, productIdentifier };
@@ -91,24 +120,25 @@ export async function purchaseStorePackage(pkg: PurchasesPackage): Promise<Purch
   }
 }
 
-export async function restorePurchases(): Promise<CustomerInfo | null> {
-  try {
-    const customerInfo = await Purchases.restorePurchases();
-    return customerInfo;
-  } catch (e) {
-    console.warn('[purchases] restore failed', e);
-    return null;
-  }
+export function restorePurchases(account: string | null): Promise<CustomerInfo | null> {
+  return readForAccount(account, () => Purchases.restorePurchases());
 }
 
-export async function getCustomerInfo(): Promise<CustomerInfo | null> {
-  try {
-    const info = await Purchases.getCustomerInfo();
-    return info;
-  } catch (e) {
-    console.warn('[purchases] getCustomerInfo failed', e);
-    return null;
-  }
+export function getCustomerInfo(account: string | null): Promise<CustomerInfo | null> {
+  return readForAccount(account, () => Purchases.getCustomerInfo());
+}
+
+function readForAccount(account: string | null, read: () => Promise<CustomerInfo>): Promise<CustomerInfo | null> {
+  return enqueue(async () => {
+    if (!account || desiredAccount !== account || verifiedAccount !== account) return null;
+    try {
+      const info = await read();
+      return desiredAccount === account ? info : null;
+    } catch (error) {
+      console.warn('[purchases] customer info unavailable', error);
+      return null;
+    }
+  });
 }
 
 export function hasActivePremium(customerInfo: CustomerInfo | null): boolean {
