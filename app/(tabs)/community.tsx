@@ -14,7 +14,7 @@ const T = {
 type Post = {
   id: string; user_id: string; caption: string; skin_type: string;
   product_names: string[]; likes_count: number; created_at: string;
-  user_email?: string; display_name?: string; image_url?: string;
+  display_name?: string; image_url?: string;
 };
 
 export default function CommunityScreen() {
@@ -62,7 +62,7 @@ export default function CommunityScreen() {
   }, []);
 
   const loadPosts = async () => {
-    const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('posts').select('id, user_id, caption, skin_type, product_names, likes_count, created_at, display_name, image_url').order('created_at', { ascending: false });
     if (error) { console.warn('loadPosts error:', error.message); }
     else if (data) setPosts(data);
     setLoading(false);
@@ -187,7 +187,7 @@ export default function CommunityScreen() {
   };
 
   const filteredPosts = filter === 'all' ? posts : posts.filter(p => p.skin_type === filter);
-  const getDisplayName = (post: Post) => post.display_name || post.user_email?.split('@')[0] || 'Membre';
+  const getDisplayName = (post: Post) => post.display_name || 'Membre';
 
   return (
     <ScrollView
