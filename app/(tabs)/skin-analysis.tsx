@@ -1,3 +1,4 @@
+import { useCacheAccount } from '../../hooks/useCacheAccount';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -53,6 +54,12 @@ function Sparkle({ color }: { color: string }) {
 }
 
 export default function SkinAnalysisScreen() {
+  const account = useCacheAccount();
+  if (account === undefined) return null;
+  return <SkinAnalysisScreenContent key={account ?? 'guest'} cacheAccount={account} />;
+}
+
+function SkinAnalysisScreenContent({ cacheAccount }: { cacheAccount: string | null }) {
   const { t, lang } = useLanguage();
   const [step, setStep] = useState<Step>('intro');
   const [result, setResult] = useState<SkinResult | null>(null);
@@ -66,7 +73,7 @@ export default function SkinAnalysisScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const cached = await loadAICache<{ result: SkinResult; resultId: string }>('skin');
+      const cached = await loadAICache<{ result: SkinResult; resultId: string }>(cacheAccount, 'skin');
       if (!cancelled && cached?.result && cached?.resultId) {
         setResult(cached.result);
         setResultId(cached.resultId);
@@ -160,7 +167,7 @@ export default function SkinAnalysisScreen() {
       });
       const newResultId = `skin_${Date.now()}`;
       setResultId(newResultId);
-      saveAICache('skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, insights: parsed.insights, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
+      saveAICache(cacheAccount, 'skin', { result: { skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, missingCategories: parsed.missingCategories, confidence: parsed.confidence, glowScore: parsed.glowScore, skinCharacter: parsed.skinCharacter, noticed: parsed.noticed, insights: parsed.insights, focus: parsed.focus, strength: parsed.strength }, resultId: newResultId });
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
       noteHappyMoment('analysis');
@@ -187,7 +194,7 @@ export default function SkinAnalysisScreen() {
     setErrorMsg('');
     setUnlocked(false);
     setResultId(null);
-    clearAICache('skin');
+    clearAICache(cacheAccount, 'skin');
   };
 
   const spin = spinAnim.interpolate({

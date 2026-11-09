@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getAICacheList } from '../utils/aiCache';
+import { useCacheAccount } from './useCacheAccount';
 
 /**
  * useProfileStats — reactive profile counters.
@@ -14,14 +15,14 @@ import { getAICacheList } from '../utils/aiCache';
  */
 export function useProfileStats() {
   const [productCount, setProductCount] = useState(0);
-  const [analysisCount, setAnalysisCount] = useState(0);
+  const account = useCacheAccount();
+  const [analysis, setAnalysis] = useState<{ account: string | null; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await supabase.auth.getSession();
-      const id = data.session?.user?.id;
+      const id = account;
       if (id) {
         const { count, error } = await supabase
           .from('products')
@@ -31,18 +32,19 @@ export function useProfileStats() {
       } else {
         setProductCount(0);
       }
-      const skin = await getAICacheList('skin');
-      setAnalysisCount(skin.length);
+      const skin = await getAICacheList(id ?? null, 'skin');
+      setAnalysis({ account: id ?? null, count: skin.length });
     } catch {
       // keep previous values — never crash the profile screen
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
+  const analysisCount = analysis && analysis.account === account ? analysis.count : 0;
   return { productCount, analysisCount, loading, refresh };
 }
