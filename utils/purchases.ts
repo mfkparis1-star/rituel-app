@@ -70,11 +70,12 @@ export async function findPackageByProductId(
 }
 
 export async function purchaseProduct(productId: string): Promise<PurchaseResult> {
+  const pkg = await findPackageByProductId(productId);
+  return pkg ? purchaseStorePackage(pkg) : { ok: false, error: 'product_not_found' };
+}
+
+export async function purchaseStorePackage(pkg: PurchasesPackage): Promise<PurchaseResult> {
   try {
-    const pkg = await findPackageByProductId(productId);
-    if (!pkg) {
-      return { ok: false, error: 'product_not_found' };
-    }
     const { customerInfo, productIdentifier } = await Purchases.purchasePackage(pkg);
     return { ok: true, customerInfo, productIdentifier };
   } catch (e: any) {

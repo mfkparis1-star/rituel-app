@@ -1,5 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -9,43 +9,18 @@ import { C, G, R, Sh, Sp, Type } from '../theme';
 import { trackEvent } from '../utils/analytics';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
-import { purchaseProduct, restorePurchases, hasActivePremium } from '../utils/purchases';
+import type { PurchasesPackage } from 'react-native-purchases';
+import { usePremium } from '../hooks/usePremium';
+import { getCurrentOffering, purchaseStorePackage, restorePurchases, hasActivePremium } from '../utils/purchases';
 
 type Plan = 'monthly' | 'yearly';
-
-type PlanInfo = {
-  id: Plan;
-  title: string;
-  price: string;
-  period: string;
-  hint?: string;
-  badge?: string;
-};
 
 const PRODUCT_IDS: Record<Plan, string> = {
   monthly: 'com.mfkparis.rituel.premium.monthly',
   yearly: 'com.mfkparis.rituel.premium.yearly',
 };
 
-// Display strings (title/hint/badge) are resolved at render via t();
-// these fields only carry stable ids and price formatting. hint/badge
-// presence flags whether to render those elements for the plan.
-const PLANS: PlanInfo[] = [
-  {
-    id: 'monthly',
-    title: 'monthly',
-    price: '2,99 €',
-    period: '/ mois',
-  },
-  {
-    id: 'yearly',
-    title: 'yearly',
-    price: '17,99 €',
-    period: '/ an',
-    hint: 'yearly',
-    badge: 'yearly',
-  },
-];
+const PLANS: Plan[] = ['monthly', 'yearly'];
 
 const BENEFIT_KEYS = ['analyses', 'reco', 'unlimited'] as const;
 
@@ -71,18 +46,50 @@ export default function PaywallScreen() {
   const params = useLocalSearchParams<{ source?: string }>();
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const { loading: initializing, userId } = usePremium();
+  const [offeringSnapshot, setOfferingSnapshot] = useState<{
+    account: string | null;
+    attempt: number;
+    packages: Partial<Record<Plan, PurchasesPackage>>;
+  } | null>(null);
+  const [retry, setRetry] = useState(0);
+  const paymentInProgress = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    if (!initializing) {
+      getCurrentOffering().then((offering) => {
+        if (!active) return;
+        const next: Partial<Record<Plan, PurchasesPackage>> = {};
+        for (const plan of PLANS) {
+          const pkg = offering?.availablePackages.find((item) =>
+            item.product.identifier === PRODUCT_IDS[plan] && item.product.priceString.trim()
+          );
+          if (pkg) next[plan] = pkg;
+        }
+        setOfferingSnapshot({ account: userId, attempt: retry, packages: next });
+        setSelected((current) => next[current] ? current : next.yearly ? 'yearly' : 'monthly');
+      });
+    }
+    return () => { active = false; };
+  }, [initializing, userId, retry]);
+
+  const currentOffering = !initializing && offeringSnapshot?.account === userId &&
+    offeringSnapshot.attempt === retry ? offeringSnapshot : null;
+  const selectedPackage = currentOffering?.packages[selected];
+  const pricesPending = !currentOffering;
 
   useEffect(() => {
     trackEvent('paywall_viewed', { source: params.source ?? 'route' });
   }, []);
 
   const handlePurchase = async () => {
-    if (purchasing) return;
+    if (!selectedPackage || pricesPending || paymentInProgress.current) return;
+    paymentInProgress.current = true;
     setPurchasing(true);
     trackEvent('paywall_cta_clicked', { plan: selected });
     try {
-      const productId = PRODUCT_IDS[selected];
-      const result = await purchaseProduct(productId);
+      const result = await purchaseStorePackage(selectedPackage);
       if (result.ok) {
         const premium = hasActivePremium(result.customerInfo);
         if (premium) {
@@ -106,7 +113,6 @@ export default function PaywallScreen() {
         // silent
       } else {
         trackEvent('purchase_failed', { plan: selected });
-        const errMsg = 'error' in result ? result.error : 'unknown';
         Alert.alert(
           t('paywall.alerts.errorTitle'),
           t('paywall.alerts.errorBody')
@@ -119,12 +125,14 @@ export default function PaywallScreen() {
         t('paywall.alerts.errorBody')
       );
     } finally {
+      paymentInProgress.current = false;
       setPurchasing(false);
     }
   };
 
   const handleRestore = async () => {
-    if (restoring) return;
+    if (initializing || paymentInProgress.current) return;
+    paymentInProgress.current = true;
     setRestoring(true);
     trackEvent('restore_clicked');
     try {
@@ -151,6 +159,7 @@ export default function PaywallScreen() {
         t('paywall.alerts.restoreErrorBody')
       );
     } finally {
+      paymentInProgress.current = false;
       setRestoring(false);
     }
   };
@@ -183,12 +192,14 @@ export default function PaywallScreen() {
           </LinearGradient>
 
           <View style={s.plans}>
-            {PLANS.map((p) => {
-              const active = selected === p.id;
+            {PLANS.map((plan) => {
+              const pkg = currentOffering?.packages[plan];
+              const active = selected === plan && !!pkg;
               return (
                 <Pressable
-                  key={p.id}
-                  onPress={() => setSelected(p.id)}
+                  key={plan}
+                  disabled={!pkg || purchasing || restoring}
+                  onPress={() => setSelected(plan)}
                   style={({ pressed }) => [
                     s.planCard,
                     Sh.soft,
@@ -196,33 +207,28 @@ export default function PaywallScreen() {
                     pressed && { opacity: 0.92 },
                   ]}
                 >
-                  {p.badge && (
-                    <View style={s.badge}>
-                      <Text style={s.badgeTxt}>{t('paywall.plans.badge')}</Text>
-                    </View>
-                  )}
                   <View style={s.planHead}>
-                    <Text style={s.planTitle}>{p.id === 'monthly' ? t('paywall.plans.monthlyTitle') : t('paywall.plans.yearlyTitle')}</Text>
+                    <Text style={s.planTitle}>{plan === 'monthly' ? t('paywall.plans.monthlyTitle') : t('paywall.plans.yearlyTitle')}</Text>
                     <View style={[s.radio, active && s.radioActive]}>
                       {active && <View style={s.radioDot} />}
                     </View>
                   </View>
                   <View style={s.planPriceRow}>
-                    <Text style={s.planPrice}>{p.price}</Text>
-                    <Text style={s.planPeriod}>{p.period}</Text>
+                    <Text style={s.planPrice}>{pkg?.product.priceString ?? t(pricesPending ? 'paywall.priceLoading' : 'paywall.priceUnavailable')}</Text>
+                    {pkg && <Text style={s.planPeriod}>{t(`paywall.plans.${plan}Period`)}</Text>}
                   </View>
-                  {p.hint && <Text style={s.planHint}>{t('paywall.plans.yearlyHint')}</Text>}
                 </Pressable>
               );
             })}
           </View>
 
           <PillButton
-            label={t('paywall.continue')}
+            label={t(!pricesPending && !selectedPackage ? 'paywall.retryPrices' : 'paywall.continue')}
             variant="primary"
             fullWidth
             loading={purchasing}
-            onPress={handlePurchase}
+            disabled={pricesPending || restoring}
+            onPress={selectedPackage ? handlePurchase : () => setRetry((value) => value + 1)}
             style={{ marginTop: Sp.sm }}
           />
 
@@ -231,6 +237,7 @@ export default function PaywallScreen() {
             variant="ghost"
             fullWidth
             loading={restoring}
+            disabled={initializing || purchasing}
             onPress={handleRestore}
             style={{ marginTop: Sp.xs }}
           />
@@ -321,21 +328,6 @@ const s = StyleSheet.create({
   planCardActive: {
     borderColor: C.copper,
   },
-  badge: {
-    position: 'absolute',
-    top: -10,
-    right: Sp.lg,
-    backgroundColor: C.copper,
-    paddingHorizontal: Sp.sm,
-    paddingVertical: 4,
-    borderRadius: R.full,
-  },
-  badgeTxt: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: C.white,
-    letterSpacing: 1.2,
-  },
   planHead: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -370,11 +362,6 @@ const s = StyleSheet.create({
     fontSize: 13,
     color: C.textMid,
     marginLeft: 4,
-  },
-  planHint: {
-    fontSize: 12,
-    color: C.copper,
-    marginTop: 4,
   },
   compliance: {
     fontSize: 11,
