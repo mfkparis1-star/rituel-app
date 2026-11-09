@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../components/ui/PillButton';
 import { supabase } from '../lib/supabase';
 import { fetchSavedPostIds } from '../utils/postSaves';
-import type { FeedPost } from '../utils/posts';
+import { FEED_POST_COLUMNS, type FeedPost } from '../utils/posts';
 import { translate } from '../utils/translate';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
@@ -50,7 +50,7 @@ export default function SavedScreen() {
       const ids = saved.map((s) => s.post_id);
       const { data: postRows } = await supabase
         .from('posts')
-        .select('*')
+        .select(FEED_POST_COLUMNS)
         .in('id', ids);
       // Preserve save order (saved newest first)
       const byId = new Map<string, FeedPost>();
@@ -130,7 +130,7 @@ export default function SavedScreen() {
                 <Image source={{ uri: p.image_url }} style={s.cardImage} resizeMode="cover" />
               ) : null}
               <View style={s.cardBody}>
-                <Text style={s.cardAuthor}>{p.display_name ?? (p.user_email?.split('@')[0] ?? t('saved.anonymous'))}</Text>
+                <Text style={s.cardAuthor}>{p.display_name?.trim() || t('saved.anonymous')}</Text>
                 <Text style={s.cardCaption} numberOfLines={4}>{translated[p.id] ?? p.caption}</Text>
                 <Pressable onPress={() => handleTranslate(p)} hitSlop={6}>
                   <Text style={s.translateBtn}>

@@ -28,7 +28,6 @@ type Post = {
   emotion: string | null;
   likes_count: number;
   created_at: string;
-  user_email?: string;
   display_name?: string;
   image_url?: string;
 };
@@ -43,7 +42,7 @@ function mapSkinType(raw: string): Exclude<SkinFilter, "all"> {
 }
 
 function displayName(post: Post, memberLabel: string): string {
-  return post.display_name || (post.user_email ? post.user_email.split('@')[0] : memberLabel);
+  return post.display_name?.trim() || memberLabel;
 }
 
 export default function CommunityScreen() {
@@ -176,7 +175,7 @@ export default function CommunityScreen() {
   };
 
   const handleAuthorPress = (post: Post) => {
-    const name = post.display_name?.trim() || (post.user_email?.split('@')[0] ?? t('community.anonymous'));
+    const name = displayName(post, t('community.anonymous'));
     const ownPostsCount = posts.filter((p) => p.user_id === post.user_id).length;
     const totalLikes = posts
       .filter((p) => p.user_id === post.user_id)

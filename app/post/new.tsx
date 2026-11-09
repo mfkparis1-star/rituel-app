@@ -114,7 +114,7 @@ export default function NewPostScreen() {
       }
     }
 
-    const display = profile?.full_name?.trim() || (session.user.email ?? '').split('@')[0] || null;
+    const display = profile?.full_name?.trim() || null;
     const productNames = Array.from(selectedProducts);
     const result = await createPost({
       userId: session.user.id,

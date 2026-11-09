@@ -11,6 +11,9 @@ import { supabase } from '../lib/supabase';
 
 const BUCKET = 'post-images';
 
+export const FEED_POST_COLUMNS =
+  'id,user_id,caption,skin_type,product_names,emotion,likes_count,created_at,display_name,image_url,lang';
+
 export type FeedPost = {
   id: string;
   user_id: string;
@@ -20,7 +23,6 @@ export type FeedPost = {
   emotion: string | null;
   likes_count: number;
   created_at: string;
-  user_email?: string | null;
   display_name?: string | null;
   image_url?: string | null;
   lang?: string | null;
@@ -67,7 +69,7 @@ export async function uploadPostImage(userId: string, localUri: string): Promise
 export async function fetchFeed(limit = 30): Promise<FeedPost[]> {
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
+    .select(FEED_POST_COLUMNS)
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error || !data) return [];
@@ -111,7 +113,7 @@ export async function createPost(input: CreatePostInput): Promise<{ ok: boolean;
 export async function fetchOwnPosts(userId: string, limit = 30): Promise<FeedPost[]> {
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
+    .select(FEED_POST_COLUMNS)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -149,7 +151,7 @@ export async function fetchPostsByProduct(name: string, limit = 30): Promise<Fee
   if (!trimmed) return [];
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
+    .select(FEED_POST_COLUMNS)
     .contains('product_names', [trimmed])
     .order('created_at', { ascending: false })
     .limit(limit);

@@ -27,11 +27,7 @@ import { safeBack } from '../../utils/safeBack';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
 function authorName(post: FeedPost, memberLabel: string = "Membre"): string {
-  const dn = (post as any).display_name as string | null | undefined;
-  if (dn && dn.trim()) return dn.trim();
-  const email = (post as any).user_email as string | null | undefined;
-  if (email) return email.split('@')[0];
-  return memberLabel;
+  return post.display_name?.trim() || memberLabel;
 }
 
 export default function ProductDiscoveryScreen() {
