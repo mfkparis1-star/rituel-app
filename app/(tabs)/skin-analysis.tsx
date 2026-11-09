@@ -171,13 +171,13 @@ function SkinAnalysisScreenContent({ cacheAccount }: { cacheAccount: string | nu
       // Persist to the skin journey (fire-and-forget, never blocks UI).
       saveSkinAnalysis({ skinType: parsed.skinType, issues: parsed.issues, recommendations: parsed.recommendations, confidence: parsed.confidence, glowScore: parsed.glowScore });
       noteHappyMoment('analysis');
-      trackEvent('skin_analysis_completed', { skinType: parsed.skinType, issueCount: parsed.issues?.length ?? 0 });
+      trackEvent('skin_analysis_completed');
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       // Load the journey trend (compares with the previous analysis).
       getSkinHistory(5).then((h) => {
         const tr = computeGlowTrend(h);
         setTrend(tr);
-        if (tr.hasPrevious) { trackEvent('skin_evolution_shown', { daysSince: tr.daysSincePrevious, issuesDelta: tr.issuesDelta }); }
+        if (tr.hasPrevious) { trackEvent('skin_evolution_shown'); }
       }).catch(() => {});
       setStep('result');
     } catch (e: any) {

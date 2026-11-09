@@ -26,6 +26,8 @@ export type EventName =
   | 'makeup_look_shared'
   | 'onboarding_completed';
 
+type ActivationEvent = 'checkin_saved' | 'guided_ritual_completed';
+
 const KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY;
 const HOST = process.env.EXPO_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
 
@@ -46,6 +48,16 @@ export function trackEvent(name: EventName, payload?: Record<string, any>): void
   }
   try {
     _client?.capture(name, payload);
+  } catch {
+    // non-fatal
+  }
+}
+
+// Enable only after reviewing the production privacy disclosures and consent flow.
+export function trackActivation(event: ActivationEvent): void {
+  if (process.env.EXPO_PUBLIC_ENABLE_ACTIVATION_ANALYTICS !== 'true') return;
+  try {
+    _client?.capture(event);
   } catch {
     // non-fatal
   }

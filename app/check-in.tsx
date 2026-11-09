@@ -8,7 +8,7 @@
  * (insert anyway — checkins are immutable but multiple per day are fine).
  */
 import { router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EmojiScale from '../components/ui/EmojiScale';
@@ -22,6 +22,7 @@ import { C, R, Sp, Type } from '../theme';
 import { supabase } from '../lib/supabase';
 import { adaptRitual } from '../utils/ritualAdapt';
 import { categoryInfo } from '../utils/routineGestures';
+import { trackActivation } from '../utils/analytics';
 
 export default function CheckinScreen() {
   const { t } = useLanguage();
@@ -37,17 +38,21 @@ export default function CheckinScreen() {
   const [submitted, setSubmitted] = useState<CheckinEmoji | null>(null);
   const [adaptSteps, setAdaptSteps] = useState<{ id: string; product_name: string; category: string | null; duration: string }[]>([]);
 
+  const submissionInProgress = useRef(false);
   const canSubmit = !!emoji && !submitting;
 
   const handleSubmit = async () => {
-    if (!canSubmit || !emoji) return;
+    if (!canSubmit || !emoji || submissionInProgress.current) return;
+    submissionInProgress.current = true;
     setSubmitting(true);
-    const ok = await submit(emoji, note.trim() || undefined);
+    const ok = await submit(emoji, note.trim() || undefined).catch(() => false);
     if (!ok) {
+      submissionInProgress.current = false;
       setSubmitting(false);
       Alert.alert(t('checkin.error.title'), t('checkin.error.body'));
       return;
     }
+    trackActivation('checkin_saved');
     // load tonight's steps to show the adaptation
     try {
       const { data: sess } = await supabase.auth.getSession();

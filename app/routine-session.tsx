@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { supabase } from '../lib/supabase';
 import { noteHappyMoment } from '../utils/reviewPrompt';
+import { trackActivation } from '../utils/analytics';
 import { useLanguage } from '../hooks/useLanguage';
 import { categoryInfo } from '../utils/routineGestures';
 import { markRitualDone, weekLune, luneCount } from '../utils/lune';
@@ -49,6 +50,8 @@ export default function RoutineSessionScreen() {
   const [idx, setIdx] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const confirmedStep = useRef(false);
+  const finished = useRef(false);
   const [luneThisWeek, setLuneThisWeek] = useState(0);
 
   useEffect(() => {
@@ -94,12 +97,16 @@ export default function RoutineSessionScreen() {
     router.replace('/(tabs)' as any);
   };
 
-  const advance = () => {
+  const advance = (completed: boolean) => {
+    if (finished.current) return;
+    if (completed) confirmedStep.current = true;
     if (idx + 1 < steps.length) {
       setIdx(idx + 1);
     } else {
       timerRef.current && clearInterval(timerRef.current);
       markRitualDone().then(() => weekLune()).then((w) => setLuneThisWeek(luneCount(w)));
+      finished.current = true;
+      if (confirmedStep.current) trackActivation('guided_ritual_completed');
       setPhase('done'); noteHappyMoment('ritual');
     }
   };
@@ -206,10 +213,10 @@ export default function RoutineSessionScreen() {
           {hint ? <Text style={s.gesture}>{hint}</Text> : <View style={{ flex: 1 }} />}
 
           <View style={s.controls}>
-            <Pressable style={s.ctaMain} onPress={advance}>
+            <Pressable style={s.ctaMain} onPress={() => advance(true)}>
               <Text style={s.ctaMainTxt}>{t('session.stepDone')}</Text>
             </Pressable>
-            <Pressable onPress={advance} hitSlop={8}>
+            <Pressable onPress={() => advance(false)} hitSlop={8}>
               <Text style={s.ctaSkip}>{t('session.skipStep')}</Text>
             </Pressable>
           </View>
