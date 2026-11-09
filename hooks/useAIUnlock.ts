@@ -37,11 +37,10 @@ function makeKey(scope: AIScope, resultId: string): string {
  * - Premium users always unlocked.
  * - Free users unlock per-result via 1 credit spend.
  * - Unlocks persist in AsyncStorage with scope:resultId key.
- * - Refund-aware: refundUnlock removes unlock and refunds credit.
  */
 export function useAIUnlock(scope: AIScope) {
   const { isPremium } = usePremium();
-  const { spend, add, balance } = useCredits();
+  const { spend, balance } = useCredits();
   const [unlocks, setUnlocks] = useState<UnlockMap>({});
   const [loading, setLoading] = useState(true);
 
@@ -86,20 +85,5 @@ export function useAIUnlock(scope: AIScope) {
     [isPremium, unlocks, scope, spend]
   );
 
-  const refundUnlock = useCallback(
-    async (resultId: string): Promise<void> => {
-      if (isPremium) return;
-      const key = makeKey(scope, resultId);
-      if (!unlocks[key]) return;
-
-      const next = { ...unlocks };
-      delete next[key];
-      setUnlocks(next);
-      await writeUnlocks(next);
-      await add(1, 'ai_unlock_refund');
-    },
-    [isPremium, unlocks, scope, add]
-  );
-
-  return { isUnlocked, unlock, refundUnlock, isPremium, balance, loading };
+  return { isUnlocked, unlock, isPremium, balance, loading };
 }

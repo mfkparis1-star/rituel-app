@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import {
-  addCredits as addCreditsUtil,
   CreditOpResult,
   getCreditBalance,
   spendCredit as spendCreditUtil,
@@ -11,7 +10,7 @@ import {
  * useCredits — reactive credit balance hook.
  *
  * Phase 12: balance + loading + refresh.
- * Optional spend()/add() helpers wrap utils/credits.ts and refresh state.
+ * The spend helper wraps utils/credits.ts and refreshes state.
  */
 export function useCredits() {
   const [balance, setBalance] = useState(0);
@@ -60,15 +59,5 @@ export function useCredits() {
     [userId]
   );
 
-  const add = useCallback(
-    async (amount: number, source: string): Promise<CreditOpResult> => {
-      if (!userId) return { ok: false, reason: 'no_user' };
-      const r = await addCreditsUtil(userId, amount, source);
-      if (r.ok) setBalance(r.balance);
-      return r;
-    },
-    [userId]
-  );
-
-  return { balance, loading, userId, refresh, spend, add };
+  return { balance, loading, userId, refresh, spend };
 }

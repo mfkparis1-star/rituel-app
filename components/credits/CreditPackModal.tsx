@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import PillButton from '../ui/PillButton';
-import { CREDIT_PACKS } from '../../utils/credits';
+import { CREDIT_CHECKOUT_ENABLED, CREDIT_PACKS, isCreditDelivered } from '../../utils/credits';
 import { useCredits } from '../../hooks/useCredits';
-import { purchaseProduct, addPendingGrant } from '../../utils/purchases';
+import type { PurchasesPackage } from 'react-native-purchases';
+import { getCurrentOffering, isCurrentPurchaseAccount, purchaseStorePackage } from '../../utils/purchases';
 import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sh, Sp, Type } from '../../theme';
 
@@ -23,21 +24,44 @@ function CloseIcon({ color }: { color: string }) {
 }
 
 export default function CreditPackModal({ visible, onClose, onSuccess }: Props) {
-  const { add, balance, userId } = useCredits();
+  const { refresh, balance, userId } = useCredits();
   const { t } = useLanguage();
 
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
+  const [offering, setOffering] = useState<{ userId: string; packages: PurchasesPackage[] } | null>(null);
+  const [reload, setReload] = useState(0);
+  const purchaseInProgress = useRef(false);
+
+  useEffect(() => {
+    if (!visible || !userId) return;
+    let active = true;
+    void refresh();
+    if (CREDIT_CHECKOUT_ENABLED) {
+      setOffering(null);
+      void getCurrentOffering('verified-credits-v2').then((result) => {
+        if (active) setOffering({ userId, packages: result?.availablePackages ?? [] });
+      });
+    }
+    return () => { active = false; };
+  }, [visible, userId, reload, refresh]);
+
+  const packages = offering && offering.userId === userId ? offering.packages : [];
   const creditUnit = (n: number) => (n > 1 ? t('creditPack.creditMany') : t('creditPack.creditOne'));
 
-  const handleBuy = async (productId: string, amount: number) => {
-    if (purchasingId || !userId) return;
-    setPurchasingId(productId);
+  const handleBuy = async (pkg: PurchasesPackage, amount: number) => {
+    if (!CREDIT_CHECKOUT_ENABLED || purchaseInProgress.current || !userId) return;
+    purchaseInProgress.current = true;
+    setPurchasingId(pkg.product.identifier);
     try {
-      const result = await purchaseProduct(productId, userId);
+      const result = await purchaseStorePackage(pkg, userId);
+      if (!isCurrentPurchaseAccount(userId)) return;
       if (result.ok) {
-        const grantResult = await add(amount, productId);
-        if (grantResult.ok) {
+        const delivered = await isCreditDelivered(result.transactionId);
+        if (!isCurrentPurchaseAccount(userId)) return;
+        if (delivered) {
+          await refresh();
+          if (!isCurrentPurchaseAccount(userId)) return;
           Alert.alert(
             t('creditPack.addedTitle'),
             t(amount > 1 ? 'creditPack.addedBodyMany' : 'creditPack.addedBodyOne').replace('{n}', String(amount))
@@ -45,27 +69,17 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
           onSuccess?.(amount);
           onClose();
         } else {
-          await addPendingGrant({ productId, amount, timestamp: Date.now() });
-          Alert.alert(
-            t('creditPack.pendingTitle'),
-            t('creditPack.pendingBody')
-          );
-          onClose();
+          Alert.alert(t('creditPack.pendingTitle'), t('creditPack.pendingBody'));
         }
-      } else if ('userCancelled' in result && result.userCancelled) {
-        // silent
-      } else {
-        Alert.alert(
-          t('creditPack.errorTitle'),
-          t('creditPack.errorBody')
-        );
+      } else if (!('userCancelled' in result)) {
+        Alert.alert(t('creditPack.errorTitle'), t('creditPack.errorBody'));
       }
-    } catch (e: any) {
-      Alert.alert(
-        t('creditPack.errorTitle'),
-        t('creditPack.errorBody')
-      );
+    } catch {
+      if (isCurrentPurchaseAccount(userId)) {
+        Alert.alert(t('creditPack.errorTitle'), t('creditPack.errorBody'));
+      }
     } finally {
+      purchaseInProgress.current = false;
       setPurchasingId(null);
     }
   };
@@ -96,35 +110,37 @@ export default function CreditPackModal({ visible, onClose, onSuccess }: Props) 
             </Text>
           </View>
 
-          {CREDIT_PACKS.map((p) => (
-            <View key={p.id} style={[s.packCard, Sh.soft]}>
-              {p.popular && (
-                <View style={s.badge}>
-                  <Text style={s.badgeTxt}>{t('creditPack.badgePopular')}</Text>
+          {CREDIT_PACKS.map((pack) => {
+            const pkg = packages.find((item) => item.product.identifier === pack.id && item.product.priceString.trim());
+            if (!pkg) return null;
+            return (
+              <View key={pack.id} style={[s.packCard, Sh.soft]}>
+                <View style={s.packLeft}>
+                  <Text style={s.packAmount}>{pack.amount} {creditUnit(pack.amount)}</Text>
+                  <Text style={s.packPrice}>{pkg.product.priceString}</Text>
                 </View>
-              )}
-              {p.best && (
-                <View style={[s.badge, s.badgeBest]}>
-                  <Text style={s.badgeTxt}>{t('creditPack.badgeBest')}</Text>
-                </View>
-              )}
-
-              <View style={s.packLeft}>
-                <Text style={s.packAmount}>
-                  {p.amount} {creditUnit(p.amount)}
-                </Text>
-                <Text style={s.packPrice}>{p.priceLabel}</Text>
+                <PillButton
+                  label={purchasingId === pack.id ? t('creditPack.buying') : t('creditPack.buy')}
+                  variant="primary"
+                  size="sm"
+                  disabled={purchasingId !== null}
+                  onPress={() => void handleBuy(pkg, pack.amount)}
+                />
               </View>
-
-              <PillButton
-                label={purchasingId === p.id ? t('creditPack.buying') : t('creditPack.buy')}
-                variant="primary"
-                size="sm"
-                disabled={purchasingId !== null}
-                onPress={() => handleBuy(p.id, p.amount)}
-              />
-            </View>
-          ))}
+            );
+          })}
+          {(!CREDIT_CHECKOUT_ENABLED || !userId || !packages.some((pkg) =>
+            CREDIT_PACKS.some((pack) => pack.id === pkg.product.identifier) && pkg.product.priceString.trim()
+          )) && <Text style={s.note}>{t('creditPack.unavailable')}</Text>}
+          {userId && (
+            <PillButton
+              label={t('creditPack.refresh')}
+              variant="ghost"
+              size="sm"
+              disabled={purchasingId !== null}
+              onPress={() => setReload((value) => value + 1)}
+            />
+          )}
 
           <Text style={s.note}>
             {t('creditPack.note')}
@@ -176,22 +192,6 @@ const s = StyleSheet.create({
     padding: Sp.lg,
     marginBottom: Sp.sm,
     position: 'relative',
-  },
-  badge: {
-    position: 'absolute',
-    top: -10,
-    right: Sp.lg,
-    backgroundColor: C.copper,
-    paddingHorizontal: Sp.sm,
-    paddingVertical: 4,
-    borderRadius: R.full,
-  },
-  badgeBest: { backgroundColor: C.espresso },
-  badgeTxt: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: C.white,
-    letterSpacing: 1.2,
   },
   packLeft: { flex: 1 },
   packAmount: {
