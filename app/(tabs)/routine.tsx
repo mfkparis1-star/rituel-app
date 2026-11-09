@@ -1,3 +1,4 @@
+import { useCacheAccount } from '../../hooks/useCacheAccount';
 import { type Session } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
@@ -52,6 +53,12 @@ function CloseIcon({ color }: { color: string }) {
 }
 
 export default function RoutineScreen() {
+  const account = useCacheAccount();
+  if (account === undefined) return null;
+  return <RoutineScreenContent key={account ?? 'guest'} cacheAccount={account} />;
+}
+
+function RoutineScreenContent({ cacheAccount }: { cacheAccount: string | null }) {
   const { t, lang } = useLanguage();
   const [slot, setSlot] = useState<Slot>('matin');
   const [steps, setSteps] = useState<RoutineStep[]>([]);
@@ -87,7 +94,7 @@ export default function RoutineScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const cached = await loadAICache<{ result: RoutineOptimizeResult }>('routine');
+      const cached = await loadAICache<{ result: RoutineOptimizeResult }>(cacheAccount, 'routine');
       if (!cancelled && cached?.result) {
         setOptimizeResult(cached.result);
       }
@@ -228,7 +235,7 @@ export default function RoutineScreen() {
       }
     }
     setOptimizeModalOpen(true);
-    clearAICache('routine');
+    clearAICache(cacheAccount, 'routine');
       setOptimizing(true);
     setOptimizeError('');
     setOptimizeResult(null);
@@ -253,7 +260,7 @@ export default function RoutineScreen() {
 
       const r = await optimizeRoutine(stepsForAI, skinType, lang);
       setOptimizeResult(r);
-      saveAICache('routine', { result: r });
+      saveAICache(cacheAccount, 'routine', { result: r });
     } catch (e: any) {
       setOptimizeError(e?.message || t('common.genericError'));
     } finally {

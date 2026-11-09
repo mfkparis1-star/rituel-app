@@ -1,3 +1,4 @@
+import { useCacheAccount } from '../../hooks/useCacheAccount';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -58,6 +59,12 @@ const TOOLS: { id: string; route: string; Icon: (props: { color: string }) => an
 ];
 
 export default function AIStudioScreen() {
+  const account = useCacheAccount();
+  if (account === undefined) return null;
+  return <AIStudioScreenContent key={account ?? 'guest'} cacheAccount={account} />;
+}
+
+function AIStudioScreenContent({ cacheAccount }: { cacheAccount: string | null }) {
   const { t } = useLanguage();
   const { balance: creditBalance, loading: creditsLoading } = useCredits();
   const [creditModalOpen, setCreditModalOpen] = useState(false);
@@ -66,7 +73,7 @@ export default function AIStudioScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const items = await getRecentAcrossTypes(3);
+      const items = await getRecentAcrossTypes(cacheAccount, 3);
       if (!cancelled) setRecent(items);
     })();
     return () => { cancelled = true; };

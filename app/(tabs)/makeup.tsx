@@ -1,3 +1,4 @@
+import { useCacheAccount } from '../../hooks/useCacheAccount';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
@@ -51,6 +52,12 @@ function ShareIcon({ color = '#2A1410' }: { color?: string }) {
 }
 
 export default function MakeupScreen() {
+  const account = useCacheAccount();
+  if (account === undefined) return null;
+  return <MakeupScreenContent key={account ?? 'guest'} cacheAccount={account} />;
+}
+
+function MakeupScreenContent({ cacheAccount }: { cacheAccount: string | null }) {
   const { t, lang } = useLanguage();
   const [step, setStep] = useState<Step>('pick_occasion');
   const [occasion, setOccasion] = useState<OccasionId | null>(null);
@@ -66,7 +73,7 @@ export default function MakeupScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const cached = await loadAICache<{ result: MakeupResult; resultId: string; occasion: OccasionId }>('makeup');
+      const cached = await loadAICache<{ result: MakeupResult; resultId: string; occasion: OccasionId }>(cacheAccount, 'makeup');
       if (!cancelled && cached?.result && cached?.resultId) {
         setResult(cached.result);
         setResultId(cached.resultId);
@@ -144,7 +151,7 @@ export default function MakeupScreen() {
       setResult(r);
       const newResultId = `makeup_${Date.now()}`;
       setResultId(newResultId);
-      saveAICache('makeup', { result: r, resultId: newResultId, occasion });
+      saveAICache(cacheAccount, 'makeup', { result: r, resultId: newResultId, occasion });
       setUnlocked(isPremium || isAIUnlocked(newResultId));
       setStep('result');
     } catch (e: any) {
@@ -162,7 +169,7 @@ export default function MakeupScreen() {
     setErrorMsg('');
     setUnlocked(false);
     setResultId(null);
-    clearAICache('makeup');
+    clearAICache(cacheAccount, 'makeup');
   };
 
   const handleHeroCta = () => {
