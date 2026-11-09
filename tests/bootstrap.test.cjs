@@ -16,3 +16,9 @@ test("Expo Router is the configured application entry point", () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
   assert.equal(manifest.main, "expo-router/entry");
 });
+
+test("Expo Updates uses the same project as EAS Build", () => {
+  const { expo } = JSON.parse(fs.readFileSync(path.join(root, "app.json"), "utf8"));
+  assert.ok(expo.extra?.eas?.projectId);
+  assert.equal(expo.updates.url, `https://u.expo.dev/${expo.extra.eas.projectId}`);
+});
