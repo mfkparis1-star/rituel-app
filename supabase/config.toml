@@ -1,0 +1,2 @@
+[functions.revenuecat-credit-grants]
+verify_jwt = false
