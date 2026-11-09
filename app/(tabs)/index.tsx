@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({ active: 0, finished: 0, stocked: 0, total: 0 });
-  const [communityStats, setCommunityStats] = useState({ totalUsers: 0, topProduct: '' });
+  const [communityStats, setCommunityStats] = useState({ totalUsers: 0 });
 
   const lbl = (fr: string, tr: string, en: string) => lang === 'fr' ? fr : lang === 'tr' ? tr : en;
 
@@ -84,15 +84,8 @@ export default function HomeScreen() {
   };
 
   const loadCommunityStats = async () => {
-    const { count: totalUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-    const { data: topProductData } = await supabase.from('products').select('name').limit(100);
-    let topProduct = 'Hyalu B5 Sérum';
-    if (topProductData && topProductData.length > 0) {
-      const freq: Record<string, number> = {};
-      topProductData.forEach((p: any) => { freq[p.name] = (freq[p.name] || 0) + 1; });
-      topProduct = Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || topProduct;
-    }
-    setCommunityStats({ totalUsers: totalUsers || 0, topProduct });
+    const { count: totalUsers } = await supabase.from('profiles').select('id', { count: 'exact', head: true });
+    setCommunityStats({ totalUsers: totalUsers || 0 });
   };
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Sophie';
