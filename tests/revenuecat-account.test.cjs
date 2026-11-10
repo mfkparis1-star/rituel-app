@@ -47,6 +47,7 @@ function setup() {
   return {
     api: exports, calls,
     failLogin: () => { loginError = true; },
+    recoverLogin: () => { loginError = false; },
     holdRead: (promise) => { pendingRead = promise; },
   };
 }
@@ -71,7 +72,8 @@ test('a failed account switch cannot start checkout or expose the previous entit
   assert.equal(await api.getCustomerInfo('A'), null);
   assert.equal(await api.getCustomerInfo('B'), null);
   assert.equal((await api.purchaseStorePackage({}, 'B')).error, 'account_unavailable');
-  assert.deepEqual(calls, [['login', 'B']]);
+  assert.ok(calls.every(([action, account]) => action === 'login' && account === 'B'));
+  assert.ok(calls.length >= 1);
 });
 
 test('a response in flight is discarded when the signed-in account changes', async () => {
@@ -85,4 +87,18 @@ test('a response in flight is discarded when the signed-in account changes', asy
   release({ sdkId: 'A' });
   assert.equal(await reading, null);
   assert.equal(await switched, true);
+});
+
+test('an offline account transition can recover without signing out again', async () => {
+  const { api, calls, failLogin, recoverLogin } = setup();
+  await api.configurePurchases('A');
+  failLogin();
+  assert.equal(await api.configurePurchases('B'), false);
+  assert.equal(api.isCurrentPurchaseAccount('A'), false);
+  assert.equal(api.isCurrentPurchaseAccount('B'), false);
+  recoverLogin();
+  assert.equal((await api.getCustomerInfo('B')).sdkId, 'B');
+  assert.equal(api.isCurrentPurchaseAccount('B'), true);
+  assert.equal((await api.purchaseStorePackage({}, 'B')).ok, true);
+  assert.deepEqual(calls, [['login', 'B'], ['login', 'B'], ['purchase', 'B']]);
 });

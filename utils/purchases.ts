@@ -94,9 +94,18 @@ export async function purchaseProduct(productId: string, account: string | null)
   return pkg ? purchaseStorePackage(pkg, account) : { ok: false, error: 'product_not_found' };
 }
 
+export function isCurrentPurchaseAccount(account: string | null): boolean {
+  return !!account && desiredAccount === account && verifiedAccount === account;
+}
+
+async function ensurePurchaseAccount(account: string | null): Promise<boolean> {
+  if (!account || desiredAccount !== account) return false;
+  return verifiedAccount === account || synchronizeAccount(account);
+}
+
 export function purchaseStorePackage(pkg: PurchasesPackage, account: string | null): Promise<PurchaseResult> {
   return enqueue(async () => {
-    if (!account || desiredAccount !== account || verifiedAccount !== account) {
+    if (!await ensurePurchaseAccount(account) || !isCurrentPurchaseAccount(account)) {
       return { ok: false, error: 'account_unavailable' };
     }
     return performPurchase(pkg);
@@ -130,10 +139,10 @@ export function getCustomerInfo(account: string | null): Promise<CustomerInfo | 
 
 function readForAccount(account: string | null, read: () => Promise<CustomerInfo>): Promise<CustomerInfo | null> {
   return enqueue(async () => {
-    if (!account || desiredAccount !== account || verifiedAccount !== account) return null;
+    if (!await ensurePurchaseAccount(account) || !isCurrentPurchaseAccount(account)) return null;
     try {
       const info = await read();
-      return desiredAccount === account ? info : null;
+      return isCurrentPurchaseAccount(account) ? info : null;
     } catch (error) {
       console.warn('[purchases] customer info unavailable', error);
       return null;

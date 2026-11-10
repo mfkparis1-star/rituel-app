@@ -5,13 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import PillButton from '../components/ui/PillButton';
-import { C, G, R, Sh, Sp, Type } from '../theme';
+import { C, G, R, Sh, Sp } from '../theme';
 import { trackEvent } from '../utils/analytics';
 import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
 import type { PurchasesPackage } from 'react-native-purchases';
 import { usePremium } from '../hooks/usePremium';
-import { getCurrentOffering, purchaseStorePackage, restorePurchases, hasActivePremium } from '../utils/purchases';
+import { getCurrentOffering, isCurrentPurchaseAccount, purchaseStorePackage, restorePurchases, hasActivePremium } from '../utils/purchases';
 
 type Plan = 'monthly' | 'yearly';
 
@@ -81,7 +81,7 @@ export default function PaywallScreen() {
 
   useEffect(() => {
     trackEvent('paywall_viewed', { source: params.source ?? 'route' });
-  }, []);
+  }, [params.source]);
 
   const handlePurchase = async () => {
     if (!selectedPackage || pricesPending || paymentInProgress.current) return;
@@ -90,6 +90,7 @@ export default function PaywallScreen() {
     trackEvent('paywall_cta_clicked', { plan: selected });
     try {
       const result = await purchaseStorePackage(selectedPackage, userId);
+      if (result.ok && !isCurrentPurchaseAccount(userId)) return;
       if (result.ok) {
         const premium = hasActivePremium(result.customerInfo);
         if (premium) {
@@ -118,7 +119,7 @@ export default function PaywallScreen() {
           t('paywall.alerts.errorBody')
         );
       }
-    } catch (e: any) {
+    } catch {
       trackEvent('purchase_failed', { plan: selected });
       Alert.alert(
         t('paywall.alerts.errorTitle'),
@@ -137,6 +138,7 @@ export default function PaywallScreen() {
     trackEvent('restore_clicked');
     try {
       const customerInfo = await restorePurchases(userId);
+      if (!isCurrentPurchaseAccount(userId)) return;
       const premium = hasActivePremium(customerInfo);
       if (premium) {
         trackEvent('restore_success');
