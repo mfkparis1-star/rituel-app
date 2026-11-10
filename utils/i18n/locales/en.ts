@@ -567,6 +567,7 @@ export const en: LocaleDict = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Credit packs are temporarily unavailable. You can still use your existing credits.',
     label: 'AI CREDITS',
     title: 'Unlock AI analyses',
     subtitle: 'One-time purchase. No subscription. Credits never expire.',

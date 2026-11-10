@@ -577,6 +577,7 @@ export const fr = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Les packs de crédits sont momentanément indisponibles. Tes crédits actuels restent utilisables.',
     label: 'CRÉDITS IA',
     title: 'Débloquez des analyses IA',
     subtitle: 'Achat unique. Pas d\'abonnement. Crédits valables sans limite de temps.',

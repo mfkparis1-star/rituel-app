@@ -568,6 +568,7 @@ export const tr: LocaleDict = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Kredi paketleri geçici olarak kullanılamıyor. Mevcut kredilerini kullanabilirsin.',
     label: 'YZ KREDİLERİ',
     title: 'YZ analizlerini aç',
     subtitle: 'Tek seferlik satın alma. Abonelik yok. Krediler süresiz geçerli.',

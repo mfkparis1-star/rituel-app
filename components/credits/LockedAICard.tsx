@@ -105,9 +105,6 @@ export default function LockedAICard({ scope, resultId, onUnlocked, title, descr
       <CreditPackModal
         visible={packsVisible}
         onClose={() => setPacksVisible(false)}
-        onSuccess={() => {
-          setPacksVisible(false);
-        }}
       />
     </>
   );

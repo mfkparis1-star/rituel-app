@@ -601,7 +601,6 @@ function RoutineScreenContent({ cacheAccount, initialSlot }: { cacheAccount: str
       <CreditPackModal
         visible={creditPacksVisible}
         onClose={() => setCreditPacksVisible(false)}
-        onSuccess={() => setCreditPacksVisible(false)}
       />
             {steps.length > 0 && (
           <View style={{ paddingHorizontal: 20, paddingBottom: 12 }}>
