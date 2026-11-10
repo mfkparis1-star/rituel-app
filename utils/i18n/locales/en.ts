@@ -855,6 +855,7 @@ export const en: LocaleDict = {
       'Énergisant': 'Energizing', Fragile: 'Fragile', Doux: 'Gentle',
     },
     alerts: {
+      productRequired: 'Enter a product name.',
         saveError: 'Could not save. Please try again.',
       permissionTitle: 'Photo access denied',
       permissionBody: 'Enable photo access in Settings to add an image to your post.',
@@ -889,6 +890,8 @@ export const en: LocaleDict = {
       normal: 'Normal skin',
     },
     empty: {
+      morningBody: 'Start with one product you already use in the morning.',
+      eveningBody: 'Start with one product you already use at night.',
       title: 'No routines yet',
       subtitle: 'Routines shared by the community will appear here.',
     },
@@ -918,6 +921,11 @@ export const en: LocaleDict = {
     },
   },
   session: {
+    morningEyebrow: 'MORNING RITUAL',
+    morningTitle: 'Start your morning',
+    emptyBody: 'Your ritual needs a first step.',
+    addSteps: 'Add a step',
+    morningDoneBody: 'You made time for your routine this morning.',
     eyebrow: 'TONIGHT\'S RITUAL',
     introTitle: 'Three gestures',
     minutes: 'minutes',

@@ -78,7 +78,7 @@ export default function IndexScreen() {
   const { count: routineCount } = useRoutineCount();
   const { memory } = useMemory();
   const { recent, hasToday } = useCheckins(7);
-  const { steps: tonightSteps } = useRoutineSteps('soir');
+  const { steps: tonightSteps, loading: tonightLoading } = useRoutineSteps('soir');
   const { completedIds, toggle: toggleTonightStep } = useTonightProgress();
 
   const [recommendations, setRecommendations] = useState<AffiliateProduct[]>([]);
@@ -186,6 +186,19 @@ export default function IndexScreen() {
           <Text style={s.subtitle}>{t('home.subtitle')}</Text>
         </View>
 
+        <TonightRitualCard
+          steps={tonightSteps}
+          loading={tonightLoading}
+          checkinEmoji={tonightEmoji}
+          completedIds={completedIds}
+          onToggleStep={toggleTonightStep}
+          onStart={() => router.push('/routine-session' as any)}
+          onCreate={() => router.push({ pathname: '/(tabs)/routine', params: { slot: 'soir' } })}
+          onCheckin={() => router.push('/check-in' as any)}
+          ritualTime={ritualTime}
+          onEditTime={() => setShowTimePicker(true)}
+        />
+
         {/* Phase 1.1d — week strip + tonight ritual + aphorism */}
         <WeekStrip dayLabels={dayLabels} completed={weekCompleted} />
         {(() => {
@@ -218,17 +231,6 @@ export default function IndexScreen() {
             </Pressable>
           );
         })()}
-        <TonightRitualCard
-          steps={tonightSteps}
-          checkinEmoji={tonightEmoji}
-          completedIds={completedIds}
-          onToggleStep={toggleTonightStep}
-          onStart={() => router.push('/routine-session' as any)}
-          onCreate={() => router.push('/(tabs)/routine' as any)}
-          onCheckin={() => router.push('/check-in' as any)}
-          ritualTime={ritualTime}
-          onEditTime={() => setShowTimePicker(true)}
-        />
         {showTimePicker && (() => {
           let DateTimePicker: any = null;
           try { DateTimePicker = require('@react-native-community/datetimepicker').default; } catch { DateTimePicker = null; }
@@ -297,7 +299,7 @@ export default function IndexScreen() {
         <AphorismCard text={aphorism} />
 
         {/* Check-in CTA (only when not done today) */}
-        {!hasToday && (
+        {!hasToday && !tonightLoading && tonightSteps.every((step) => completedIds.includes(step.id)) && (
           <Pressable
             onPress={() => router.push('/check-in' as any)}
             style={s.checkinCard}

@@ -874,6 +874,7 @@ export const fr = {
       'Énergisant': 'Énergisant', Fragile: 'Fragile', Doux: 'Doux',
     },
     alerts: {
+      productRequired: 'Renseigne le nom du produit.',
         saveError: 'Erreur lors de l\'enregistrement. Réessayez.',
       permissionTitle: 'Accès aux photos refusé',
       permissionBody: 'Active l\u2019accès aux photos dans Réglages pour ajouter une image à ta publication.',
@@ -908,6 +909,8 @@ export const fr = {
       normal: 'Peau normale',
     },
     empty: {
+      morningBody: 'Commence avec un produit que tu utilises déjà le matin.',
+      eveningBody: 'Commence avec un produit que tu utilises déjà le soir.',
       title: 'Pas encore de routines',
       subtitle: 'Les routines partagées par la communauté apparaîtront ici.',
     },
@@ -937,6 +940,11 @@ export const fr = {
     },
   },
   session: {
+    morningEyebrow: 'RITUEL DU MATIN',
+    morningTitle: 'Commence ton matin',
+    emptyBody: 'Ajoute une première étape à ton rituel.',
+    addSteps: 'Ajouter une étape',
+    morningDoneBody: 'Tu as pris un moment pour toi ce matin.',
     eyebrow: 'LE RITUEL DE CE SOIR',
     introTitle: 'Trois gestes',
     minutes: 'minutes',

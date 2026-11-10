@@ -856,6 +856,7 @@ export const tr: LocaleDict = {
       'Énergisant': 'Enerjik', Fragile: 'Kırılgan', Doux: 'Yumuşak',
     },
     alerts: {
+      productRequired: 'Ürün adını gir.',
         saveError: 'Kaydedilemedi. Tekrar dene.',
       permissionTitle: 'Fotoğraf erişimi reddedildi',
       permissionBody: 'Paylaşımına görsel eklemek için Ayarlar\'dan fotoğraf erişimini aç.',
@@ -890,6 +891,8 @@ export const tr: LocaleDict = {
       normal: 'Normal cilt',
     },
     empty: {
+      morningBody: 'Sabah zaten kullandığın bir ürünle başla.',
+      eveningBody: 'Akşam zaten kullandığın bir ürünle başla.',
       title: 'Henüz rutin yok',
       subtitle: 'Topluluğun paylaştığı rutinler burada görünecek.',
     },
@@ -919,6 +922,11 @@ export const tr: LocaleDict = {
     },
   },
   session: {
+    morningEyebrow: 'SABAH RİTÜELİ',
+    morningTitle: 'Sabah ritüeline başla',
+    emptyBody: 'Ritüeline ilk adımı ekle.',
+    addSteps: 'Adım ekle',
+    morningDoneBody: 'Bu sabah rutinine zaman ayırdın.',
     eyebrow: 'BU AKŞAMIN RİTÜELİ',
     introTitle: 'Üç adım',
     minutes: 'dakika',

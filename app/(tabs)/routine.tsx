@@ -1,6 +1,6 @@
 import { useCacheAccount } from '../../hooks/useCacheAccount';
 import { type Session } from '@supabase/supabase-js';
-import { router } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -54,13 +54,14 @@ function CloseIcon({ color }: { color: string }) {
 
 export default function RoutineScreen() {
   const account = useCacheAccount();
+  const { slot } = useLocalSearchParams<{ slot?: string }>();
   if (account === undefined) return null;
-  return <RoutineScreenContent key={account ?? 'guest'} cacheAccount={account} />;
+  return <RoutineScreenContent key={`${account ?? 'guest'}:${slot ?? ''}`} cacheAccount={account} initialSlot={slot === 'soir' ? 'soir' : 'matin'} />;
 }
 
-function RoutineScreenContent({ cacheAccount }: { cacheAccount: string | null }) {
+function RoutineScreenContent({ cacheAccount, initialSlot }: { cacheAccount: string | null; initialSlot: Slot }) {
   const { t, lang } = useLanguage();
-  const [slot, setSlot] = useState<Slot>('matin');
+  const [slot, setSlot] = useState<Slot>(initialSlot);
   const [steps, setSteps] = useState<RoutineStep[]>([]);
 
   const routineShareRef = useRef<View>(null);
@@ -169,7 +170,7 @@ function RoutineScreenContent({ cacheAccount }: { cacheAccount: string | null })
     setError(null);
     if (!session) return;
     if (!productName.trim()) {
-      setError('Veuillez renseigner le nom du produit.');
+      setError(t('routine.alerts.productRequired'));
       return;
     }
     setSaving(true);
@@ -333,7 +334,7 @@ function RoutineScreenContent({ cacheAccount }: { cacheAccount: string | null })
           <View style={s.emptyCard}>
             <EmptyState
               title={t('routine.empty.title')}
-              subtitle="Ajoutez vos étapes pour mieux suivre vos soins."
+              subtitle={t(slot === 'soir' ? 'routine.empty.eveningBody' : 'routine.empty.morningBody')}
               action={<PillButton label={t('routine.empty.addStep')} variant="primary" onPress={openAddModal} />}
             />
           </View>
@@ -379,7 +380,7 @@ function RoutineScreenContent({ cacheAccount }: { cacheAccount: string | null })
               label={t('routine.startRitual')}
               variant="primary"
               fullWidth
-              onPress={() => router.push('/routine-session' as any)}
+              onPress={() => router.push({ pathname: '/routine-session', params: { slot } })}
               style={{ marginTop: Sp.sm }}
             />
             <Pressable onPress={handleOptimize} style={s.optimizeLink} hitSlop={6}>

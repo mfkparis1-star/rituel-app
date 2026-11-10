@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useCacheAccount } from './useCacheAccount';
 
-/**
- * useRoutineSteps — read-only routine steps for a slot.
- * Used by the home Tonight card. Never writes; safe fallback
- * to empty list on error or signed-out session.
- */
 export type TonightStep = {
   id: string;
   product_name: string;
@@ -14,35 +11,39 @@ export type TonightStep = {
 };
 
 export function useRoutineSteps(slot: 'matin' | 'soir' = 'soir') {
-  const [steps, setSteps] = useState<TonightStep[]>([]);
-  const [loading, setLoading] = useState(true);
+  const account = useCacheAccount();
+  const [result, setResult] = useState<{
+    account: string;
+    slot: 'matin' | 'soir';
+    steps: TonightStep[];
+  } | null>(null);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data } = await supabase.auth.getSession();
-      const id = data.session?.user?.id;
-      if (!id) {
-        setSteps([]);
-        return;
+  useFocusEffect(useCallback(() => {
+    if (!account) return;
+    let active = true;
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('routine_steps')
+          .select('id, product_name, step_order, duration')
+          .eq('user_id', account)
+          .eq('routine_type', slot)
+          .order('step_order', { ascending: true });
+        if (active && !error) {
+          setResult({ account, slot, steps: data as TonightStep[] ?? [] });
+        }
+      } catch {
+        // Fall back to the last result for this account and slot.
+      } finally {
+        if (active) {
+          setResult((previous) => previous?.account === account && previous.slot === slot
+            ? previous : { account, slot, steps: [] });
+        }
       }
-      const { data: rows, error } = await supabase
-        .from('routine_steps')
-        .select('id, product_name, step_order, duration')
-        .eq('user_id', id)
-        .eq('routine_type', slot)
-        .order('step_order', { ascending: true });
-      if (!error && rows) setSteps(rows as TonightStep[]);
-    } catch {
-      // keep previous steps
-    } finally {
-      setLoading(false);
-    }
-  }, [slot]);
+    })();
+    return () => { active = false; };
+  }, [account, slot]));
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { steps, loading, refresh };
+  const current = result?.account === account && result?.slot === slot ? result : null;
+  return { steps: current?.steps ?? [], loading: account === undefined || (!!account && !current) };
 }

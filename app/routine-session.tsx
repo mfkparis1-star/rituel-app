@@ -11,9 +11,9 @@
  * Read-only on routine_steps. Lune badge + reflection line are
  * visual placeholders here; wired to real data in 1.4 / 1.5.
  */
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { supabase } from '../lib/supabase';
@@ -45,6 +45,9 @@ function durationSeconds(d: string): number {
 
 export default function RoutineSessionScreen() {
   const { t } = useLanguage();
+  const { slot: requestedSlot } = useLocalSearchParams<{ slot?: string }>();
+  const slot = requestedSlot === 'matin' ? 'matin' : 'soir';
+  const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState<SessionStep[]>([]);
   const [phase, setPhase] = useState<'intro' | 'step' | 'done'>('intro');
   const [idx, setIdx] = useState(0);
@@ -55,19 +58,27 @@ export default function RoutineSessionScreen() {
   const [luneThisWeek, setLuneThisWeek] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      const { data: sess } = await supabase.auth.getSession();
-      const uid = sess.session?.user?.id;
-      if (!uid) return;
-      const { data } = await supabase
-        .from('routine_steps')
-        .select('id, product_name, brand, duration, category')
-        .eq('user_id', uid)
-        .eq('routine_type', 'soir')
-        .order('step_order', { ascending: true });
-      if (data) setSteps(data as SessionStep[]);
-    })();
-  }, []);
+    let active = true;
+    setLoading(true);
+    setSteps([]);
+    void (async () => {
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const uid = sess.session?.user?.id;
+        if (!uid || !active) return;
+        const { data } = await supabase
+          .from('routine_steps')
+          .select('id, product_name, brand, duration, category')
+          .eq('user_id', uid)
+          .eq('routine_type', slot)
+          .order('step_order', { ascending: true });
+        if (data && active) setSteps(data as SessionStep[]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })().catch(() => {});
+    return () => { active = false; };
+  }, [slot]);
 
   // countdown for the active step
   useEffect(() => {
@@ -104,7 +115,7 @@ export default function RoutineSessionScreen() {
       setIdx(idx + 1);
     } else {
       timerRef.current && clearInterval(timerRef.current);
-      markRitualDone().then(() => weekLune()).then((w) => setLuneThisWeek(luneCount(w)));
+      if (slot === 'soir') markRitualDone().then(() => weekLune()).then((w) => setLuneThisWeek(luneCount(w)));
       finished.current = true;
       if (confirmedStep.current) trackActivation('guided_ritual_completed');
       setPhase('done'); noteHappyMoment('ritual');
@@ -148,12 +159,13 @@ export default function RoutineSessionScreen() {
 
       {phase === 'intro' && (
         <>
-          <Text style={s.eyebrow}>{t('session.eyebrow')}</Text>
-          <Text style={s.bigTitle}>{t('session.introTitle')}</Text>
+          <Text style={s.eyebrow}>{t(slot === 'matin' ? 'session.morningEyebrow' : 'session.eyebrow')}</Text>
+          <Text style={s.bigTitle}>{t(slot === 'matin' ? 'session.morningTitle' : 'session.introTitle')}</Text>
           <Text style={s.subtle}>
-            ≈ {totalMin} {t('session.minutes')} · {t('session.atYourPace')}
+            {steps.length ? `≈ ${totalMin} ${t('session.minutes')} · ${t('session.atYourPace')}` : loading ? null : t('session.emptyBody')}
           </Text>
 
+          {loading && <ActivityIndicator color={C.copper} />}
           <View style={s.introList}>
             {steps.map((st, i) => (
               <View key={st.id} style={[s.introStep, i === steps.length - 1 && s.introStepLast]}>
@@ -166,13 +178,19 @@ export default function RoutineSessionScreen() {
 
           <View style={s.controls}>
             <Pressable
-              style={s.ctaMain}
+              style={[s.ctaMain, loading && { opacity: 0.5 }]}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: loading }}
+              disabled={loading}
               onPress={() => {
-                if (steps.length === 0) { close(); return; }
-                setPhase('step');
+                if (steps.length === 0) {
+                  router.replace({ pathname: '/(tabs)/routine', params: { slot } });
+                } else {
+                  setPhase('step');
+                }
               }}
             >
-              <Text style={s.ctaMainTxt}>{t('session.begin')}</Text>
+              <Text style={s.ctaMainTxt}>{t(steps.length ? 'session.begin' : 'session.addSteps')}</Text>
             </Pressable>
             <Pressable onPress={close} hitSlop={8}>
               <Text style={s.ctaSkip}>{t('session.later')}</Text>
@@ -228,10 +246,10 @@ export default function RoutineSessionScreen() {
           <View style={s.doneCenter}>
             <Text style={s.doneMoon}>☾</Text>
             <Text style={s.doneTitle}>{t('session.doneTitle')}</Text>
-            <Text style={s.doneBody}>{t('session.doneBody')}</Text>
-            <View style={s.doneLune}>
+            <Text style={s.doneBody}>{t(slot === 'matin' ? 'session.morningDoneBody' : 'session.doneBody')}</Text>
+            {slot === 'soir' && <View style={s.doneLune}>
               <Text style={s.doneLuneTxt}>☾ {luneThisWeek}/7 · {t('session.luneNote')}</Text>
-            </View>
+            </View>}
           </View>
           <View style={s.controls}>
             <Pressable style={s.ctaMain} onPress={close}>

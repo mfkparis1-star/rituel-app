@@ -11,7 +11,7 @@
  * Pure UI + callbacks. No supabase, no purchases, no storage —
  * persistence is owned by the screen (Phase 1.1d).
  */
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useLanguage } from '../../hooks/useLanguage';
 import { C, R, Sp, Type } from '../../theme';
@@ -20,6 +20,7 @@ import type { CheckinEmoji } from '../../utils/checkins';
 
 type Props = {
   steps: TonightStep[];
+  loading: boolean;
   checkinEmoji: CheckinEmoji | null;
   completedIds: string[];
   onToggleStep: (id: string) => void;
@@ -66,6 +67,7 @@ function durationSeconds(d: string): number {
 
 export default function TonightRitualCard({
   steps,
+  loading,
   checkinEmoji,
   completedIds,
   onToggleStep,
@@ -77,6 +79,10 @@ export default function TonightRitualCard({
 }: Props) {
   const { t } = useLanguage();
 
+  if (loading && steps.length === 0) {
+    return <View style={[s.card, s.empty]}><ActivityIndicator color={C.copper} /></View>;
+  }
+
   // ----- State 1: empty -----
   if (steps.length === 0) {
     return (
@@ -84,7 +90,7 @@ export default function TonightRitualCard({
         <Crescent size={26} />
         <Text style={s.emptyTitle}>{t('home.tonight.emptyTitle')}</Text>
         <Text style={s.emptyBody}>{t('home.tonight.emptyBody')}</Text>
-        <Pressable style={s.ctaSmall} onPress={onCreate}>
+        <Pressable style={s.ctaSmall} accessibilityRole="button" onPress={onCreate}>
           <Text style={s.ctaText}>{t('home.tonight.emptyCta')}</Text>
         </Pressable>
       </View>
