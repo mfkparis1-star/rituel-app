@@ -4,7 +4,7 @@ on:
   push:
     branches: [phase15-rebuild, ai-studio/mobile-release-validation]
   pull_request:
-    branches: [phase15-rebuild]
+    branches: [phase15-rebuild, ai-studio/testflight-1-4-2]
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Typecheck and smoke tests
+    name: Typecheck, tests, and iOS bundle
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -32,3 +32,9 @@ jobs:
         run: npm run typecheck
       - name: Run tests
         run: npm test
+      - name: Export iOS JavaScript bundle
+        env:
+          EXPO_NO_DOTENV: '1'
+          EXPO_OFFLINE: '1'
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
+        run: npm exec --offline -- expo export --platform ios --output-dir "$RUNNER_TEMP/rituel-ios-export"

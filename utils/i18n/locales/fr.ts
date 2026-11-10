@@ -60,6 +60,7 @@ export const fr = {
     },
   },
   onboarding: {
+    openQuiz: 'Ouvrir le questionnaire peau',
     swipeHint: 'Glissez pour découvrir',
     skip: 'Passer',
     next: 'Continuer',
@@ -108,6 +109,8 @@ export const fr = {
 
   // Skin profile quiz (Phase 17E)
   skinQuiz: {
+    saveErrorTitle: 'Réponses non enregistrées',
+    saveErrorBody: 'Vérifie ta connexion et réessaie.',
     header: {
       stepLabel: 'Question {n} / {total}',
       skip: 'Sauter',
@@ -165,7 +168,7 @@ export const fr = {
       },
       routine_level: {
         label: 'À quoi ressemble ta routine actuelle ?',
-        hint: '',
+        hint: 'Pense à une journée ordinaire.',
         choices: {
           basique: 'Simple — nettoyant + hydratant',
           intermediaire: 'Intermédiaire — quelques actifs',
@@ -315,6 +318,7 @@ export const fr = {
 
   // Auth — sign-in / sign-up forms (Phase 19.6a)
   auth: {
+    language: 'Langue',
     brand: 'RITUEL',
     signin: {
       title: 'Connexion',
@@ -405,8 +409,8 @@ export const fr = {
       skinQuiz: {
         title: 'Mon profil de peau',
         subtitle: 'Quelques questions douces pour mieux t\'accompagner.',
-        emptyTitle: 'Complète ton profil de peau',
-        emptySubtitle: 'Pour des recommandations vraiment personnalisées',
+        emptyTitle: 'Questionnaire peau',
+        emptySubtitle: 'Six questions facultatives sur ta peau.',
         update: 'Mettre à jour',
         summary: {
           skinType: 'Peau {value}',
@@ -573,6 +577,7 @@ export const fr = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Les packs de crédits sont momentanément indisponibles. Tes crédits actuels restent utilisables.',
     label: 'CRÉDITS IA',
     title: 'Débloquez des analyses IA',
     subtitle: 'Achat unique. Pas d\'abonnement. Crédits valables sans limite de temps.',
@@ -655,6 +660,8 @@ export const fr = {
       restoreEmptyBody: "Nous n'avons pas trouvé d'achat actif lié à ton compte.",
       restoreErrorTitle: 'Restauration impossible',
       restoreErrorBody: 'Une erreur est survenue. Réessaye dans un instant.',
+      restoreAccountChangedTitle: 'Compte modifié',
+      restoreAccountChangedBody: 'Ton compte Rituel a changé pendant la restauration. Réessaie avec le compte que tu souhaites utiliser.',
     },
   },
 
@@ -937,6 +944,11 @@ export const fr = {
     },
   },
   session: {
+    morningEyebrow: 'RITUEL DU MATIN',
+    morningTitle: 'Commence ton matin',
+    emptyBody: 'Ajoute une première étape à ton rituel.',
+    addSteps: 'Ajouter une étape',
+    morningDoneBody: 'Tu as pris un moment pour toi ce matin.',
     eyebrow: 'LE RITUEL DE CE SOIR',
     introTitle: 'Trois gestes',
     minutes: 'minutes',
@@ -956,6 +968,8 @@ export const fr = {
     subtitle: 'Construisez une routine simple et cohérente.',
     segment: { morning: 'Matin', evening: 'Soir' },
     empty: {
+      morningBody: 'Commence avec un produit que tu utilises déjà le matin.',
+      eveningBody: 'Commence avec un produit que tu utilises déjà le soir.',
       title: 'Votre routine est prête à être construite',
       addStep: '+ Ajouter une étape',
     },
@@ -987,6 +1001,8 @@ export const fr = {
       close: 'Fermer',
     },
     alerts: {
+      productRequired: 'Renseigne le nom du produit.',
+      saveError: 'Impossible d’enregistrer cette étape. Réessaie.',
       signInTitle: 'Connexion requise',
       signInManageBody: 'Connectez-vous pour gérer votre routine.',
       signInAddBody: 'Connectez-vous pour ajouter une étape.',

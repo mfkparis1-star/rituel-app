@@ -1,8 +1,7 @@
 /**
  * Phase 17E — Optional Skin Profile Quiz.
  *
- * 6-question soft quiz, accessible from Profile only. NEVER forced on
- * onboarding. Result writes to profiles.memory.skin_profile (no DB
+ * Six optional questions available from onboarding and Profile. Result writes to profiles.memory.skin_profile (no DB
  * migration — schema-less JSONB).
  *
  * Tone:
@@ -18,16 +17,16 @@
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
-import { supabase } from '../../lib/supabase';
+import { finishOnboarding } from '../../hooks/useOnboarded';
 import { useMemory } from '../../hooks/useMemory';
 import { usePremium } from '../../hooks/usePremium';
 import { safeBack } from '../../utils/safeBack';
 import { trackEvent } from '../../utils/analytics';
 import { useLanguage } from '../../hooks/useLanguage';
-import { C, R, Sh, Sp } from '../../theme';
+import { C, Sp } from '../../theme';
 
 type Choice = { id: string };
 
@@ -115,17 +114,32 @@ const QUESTIONS: Question[] = [
 const MAX_NOTE = 140;
 
 export default function SkinQuizScreen() {
+  const memoryState = useMemory();
+  if (memoryState.account === undefined) return null;
+  return <SkinQuizContent key={memoryState.account ?? 'guest'} memoryState={memoryState} />;
+}
+
+function SkinQuizContent({ memoryState }: { memoryState: ReturnType<typeof useMemory> }) {
   const params = useLocalSearchParams<{ from?: string }>();
   const fromOnboarding = params.from === 'onboarding';
+  const { account, memory, patch, loading: memLoading } = memoryState;
+  const finishFirstVisit = async () => {
+    if (fromOnboarding && account) {
+      await finishOnboarding(account);
+      trackEvent('onboarding_completed');
+    }
+  };
   // When reached from onboarding there's no back-stack to auth, and we
   // want the first run to end on a populated Accueil, not the auth tab.
-  const exitQuiz = () => {
-    if (fromOnboarding) { router.replace('/(tabs)' as any); }
+  const exitQuiz = async () => {
+    if (fromOnboarding) {
+      await finishFirstVisit();
+      router.replace('/(tabs)');
+    }
     else { safeBack('/(tabs)/auth'); }
   };
 
   const { t } = useLanguage();
-  const { memory, patch, loading: memLoading } = useMemory();
   const { isPremium } = usePremium();
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -176,44 +190,38 @@ export default function SkinQuizScreen() {
     if (stepIdx > 0) setStepIdx(stepIdx - 1);
   };
 
-  const handleSave = async () => {
+  const saveAnswers = async () => {
+    if (submitting || memLoading) return false;
     setSubmitting(true);
-    const clean: Answers = {};
-    if (answers.skin_type) clean.skin_type = answers.skin_type;
-    if (answers.concerns && answers.concerns.length > 0) clean.concerns = answers.concerns;
-    if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
-    if (answers.routine_level) clean.routine_level = answers.routine_level;
-    if (answers.goal) clean.goal = answers.goal;
-    if (answers.self_note && answers.self_note.trim()) clean.self_note = answers.self_note.trim();
+    try {
+      const clean: Answers = {};
+      if (answers.skin_type) clean.skin_type = answers.skin_type;
+      if (answers.concerns?.length) clean.concerns = answers.concerns;
+      if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
+      if (answers.routine_level) clean.routine_level = answers.routine_level;
+      if (answers.goal) clean.goal = answers.goal;
+      if (answers.self_note?.trim()) clean.self_note = answers.self_note.trim();
+      const saved = await patch({
+        skin_profile: { ...clean, completed_at: new Date().toISOString() },
+      });
+      if (saved) return true;
+    } catch {
+      // Keep the answers on screen so the user can retry.
+    } finally {
+      setSubmitting(false);
+    }
+    Alert.alert(t('skinQuiz.saveErrorTitle'), t('skinQuiz.saveErrorBody'));
+    return false;
+  };
 
-    await patch({
-      skin_profile: {
-        ...clean,
-        completed_at: new Date().toISOString(),
-      },
-    });
-    setSubmitting(false);
-    exitQuiz();
+  const handleSave = async () => {
+    if (await saveAnswers()) exitQuiz();
   };
 
   const handleAiAnalysis = async () => {
-    setSubmitting(true);
-    const clean: Answers = {};
-    if (answers.skin_type) clean.skin_type = answers.skin_type;
-    if (answers.concerns && answers.concerns.length > 0) clean.concerns = answers.concerns;
-    if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
-    if (answers.routine_level) clean.routine_level = answers.routine_level;
-    if (answers.goal) clean.goal = answers.goal;
-    if (answers.self_note && answers.self_note.trim()) clean.self_note = answers.self_note.trim();
-
-    await patch({
-      skin_profile: {
-        ...clean,
-        completed_at: new Date().toISOString(),
-      },
-    });
+    if (!await saveAnswers()) return;
+    await finishFirstVisit();
     trackEvent('skin_quiz_ai_cta_tapped');
-    setSubmitting(false);
     if (isPremium) {
       router.push('/profile/skin-analysis-result' as any);
     } else {
@@ -222,7 +230,7 @@ export default function SkinQuizScreen() {
   };
 
   const handleExit = () => {
-    exitQuiz();
+    void exitQuiz();
   };
 
   // ----- Summary view -----
@@ -257,7 +265,7 @@ export default function SkinQuizScreen() {
           <Text style={s.summaryKicker}>{t('skinQuiz.summary.kicker')}</Text>
           <Text style={s.summaryTitle}>{t('skinQuiz.summary.title')}</Text>
           <Text style={s.summarySub}>
-            Rituel s\'en souvient pour t\'accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.
+            Rituel s&apos;en souvient pour t&apos;accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.
           </Text>
 
           <View style={s.summaryCard}>
@@ -274,7 +282,7 @@ export default function SkinQuizScreen() {
             {summary.self_note ? (
               <View style={s.summaryNote}>
                 <Text style={s.summaryNoteLabel}>{t('skinQuiz.summary.noteLabel')}</Text>
-                <Text style={s.summaryNoteValue}>"{summary.self_note}"</Text>
+                <Text style={s.summaryNoteValue}>&quot;{summary.self_note}&quot;</Text>
               </View>
             ) : null}
           </View>

@@ -1,60 +1,58 @@
-/**
- * Phase 16F.1 — useOnboarded
- *
- * Read and write `profiles.onboarded` flag. Used by the root layout to
- * redirect new users to /onboarding, and by the onboarding screen to
- * flip the flag once when the user taps Commencer or Passer.
- */
-import { useCallback, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
-type State = {
-  onboarded: boolean | null; // null = unknown / not loaded yet
-  loading: boolean;
-};
+const completedOnDevice = new Set<string>();
+const retryDelaysMs = [1000, 3000, 10000];
+const completionKey = (userId: string) => `@rituel:onboarded:${userId}`;
+
+export async function finishOnboarding(userId: string): Promise<void> {
+  if (completedOnDevice.has(userId)) return;
+  completedOnDevice.add(userId);
+  await AsyncStorage.setItem(completionKey(userId), '1').catch(() => {});
+  // Keep navigation available even when the server cannot be reached.
+  void Promise.resolve(supabase.from('profiles').upsert(
+    { id: userId, onboarded: true }, { onConflict: 'id' }
+  )).catch(() => {});
+}
+
+export async function readOnboarding(userId: string): Promise<boolean | null> {
+  if (completedOnDevice.has(userId)) return true;
+  const local = await AsyncStorage.getItem(completionKey(userId)).catch(() => null);
+  if (local === '1') return true;
+  try {
+    const { data, error } = await supabase.from('profiles')
+      .select('onboarded').eq('id', userId).maybeSingle();
+    return error ? null : data?.onboarded === true;
+  } catch {
+    return null;
+  }
+}
 
 export function useOnboarded(userId: string | null | undefined) {
-  const [state, setState] = useState<State>({ onboarded: null, loading: true });
-
-  const refresh = useCallback(async () => {
-    if (!userId) {
-      setState({ onboarded: null, loading: false });
-      return;
-    }
-    setState((s) => ({ ...s, loading: true }));
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('onboarded')
-        .eq('id', userId)
-        .maybeSingle();
-      if (error) throw error;
-      setState({ onboarded: data?.onboarded ?? false, loading: false });
-    } catch {
-      // Fail-safe: treat as onboarded=true to avoid trapping the user
-      // in a loop if profiles row is missing or RLS blocks the read.
-      setState({ onboarded: true, loading: false });
-    }
-  }, [userId]);
+  const [result, setResult] = useState<{ account: string; completed: boolean | null } | null>(null);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  const markOnboarded = useCallback(async () => {
     if (!userId) return;
-    // Optimistic — flip local state immediately so the redirect happens
-    // even if the server write is slow.
-    setState((s) => ({ ...s, onboarded: true }));
-    try {
-      await supabase
-        .from('profiles')
-        .upsert({ id: userId, onboarded: true }, { onConflict: 'id' });
-    } catch {
-      // If the write fails, the next login will re-trigger onboarding.
-      // Not a fatal error.
-    }
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const check = async (attempt: number) => {
+      const completed = await readOnboarding(userId);
+      if (!active) return;
+      setResult({ account: userId, completed });
+      if (completed === null && attempt < retryDelaysMs.length) {
+        timer = setTimeout(() => { void check(attempt + 1); }, retryDelaysMs[attempt]);
+      }
+    };
+
+    void check(0);
+    return () => {
+      active = false;
+      if (timer !== undefined) clearTimeout(timer);
+    };
   }, [userId]);
 
-  return { ...state, refresh, markOnboarded };
+  if (!userId || completedOnDevice.has(userId)) return true;
+  return result?.account === userId ? result.completed : null;
 }

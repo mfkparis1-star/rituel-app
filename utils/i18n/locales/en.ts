@@ -60,6 +60,7 @@ export const en: LocaleDict = {
     },
   },
   onboarding: {
+    openQuiz: 'Open skin questionnaire',
     swipeHint: 'Swipe to discover',
     skip: 'Skip',
     next: 'Continue',
@@ -107,6 +108,8 @@ export const en: LocaleDict = {
   },
 
   skinQuiz: {
+    saveErrorTitle: 'Could not save your answers',
+    saveErrorBody: 'Check your connection and try again.',
     header: {
       stepLabel: 'Question {n} / {total}',
       skip: 'Skip',
@@ -164,7 +167,7 @@ export const en: LocaleDict = {
       },
       routine_level: {
         label: 'What does your current routine look like?',
-        hint: '',
+        hint: 'Think of what you do on a typical day.',
         choices: {
           basique: 'Simple — cleanser + moisturizer',
           intermediaire: 'Intermediate — a few actives',
@@ -311,6 +314,7 @@ export const en: LocaleDict = {
   },
 
   auth: {
+    language: 'Language',
     brand: 'RITUEL',
     signin: {
       title: 'Sign in',
@@ -400,8 +404,8 @@ export const en: LocaleDict = {
       skinQuiz: {
         title: 'My skin profile',
         subtitle: 'A few gentle questions to accompany you better.',
-        emptyTitle: 'Complete your skin profile',
-        emptySubtitle: 'For truly personalized recommendations',
+        emptyTitle: 'Skin questionnaire',
+        emptySubtitle: 'Six optional questions about your skin.',
         update: 'Update',
         summary: {
           skinType: '{value} skin',
@@ -563,6 +567,7 @@ export const en: LocaleDict = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Credit packs are temporarily unavailable. You can still use your existing credits.',
     label: 'AI CREDITS',
     title: 'Unlock AI analyses',
     subtitle: 'One-time purchase. No subscription. Credits never expire.',
@@ -644,6 +649,8 @@ export const en: LocaleDict = {
       restoreEmptyBody: "We couldn't find any active purchase linked to your account.",
       restoreErrorTitle: "Couldn't restore",
       restoreErrorBody: 'Something went wrong. Try again in a moment.',
+      restoreAccountChangedTitle: 'Account changed',
+      restoreAccountChangedBody: 'Your Rituel account changed during the restore. Try again with the account you want to use.',
     },
   },
 
@@ -918,6 +925,11 @@ export const en: LocaleDict = {
     },
   },
   session: {
+    morningEyebrow: 'MORNING RITUAL',
+    morningTitle: 'Start your morning',
+    emptyBody: 'Your ritual needs a first step.',
+    addSteps: 'Add a step',
+    morningDoneBody: 'You made time for your routine this morning.',
     eyebrow: 'TONIGHT\'S RITUAL',
     introTitle: 'Three gestures',
     minutes: 'minutes',
@@ -937,6 +949,8 @@ export const en: LocaleDict = {
     subtitle: 'Build a simple, consistent routine.',
     segment: { morning: 'Morning', evening: 'Evening' },
     empty: {
+      morningBody: 'Start with one product you already use in the morning.',
+      eveningBody: 'Start with one product you already use at night.',
       title: 'Your routine is ready to be built',
       addStep: '+ Add a step',
     },
@@ -968,6 +982,8 @@ export const en: LocaleDict = {
       close: 'Close',
     },
     alerts: {
+      productRequired: 'Enter a product name.',
+      saveError: 'Could not save this step. Please try again.',
       signInTitle: 'Sign in required',
       signInManageBody: 'Sign in to manage your routine.',
       signInAddBody: 'Sign in to add a step.',

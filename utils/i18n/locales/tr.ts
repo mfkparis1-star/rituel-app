@@ -60,6 +60,7 @@ export const tr: LocaleDict = {
     },
   },
   onboarding: {
+    openQuiz: 'Cilt anketini aç',
     swipeHint: 'Keşfetmek için kaydır',
     skip: 'Atla',
     next: 'Devam et',
@@ -107,6 +108,8 @@ export const tr: LocaleDict = {
   },
 
   skinQuiz: {
+    saveErrorTitle: 'Yanıtların kaydedilemedi',
+    saveErrorBody: 'Bağlantını kontrol edip tekrar dene.',
     header: {
       stepLabel: 'Soru {n} / {total}',
       skip: 'Atla',
@@ -164,7 +167,7 @@ export const tr: LocaleDict = {
       },
       routine_level: {
         label: 'Şu anki rutinin nasıl?',
-        hint: '',
+        hint: 'Sıradan bir günde ne yaptığını düşün.',
         choices: {
           basique: 'Basit — temizleyici + nemlendirici',
           intermediaire: 'Orta — birkaç aktif',
@@ -311,6 +314,7 @@ export const tr: LocaleDict = {
   },
 
   auth: {
+    language: 'Dil',
     brand: 'RITUEL',
     signin: {
       title: 'Giriş',
@@ -401,8 +405,8 @@ export const tr: LocaleDict = {
       skinQuiz: {
         title: 'Cilt profilim',
         subtitle: 'Sana daha iyi eşlik etmek için birkaç yumuşak soru.',
-        emptyTitle: 'Cilt profilini tamamla',
-        emptySubtitle: 'Gerçekten sana özel öneriler için',
+        emptyTitle: 'Cilt anketi',
+        emptySubtitle: 'Cildinle ilgili altı isteğe bağlı soru.',
         update: 'Güncelle',
         summary: {
           skinType: '{value} cilt',
@@ -564,6 +568,7 @@ export const tr: LocaleDict = {
 
   // Credit pack purchase modal
   creditPack: {
+    checkoutPaused: 'Kredi paketleri geçici olarak kullanılamıyor. Mevcut kredilerini kullanabilirsin.',
     label: 'YZ KREDİLERİ',
     title: 'YZ analizlerini aç',
     subtitle: 'Tek seferlik satın alma. Abonelik yok. Krediler süresiz geçerli.',
@@ -645,6 +650,8 @@ export const tr: LocaleDict = {
       restoreEmptyBody: 'Hesabına bağlı aktif bir satın alım bulamadık.',
       restoreErrorTitle: 'Geri yüklenemedi',
       restoreErrorBody: 'Bir hata oluştu. Birazdan tekrar dene.',
+      restoreAccountChangedTitle: 'Hesap değişti',
+      restoreAccountChangedBody: 'Geri yükleme sırasında Rituel hesabın değişti. Kullanmak istediğin hesapla tekrar dene.',
     },
   },
 
@@ -919,6 +926,11 @@ export const tr: LocaleDict = {
     },
   },
   session: {
+    morningEyebrow: 'SABAH RİTÜELİ',
+    morningTitle: 'Sabah ritüeline başla',
+    emptyBody: 'Ritüeline ilk adımı ekle.',
+    addSteps: 'Adım ekle',
+    morningDoneBody: 'Bu sabah rutinine zaman ayırdın.',
     eyebrow: 'BU AKŞAMIN RİTÜELİ',
     introTitle: 'Üç adım',
     minutes: 'dakika',
@@ -938,6 +950,8 @@ export const tr: LocaleDict = {
     subtitle: 'Sade ve tutarlı bir rutin oluştur.',
     segment: { morning: 'Sabah', evening: 'Akşam' },
     empty: {
+      morningBody: 'Sabah zaten kullandığın bir ürünle başla.',
+      eveningBody: 'Akşam zaten kullandığın bir ürünle başla.',
       title: 'Rutinin oluşturulmaya hazır',
       addStep: '+ Adım ekle',
     },
@@ -969,6 +983,8 @@ export const tr: LocaleDict = {
       close: 'Kapat',
     },
     alerts: {
+      productRequired: 'Ürün adını gir.',
+      saveError: 'Bu adım kaydedilemedi. Tekrar dene.',
       signInTitle: 'Giriş gerekli',
       signInManageBody: 'Rutinini yönetmek için giriş yap.',
       signInAddBody: 'Adım eklemek için giriş yap.',

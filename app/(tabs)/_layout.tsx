@@ -1,9 +1,8 @@
 import { Tabs, router } from 'expo-router';
 import Svg, { Circle, Path, Polyline, Rect } from 'react-native-svg';
 import { C } from '../../theme';
-import { useEffect, useState } from 'react';
-import { Session } from '@supabase/supabase-js';
-import { supabase } from '../../lib/supabase';
+import { useEffect } from 'react';
+import { useCacheAccount } from '../../hooks/useCacheAccount';
 import { useOnboarded } from '../../hooks/useOnboarded';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -56,18 +55,11 @@ function ProfileIcon({ color }: { color: string }) {
 
 export default function TabLayout() {
   const { t } = useLanguage();
-  const [session, setSession] = useState<Session | null>(null);
+  const account = useCacheAccount();
+  const onboarded = useOnboarded(account);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => sub.subscription.unsubscribe();
-  }, []);
-  const { onboarded, loading: onboardedLoading } = useOnboarded(session?.user?.id);
-  useEffect(() => {
-    if (!onboardedLoading && session?.user?.id && onboarded === false) {
-      router.replace('/onboarding' as any);
-    }
-  }, [onboarded, onboardedLoading, session?.user?.id]);
+    if (account && onboarded === false) router.replace('/onboarding');
+  }, [account, onboarded]);
 
   return (
     <Tabs

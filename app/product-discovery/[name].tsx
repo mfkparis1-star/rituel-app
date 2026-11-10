@@ -81,13 +81,13 @@ export default function ProductDiscoveryScreen() {
         <View style={s.emptyWrap}>
           <Text style={s.emptyTitle}>{t('productDiscovery.emptyTitle')}</Text>
           <Text style={s.emptyBody}>
-            Personne n'a encore partagé ce produit dans son rituel. Reviens un peu plus tard.
+            Personne n&apos;a encore partagé ce produit dans son rituel. Reviens un peu plus tard.
           </Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={s.scrollBody} showsVerticalScrollIndicator={false}>
           <Text style={s.intro}>
-            Des femmes l'ont partagé dans leur routine.
+            Des femmes l&apos;ont partagé dans leur routine.
           </Text>
 
           {posts.map((post) => (

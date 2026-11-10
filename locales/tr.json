@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSCameraUsageDescription": "Rituel, ürünlerini taramak için kamerayı kullanır.",
+    "NSPhotoLibraryUsageDescription": "Rituel, güzellik arşivin ve cilt günlüğün için fotoğraflarını kullanır.",
+    "NSPhotoLibraryAddUsageDescription": "Rituel, fotoğraflarını ve analiz sonuçlarını arşivine kaydedebilir."
+  }
+}

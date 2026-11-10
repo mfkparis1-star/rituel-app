@@ -33,8 +33,11 @@ const STORAGE_KEY = '@rituel:lang';
 function readDeviceLangSync(): Lang {
   try {
     const locales = Localization.getLocales();
-    const device = locales[0]?.languageTag ?? locales[0]?.languageCode ?? null;
-    return normalizeDeviceLocale(device) ?? DEFAULT_LANG;
+    for (const locale of locales) {
+      const language = normalizeDeviceLocale(locale.languageTag ?? locale.languageCode);
+      if (language) return language;
+    }
+    return DEFAULT_LANG;
   } catch {
     return DEFAULT_LANG;
   }
