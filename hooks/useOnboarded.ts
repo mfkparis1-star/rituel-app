@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 const completedOnDevice = new Set<string>();
+const retryDelaysMs = [1000, 3000, 10000];
 const completionKey = (userId: string) => `@rituel:onboarded:${userId}`;
 
 export async function finishOnboarding(userId: string): Promise<void> {
@@ -34,10 +35,22 @@ export function useOnboarded(userId: string | null | undefined) {
   useEffect(() => {
     if (!userId) return;
     let active = true;
-    void readOnboarding(userId).then((completed) => {
-      if (active) setResult({ account: userId, completed });
-    });
-    return () => { active = false; };
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const check = async (attempt: number) => {
+      const completed = await readOnboarding(userId);
+      if (!active) return;
+      setResult({ account: userId, completed });
+      if (completed === null && attempt < retryDelaysMs.length) {
+        timer = setTimeout(() => { void check(attempt + 1); }, retryDelaysMs[attempt]);
+      }
+    };
+
+    void check(0);
+    return () => {
+      active = false;
+      if (timer !== undefined) clearTimeout(timer);
+    };
   }, [userId]);
 
   if (!userId || completedOnDevice.has(userId)) return true;

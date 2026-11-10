@@ -20,7 +20,6 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
-import { useCacheAccount } from '../../hooks/useCacheAccount';
 import { finishOnboarding } from '../../hooks/useOnboarded';
 import { useMemory } from '../../hooks/useMemory';
 import { usePremium } from '../../hooks/usePremium';
@@ -115,9 +114,15 @@ const QUESTIONS: Question[] = [
 const MAX_NOTE = 140;
 
 export default function SkinQuizScreen() {
+  const memoryState = useMemory();
+  if (memoryState.account === undefined) return null;
+  return <SkinQuizContent key={memoryState.account ?? 'guest'} memoryState={memoryState} />;
+}
+
+function SkinQuizContent({ memoryState }: { memoryState: ReturnType<typeof useMemory> }) {
   const params = useLocalSearchParams<{ from?: string }>();
   const fromOnboarding = params.from === 'onboarding';
-  const account = useCacheAccount();
+  const { account, memory, patch, loading: memLoading } = memoryState;
   const finishFirstVisit = async () => {
     if (fromOnboarding && account) {
       await finishOnboarding(account);
@@ -135,7 +140,6 @@ export default function SkinQuizScreen() {
   };
 
   const { t } = useLanguage();
-  const { memory, patch, loading: memLoading } = useMemory();
   const { isPremium } = usePremium();
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
