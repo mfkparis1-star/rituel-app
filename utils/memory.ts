@@ -96,23 +96,23 @@ export async function getMemory(userId: string): Promise<Memory | null> {
 }
 
 /**
- * Shallow-merge a patch into memory. Existing keys not in the patch are
- * preserved. Concurrent writes to disjoint keys are safe; concurrent
- * writes to the same key follow last-write-wins.
- *
- * Implementation: read-merge-write. For higher concurrency we could
- * push this into a Postgres function with jsonb_set, but launch traffic
- * does not justify it yet.
+ * Read and merge existing profile memory. A failed read must not overwrite it.
+ * Concurrent writes can still conflict because the merge runs in the client.
  */
 export async function patchMemory(userId: string, patch: Partial<Memory>): Promise<boolean> {
   try {
-    const current = (await getMemory(userId)) ?? {};
-    const merged: Memory = { ...current, ...patch };
-    const { error } = await supabase
+    const { data, error: readError } = await supabase
       .from('profiles')
-      .update({ memory: merged })
-      .eq('id', userId);
-    return !error;
+      .select('memory')
+      .eq('id', userId)
+      .maybeSingle();
+    if (readError) return false;
+    const merged: Memory = { ...((data?.memory as Memory | null) ?? {}), ...patch };
+    const operation = data
+      ? supabase.from('profiles').update({ memory: merged }).eq('id', userId)
+      : supabase.from('profiles').insert({ id: userId, memory: merged });
+    const { data: saved, error } = await operation.select('id').maybeSingle();
+    return !error && !!saved;
   } catch {
     return false;
   }

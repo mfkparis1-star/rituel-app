@@ -167,7 +167,7 @@ export const en: LocaleDict = {
       },
       routine_level: {
         label: 'What does your current routine look like?',
-        hint: '',
+        hint: 'Think of what you do on a typical day.',
         choices: {
           basique: 'Simple — cleanser + moisturizer',
           intermediaire: 'Intermediate — a few actives',
@@ -314,6 +314,7 @@ export const en: LocaleDict = {
   },
 
   auth: {
+    language: 'Language',
     brand: 'RITUEL',
     signin: {
       title: 'Sign in',
@@ -858,7 +859,6 @@ export const en: LocaleDict = {
       'Énergisant': 'Energizing', Fragile: 'Fragile', Doux: 'Gentle',
     },
     alerts: {
-      productRequired: 'Enter a product name.',
         saveError: 'Could not save. Please try again.',
       permissionTitle: 'Photo access denied',
       permissionBody: 'Enable photo access in Settings to add an image to your post.',
@@ -893,8 +893,6 @@ export const en: LocaleDict = {
       normal: 'Normal skin',
     },
     empty: {
-      morningBody: 'Start with one product you already use in the morning.',
-      eveningBody: 'Start with one product you already use at night.',
       title: 'No routines yet',
       subtitle: 'Routines shared by the community will appear here.',
     },
@@ -948,6 +946,8 @@ export const en: LocaleDict = {
     subtitle: 'Build a simple, consistent routine.',
     segment: { morning: 'Morning', evening: 'Evening' },
     empty: {
+      morningBody: 'Start with one product you already use in the morning.',
+      eveningBody: 'Start with one product you already use at night.',
       title: 'Your routine is ready to be built',
       addStep: '+ Add a step',
     },
@@ -979,6 +979,8 @@ export const en: LocaleDict = {
       close: 'Close',
     },
     alerts: {
+      productRequired: 'Enter a product name.',
+      saveError: 'Could not save this step. Please try again.',
       signInTitle: 'Sign in required',
       signInManageBody: 'Sign in to manage your routine.',
       signInAddBody: 'Sign in to add a step.',

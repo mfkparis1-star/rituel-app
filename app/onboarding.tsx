@@ -2,13 +2,11 @@
  * Phase 16F.1 — Welcome onboarding screen
  *
  * 3 luxury full-screen slides, swipeable. "Passer" top-right on every
- * slide. "Commencer" CTA at the bottom of the final slide. The final action opens the optional skin quiz. Skipping leaves the
- * quiz available from Profile.
+ * slide. "Commencer" CTA at the bottom of the final slide. The final action and skipping the slides both open the optional skin quiz.
  *
  * Triggered from the root layout when profile.onboarded === false.
  */
-import { useEffect, useRef, useState } from 'react';
-import { trackEvent } from '../utils/analytics';
+import { useRef, useState } from 'react';
 import {
   Dimensions,
   Pressable,
@@ -21,11 +19,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
 import OnboardingSlide from '../components/onboarding/OnboardingSlide';
 import PillButton from '../components/ui/PillButton';
-import { useOnboarded } from '../hooks/useOnboarded';
 import { C, Sp } from '../theme';
 import { useLanguage } from '../hooks/useLanguage';
 
@@ -53,26 +48,11 @@ export default function OnboardingScreen() {
       mark: '♡',
     },
   ];
-  const [session, setSession] = useState<Session | null>(null);
   const [index, setIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  const { markOnboarded } = useOnboarded(session?.user?.id);
-
-  const finish = async (openQuiz: boolean) => {
-    trackEvent('onboarding_completed');
-    await markOnboarded();
-    // Lead straight into the skin quiz so the first run personalizes
-    // and shows value, instead of dropping onto an empty Accueil. The
-    // quiz is fully skippable and exits to Accueil when reached this way.
-    if (openQuiz) router.replace({ pathname: '/profile/skin-quiz', params: { from: 'onboarding' } });
-    else router.replace('/(tabs)');
+  const openQuiz = () => {
+    router.replace({ pathname: '/profile/skin-quiz', params: { from: 'onboarding' } });
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -109,7 +89,7 @@ export default function OnboardingScreen() {
 
       {/* Top-right Passer */}
       <SafeAreaView style={s.topBar} edges={['top']} pointerEvents="box-none">
-        <Pressable onPress={() => void finish(false)} accessibilityRole="button" hitSlop={16} style={s.skipBtn}>
+        <Pressable onPress={openQuiz} accessibilityRole="button" hitSlop={16} style={s.skipBtn}>
           <Text style={s.skipTxt}>{t('onboarding.skip')}</Text>
         </Pressable>
       </SafeAreaView>
@@ -134,7 +114,7 @@ export default function OnboardingScreen() {
               label={t('onboarding.openQuiz')}
               variant="primary"
               fullWidth
-              onPress={() => void finish(true)}
+              onPress={openQuiz}
             />
           </View>
         ) : (

@@ -20,7 +20,8 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
-import { supabase } from '../../lib/supabase';
+import { useCacheAccount } from '../../hooks/useCacheAccount';
+import { finishOnboarding } from '../../hooks/useOnboarded';
 import { useMemory } from '../../hooks/useMemory';
 import { usePremium } from '../../hooks/usePremium';
 import { safeBack } from '../../utils/safeBack';
@@ -116,10 +117,20 @@ const MAX_NOTE = 140;
 export default function SkinQuizScreen() {
   const params = useLocalSearchParams<{ from?: string }>();
   const fromOnboarding = params.from === 'onboarding';
+  const account = useCacheAccount();
+  const finishFirstVisit = async () => {
+    if (fromOnboarding && account) {
+      await finishOnboarding(account);
+      trackEvent('onboarding_completed');
+    }
+  };
   // When reached from onboarding there's no back-stack to auth, and we
   // want the first run to end on a populated Accueil, not the auth tab.
-  const exitQuiz = () => {
-    if (fromOnboarding) { router.replace('/(tabs)' as any); }
+  const exitQuiz = async () => {
+    if (fromOnboarding) {
+      await finishFirstVisit();
+      router.replace('/(tabs)');
+    }
     else { safeBack('/(tabs)/auth'); }
   };
 
@@ -205,6 +216,7 @@ export default function SkinQuizScreen() {
 
   const handleAiAnalysis = async () => {
     if (!await saveAnswers()) return;
+    await finishFirstVisit();
     trackEvent('skin_quiz_ai_cta_tapped');
     if (isPremium) {
       router.push('/profile/skin-analysis-result' as any);
@@ -214,7 +226,7 @@ export default function SkinQuizScreen() {
   };
 
   const handleExit = () => {
-    exitQuiz();
+    void exitQuiz();
   };
 
   // ----- Summary view -----

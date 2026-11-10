@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSCameraUsageDescription": "Rituel uses the camera to scan your products.",
+    "NSPhotoLibraryUsageDescription": "Rituel uses your photos for your beauty archive and skin journal.",
+    "NSPhotoLibraryAddUsageDescription": "Rituel can save your photos and analysis results to your library."
+  }
+}

@@ -8,7 +8,7 @@ import { useProfile } from '../../hooks/useProfile'
 import { useFavoriteProducts } from '../../hooks/useFavoriteProducts';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useMemory } from '../../hooks/useMemory';
-import { SUPPORTED_LANGS, type Lang } from '../../utils/i18n';;
+import { SUPPORTED_LANGS, type Lang } from '../../utils/i18n';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HeroCard from '../../components/ui/HeroCard';
 import ListRow from '../../components/ui/ListRow';
@@ -354,6 +354,16 @@ export default function AuthScreen() {
     );
   }
 
+  const languageNames: Record<Lang, string> = { fr: 'Français', en: 'English', tr: 'Türkçe' };
+  const openLanguagePicker = () => {
+    Alert.alert(t('auth.language'), undefined, [
+      ...SUPPORTED_LANGS.map((language) => ({
+        text: languageNames[language],
+        onPress: () => setLanguage(language),
+      })),
+    ]);
+  };
+
   // ----- SIGNIN / SIGNUP MODE -----
   if (mode === 'signin' || mode === 'signup') {
     return (
@@ -370,6 +380,10 @@ export default function AuthScreen() {
                 : t('auth.signup.subtitle')}
             </Text>
           </View>
+
+          <Pressable accessibilityRole="button" onPress={openLanguagePicker} style={s.languageButton}>
+            <Text style={s.languageText}>{t('auth.language')} · {languageNames[currentLang]}</Text>
+          </Pressable>
 
           <View style={[s.formCard, Sh.soft]}>
             {mode === 'signup' && (
@@ -564,20 +578,7 @@ export default function AuthScreen() {
   const avatarLetter = (displayName[0] || 'U').toUpperCase();
 
 
-  // Phase 19.2 — hidden dev language switcher (__DEV__ only)
-  const handleDevLangSwitch = () => {
-    Alert.alert(
-      'DEV — Language',
-      `Active: ${currentLang.toUpperCase()}`,
-      [
-        ...SUPPORTED_LANGS.map((l) => ({
-          text: l.toUpperCase(),
-          onPress: () => setLanguage(l as Lang),
-        })),
-        { text: t('common.cancel'), style: 'cancel' as const },
-      ]
-    );
-  };
+
 
 
   return (
@@ -748,6 +749,7 @@ export default function AuthScreen() {
         )}
 
         <Text style={s.section}>{t('auth.profile.sections.account')}</Text>
+        <ListRow title={t('auth.language')} subtitle={languageNames[currentLang]} onPress={openLanguagePicker} />
         <ListRow
           title={t('auth.profile.rows.signOut.title')}
           subtitle={t('auth.profile.rows.signOut.subtitle')}
@@ -764,11 +766,6 @@ export default function AuthScreen() {
           onClose={() => setCreditModalOpen(false)}
         />
 
-        {__DEV__ ? (
-          <Pressable onPress={handleDevLangSwitch} hitSlop={6} style={s.devLangRow}>
-            <Text style={s.devLangTxt}>🔧 DEV · Language: {currentLang.toUpperCase()}</Text>
-          </Pressable>
-        ) : null}
         <View style={{ height: Sp.huge }} />
       </ScrollView>
     </SafeAreaView>
@@ -985,19 +982,8 @@ const s = StyleSheet.create({
     fontWeight: '300',
     marginLeft: 12,
   },
-  devLangRow: {
-    alignSelf: 'center',
-    marginTop: 24,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    opacity: 0.4,
-  },
-  devLangTxt: {
-    fontSize: 10,
-    fontStyle: 'italic',
-    color: '#A99583',
-    letterSpacing: 0.5,
-  },
+  languageButton: { alignSelf: 'flex-end', paddingVertical: 10, paddingHorizontal: 8 },
+  languageText: { color: C.espresso, fontWeight: '600' },
   recoLabel: {
     fontSize: 10, fontWeight: '700', color: C.copper,
     letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: Sp.xs,

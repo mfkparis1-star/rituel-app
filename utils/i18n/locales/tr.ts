@@ -167,7 +167,7 @@ export const tr: LocaleDict = {
       },
       routine_level: {
         label: 'Şu anki rutinin nasıl?',
-        hint: '',
+        hint: 'Sıradan bir günde ne yaptığını düşün.',
         choices: {
           basique: 'Basit — temizleyici + nemlendirici',
           intermediaire: 'Orta — birkaç aktif',
@@ -314,6 +314,7 @@ export const tr: LocaleDict = {
   },
 
   auth: {
+    language: 'Dil',
     brand: 'RITUEL',
     signin: {
       title: 'Giriş',
@@ -859,7 +860,6 @@ export const tr: LocaleDict = {
       'Énergisant': 'Enerjik', Fragile: 'Kırılgan', Doux: 'Yumuşak',
     },
     alerts: {
-      productRequired: 'Ürün adını gir.',
         saveError: 'Kaydedilemedi. Tekrar dene.',
       permissionTitle: 'Fotoğraf erişimi reddedildi',
       permissionBody: 'Paylaşımına görsel eklemek için Ayarlar\'dan fotoğraf erişimini aç.',
@@ -894,8 +894,6 @@ export const tr: LocaleDict = {
       normal: 'Normal cilt',
     },
     empty: {
-      morningBody: 'Sabah zaten kullandığın bir ürünle başla.',
-      eveningBody: 'Akşam zaten kullandığın bir ürünle başla.',
       title: 'Henüz rutin yok',
       subtitle: 'Topluluğun paylaştığı rutinler burada görünecek.',
     },
@@ -949,6 +947,8 @@ export const tr: LocaleDict = {
     subtitle: 'Sade ve tutarlı bir rutin oluştur.',
     segment: { morning: 'Sabah', evening: 'Akşam' },
     empty: {
+      morningBody: 'Sabah zaten kullandığın bir ürünle başla.',
+      eveningBody: 'Akşam zaten kullandığın bir ürünle başla.',
       title: 'Rutinin oluşturulmaya hazır',
       addStep: '+ Adım ekle',
     },
@@ -980,6 +980,8 @@ export const tr: LocaleDict = {
       close: 'Kapat',
     },
     alerts: {
+      productRequired: 'Ürün adını gir.',
+      saveError: 'Bu adım kaydedilemedi. Tekrar dene.',
       signInTitle: 'Giriş gerekli',
       signInManageBody: 'Rutinini yönetmek için giriş yap.',
       signInAddBody: 'Adım eklemek için giriş yap.',

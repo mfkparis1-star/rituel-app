@@ -168,7 +168,7 @@ export const fr = {
       },
       routine_level: {
         label: 'À quoi ressemble ta routine actuelle ?',
-        hint: '',
+        hint: 'Pense à une journée ordinaire.',
         choices: {
           basique: 'Simple — nettoyant + hydratant',
           intermediaire: 'Intermédiaire — quelques actifs',
@@ -318,6 +318,7 @@ export const fr = {
 
   // Auth — sign-in / sign-up forms (Phase 19.6a)
   auth: {
+    language: 'Langue',
     brand: 'RITUEL',
     signin: {
       title: 'Connexion',
@@ -877,7 +878,6 @@ export const fr = {
       'Énergisant': 'Énergisant', Fragile: 'Fragile', Doux: 'Doux',
     },
     alerts: {
-      productRequired: 'Renseigne le nom du produit.',
         saveError: 'Erreur lors de l\'enregistrement. Réessayez.',
       permissionTitle: 'Accès aux photos refusé',
       permissionBody: 'Active l\u2019accès aux photos dans Réglages pour ajouter une image à ta publication.',
@@ -912,8 +912,6 @@ export const fr = {
       normal: 'Peau normale',
     },
     empty: {
-      morningBody: 'Commence avec un produit que tu utilises déjà le matin.',
-      eveningBody: 'Commence avec un produit que tu utilises déjà le soir.',
       title: 'Pas encore de routines',
       subtitle: 'Les routines partagées par la communauté apparaîtront ici.',
     },
@@ -967,6 +965,8 @@ export const fr = {
     subtitle: 'Construisez une routine simple et cohérente.',
     segment: { morning: 'Matin', evening: 'Soir' },
     empty: {
+      morningBody: 'Commence avec un produit que tu utilises déjà le matin.',
+      eveningBody: 'Commence avec un produit que tu utilises déjà le soir.',
       title: 'Votre routine est prête à être construite',
       addStep: '+ Ajouter une étape',
     },
@@ -998,6 +998,8 @@ export const fr = {
       close: 'Fermer',
     },
     alerts: {
+      productRequired: 'Renseigne le nom du produit.',
+      saveError: 'Impossible d’enregistrer cette étape. Réessaie.',
       signInTitle: 'Connexion requise',
       signInManageBody: 'Connectez-vous pour gérer votre routine.',
       signInAddBody: 'Connectez-vous pour ajouter une étape.',
