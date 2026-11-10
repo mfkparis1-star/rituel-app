@@ -89,7 +89,7 @@ export default function AIStudioScreen() {
   };
 
   return (
-    <SafeAreaView style={s.root} edges={['top']}>
+    <SafeAreaView testID="screen-ai-studio" style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.header}>
           <Text style={s.label}>{t('aiStudio.kicker')}</Text>

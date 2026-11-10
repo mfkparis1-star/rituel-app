@@ -1,0 +1,18 @@
+appId: com.mfkparis.rituel
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: tab-index
+- tapOn:
+    id: tab-archive
+- assertVisible:
+    id: screen-archive
+- tapOn:
+    id: tab-ai-studio
+- assertVisible:
+    id: screen-ai-studio
+- tapOn:
+    id: tab-auth
+- assertVisible:
+    id: screen-auth

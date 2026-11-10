@@ -93,10 +93,10 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: ({ color }) => <HomeIcon color={color} /> }} />
-      <Tabs.Screen name="archive" options={{ title: t('tabs.products'), tabBarIcon: ({ color }) => <ArchiveIcon color={color} /> }} />
-      <Tabs.Screen name="ai-studio" options={{ title: t('tabs.studio'), tabBarIcon: ({ color }) => <StudioIcon color={color} /> }} />
-      <Tabs.Screen name="auth" options={{ title: t('tabs.profile'), tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }} />
+      <Tabs.Screen name="index" options={{ tabBarButtonTestID: "tab-index", title: t('tabs.home'), tabBarIcon: ({ color }) => <HomeIcon color={color} /> }} />
+      <Tabs.Screen name="archive" options={{ tabBarButtonTestID: "tab-archive", title: t('tabs.products'), tabBarIcon: ({ color }) => <ArchiveIcon color={color} /> }} />
+      <Tabs.Screen name="ai-studio" options={{ tabBarButtonTestID: "tab-ai-studio", title: t('tabs.studio'), tabBarIcon: ({ color }) => <StudioIcon color={color} /> }} />
+      <Tabs.Screen name="auth" options={{ tabBarButtonTestID: "tab-auth", title: t('tabs.profile'), tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }} />
 
       {/* Community is hidden until there are enough members for the feed to
           feel alive — an empty feed reads as an abandoned app. The screen and

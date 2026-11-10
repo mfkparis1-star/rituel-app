@@ -357,7 +357,7 @@ export default function AuthScreen() {
   // ----- SIGNIN / SIGNUP MODE -----
   if (mode === 'signin' || mode === 'signup') {
     return (
-      <SafeAreaView style={s.root} edges={['top']}>
+      <SafeAreaView testID="screen-auth" style={s.root} edges={['top']}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={s.header}>
             <Text style={s.brand}>{t('auth.brand')}</Text>
@@ -581,7 +581,7 @@ export default function AuthScreen() {
 
 
   return (
-    <SafeAreaView style={s.root} edges={['top']}>
+    <SafeAreaView testID="screen-auth" style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={[s.profileCard, Sh.soft]}>
           <Pressable
