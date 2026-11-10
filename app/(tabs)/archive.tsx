@@ -127,7 +127,7 @@ export default function ArchiveScreen() {
   const isEmpty = products.length === 0;
 
   return (
-    <SafeAreaView style={s.root} edges={['top']}>
+    <SafeAreaView testID="screen-archive" style={s.root} edges={['top']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.header}>
           <Text style={s.title}>{t('archive.title')}</Text>

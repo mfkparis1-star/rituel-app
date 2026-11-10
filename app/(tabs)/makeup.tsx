@@ -250,7 +250,7 @@ export default function MakeupScreen() {
           <ActivityIndicator color={C.copper} size="large" />
           <Text style={s.generatingTxt}>{t('makeup.generating')}</Text>
           <Text style={s.generatingSub}>
-            L\'IA analyse ton occasion et compose 3 propositions.
+            L&apos;IA analyse ton occasion et compose 3 propositions.
           </Text>
         </View>
       </SafeAreaView>

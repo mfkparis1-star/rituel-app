@@ -7,6 +7,7 @@
 <!-- Call out security, privacy, Supabase, RevenueCat, and App Store risks. Confirm tests use synthetic data. -->
 
 ## Verification
+- [ ] npm run lint
 
 - [ ] npm run typecheck
 - [ ] npm test

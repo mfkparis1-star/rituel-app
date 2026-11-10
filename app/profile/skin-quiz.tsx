@@ -257,7 +257,7 @@ export default function SkinQuizScreen() {
           <Text style={s.summaryKicker}>{t('skinQuiz.summary.kicker')}</Text>
           <Text style={s.summaryTitle}>{t('skinQuiz.summary.title')}</Text>
           <Text style={s.summarySub}>
-            Rituel s\'en souvient pour t\'accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.
+            Rituel s&apos;en souvient pour t&apos;accompagner avec plus de douceur. Tu peux le mettre à jour quand tu veux.
           </Text>
 
           <View style={s.summaryCard}>
@@ -274,7 +274,7 @@ export default function SkinQuizScreen() {
             {summary.self_note ? (
               <View style={s.summaryNote}>
                 <Text style={s.summaryNoteLabel}>{t('skinQuiz.summary.noteLabel')}</Text>
-                <Text style={s.summaryNoteValue}>"{summary.self_note}"</Text>
+                <Text style={s.summaryNoteValue}>&quot;{summary.self_note}&quot;</Text>
               </View>
             ) : null}
           </View>
