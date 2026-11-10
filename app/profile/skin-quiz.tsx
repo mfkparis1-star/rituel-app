@@ -1,8 +1,7 @@
 /**
  * Phase 17E — Optional Skin Profile Quiz.
  *
- * 6-question soft quiz, accessible from Profile only. NEVER forced on
- * onboarding. Result writes to profiles.memory.skin_profile (no DB
+ * Six optional questions available from onboarding and Profile. Result writes to profiles.memory.skin_profile (no DB
  * migration — schema-less JSONB).
  *
  * Tone:
@@ -18,7 +17,7 @@
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PillButton from '../../components/ui/PillButton';
 import { supabase } from '../../lib/supabase';
@@ -176,44 +175,37 @@ export default function SkinQuizScreen() {
     if (stepIdx > 0) setStepIdx(stepIdx - 1);
   };
 
-  const handleSave = async () => {
+  const saveAnswers = async () => {
+    if (submitting || memLoading) return false;
     setSubmitting(true);
-    const clean: Answers = {};
-    if (answers.skin_type) clean.skin_type = answers.skin_type;
-    if (answers.concerns && answers.concerns.length > 0) clean.concerns = answers.concerns;
-    if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
-    if (answers.routine_level) clean.routine_level = answers.routine_level;
-    if (answers.goal) clean.goal = answers.goal;
-    if (answers.self_note && answers.self_note.trim()) clean.self_note = answers.self_note.trim();
+    try {
+      const clean: Answers = {};
+      if (answers.skin_type) clean.skin_type = answers.skin_type;
+      if (answers.concerns?.length) clean.concerns = answers.concerns;
+      if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
+      if (answers.routine_level) clean.routine_level = answers.routine_level;
+      if (answers.goal) clean.goal = answers.goal;
+      if (answers.self_note?.trim()) clean.self_note = answers.self_note.trim();
+      const saved = await patch({
+        skin_profile: { ...clean, completed_at: new Date().toISOString() },
+      });
+      if (saved) return true;
+    } catch {
+      // Keep the answers on screen so the user can retry.
+    } finally {
+      setSubmitting(false);
+    }
+    Alert.alert(t('skinQuiz.saveErrorTitle'), t('skinQuiz.saveErrorBody'));
+    return false;
+  };
 
-    await patch({
-      skin_profile: {
-        ...clean,
-        completed_at: new Date().toISOString(),
-      },
-    });
-    setSubmitting(false);
-    exitQuiz();
+  const handleSave = async () => {
+    if (await saveAnswers()) exitQuiz();
   };
 
   const handleAiAnalysis = async () => {
-    setSubmitting(true);
-    const clean: Answers = {};
-    if (answers.skin_type) clean.skin_type = answers.skin_type;
-    if (answers.concerns && answers.concerns.length > 0) clean.concerns = answers.concerns;
-    if (answers.sensitivity) clean.sensitivity = answers.sensitivity;
-    if (answers.routine_level) clean.routine_level = answers.routine_level;
-    if (answers.goal) clean.goal = answers.goal;
-    if (answers.self_note && answers.self_note.trim()) clean.self_note = answers.self_note.trim();
-
-    await patch({
-      skin_profile: {
-        ...clean,
-        completed_at: new Date().toISOString(),
-      },
-    });
+    if (!await saveAnswers()) return;
     trackEvent('skin_quiz_ai_cta_tapped');
-    setSubmitting(false);
     if (isPremium) {
       router.push('/profile/skin-analysis-result' as any);
     } else {

@@ -635,6 +635,58 @@ export default function AuthScreen() {
           )}
         </View>
 
+        <View style={s.skinQuizSection}>
+            <Text style={s.section}>{t('auth.profile.sections.mySkin')}</Text>
+            {(() => {
+              const sp = memory?.skin_profile;
+              const hasProfile = !!(sp?.skin_type || sp?.sensitivity || sp?.goal);
+              const summaryLines: string[] = [];
+              if (sp?.skin_type) {
+                const v = t(`skinQuiz.q.skin_type.choices.${sp.skin_type}`);
+                summaryLines.push(t('auth.profile.skinQuiz.summary.skinType').replace('{value}', v));
+              }
+              if (sp?.sensitivity) {
+                const v = t(`skinQuiz.q.sensitivity.choices.${sp.sensitivity}`);
+                summaryLines.push(t('auth.profile.skinQuiz.summary.sensitivity').replace('{value}', v));
+              }
+              if (sp?.goal) {
+                const v = t(`skinQuiz.q.goal.choices.${sp.goal}`);
+                summaryLines.push(t('auth.profile.skinQuiz.summary.goal').replace('{value}', v));
+              }
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t(hasProfile ? 'auth.profile.skinQuiz.update' : 'auth.profile.skinQuiz.emptyTitle')}
+                  onPress={() => router.push('/profile/skin-quiz' as any)}
+                  style={s.skinQuizCard}
+                  hitSlop={4}
+                >
+                  <View style={{ flex: 1 }}>
+                    {hasProfile ? (
+                      <>
+                        <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.title')}</Text>
+                        <View style={s.skinQuizSummaryRows}>
+                          {summaryLines.map((line) => (
+                            <Text key={line} style={s.skinQuizSummaryLine}>{line}</Text>
+                          ))}
+                          <Text style={s.skinQuizUpdateCta}>{t('auth.profile.skinQuiz.update')}</Text>
+                        </View>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.emptyTitle')}</Text>
+                        <Text style={s.skinQuizSub}>
+                          {t('auth.profile.skinQuiz.emptySubtitle')}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+                  <Text style={s.skinQuizArrow}>›</Text>
+                </Pressable>
+              );
+            })()}
+          </View>
+
         <View style={s.statsRow}>
           <StatCard label={t('auth.profile.stats.products')} value={productCount} />
           <View style={s.gap} />
@@ -673,57 +725,7 @@ export default function AuthScreen() {
             </View>
           </View>
         ) : null}
-<View style={s.skinQuizSection}>
-                  <Text style={s.section}>{t('auth.profile.sections.mySkin')}</Text>
-                  {(() => {
-                    const sp = memory?.skin_profile;
-                    const hasProfile = !!(sp?.skin_type || sp?.sensitivity || sp?.goal);
-                    const summaryLines: string[] = [];
-                    if (sp?.skin_type) {
-                      const v = t(`skinQuiz.q.skin_type.choices.${sp.skin_type}`);
-                      summaryLines.push(t('auth.profile.skinQuiz.summary.skinType').replace('{value}', v));
-                    }
-                    if (sp?.sensitivity) {
-                      const v = t(`skinQuiz.q.sensitivity.choices.${sp.sensitivity}`);
-                      summaryLines.push(t('auth.profile.skinQuiz.summary.sensitivity').replace('{value}', v));
-                    }
-                    if (sp?.goal) {
-                      const v = t(`skinQuiz.q.goal.choices.${sp.goal}`);
-                      summaryLines.push(t('auth.profile.skinQuiz.summary.goal').replace('{value}', v));
-                    }
-                    return (
-                      <Pressable
-                        onPress={() => router.push('/profile/skin-quiz' as any)}
-                        style={s.skinQuizCard}
-                        hitSlop={4}
-                      >
-                        <View style={{ flex: 1 }}>
-                          {hasProfile ? (
-                            <>
-                              <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.title')}</Text>
-                              <View style={s.skinQuizSummaryRows}>
-                                {summaryLines.map((line) => (
-                                  <Text key={line} style={s.skinQuizSummaryLine}>{line}</Text>
-                                ))}
-                                <Text style={s.skinQuizUpdateCta}>{t('auth.profile.skinQuiz.update')}</Text>
-                              </View>
-                            </>
-                          ) : (
-                            <>
-                              <Text style={s.skinQuizTitle}>{t('auth.profile.skinQuiz.emptyTitle')}</Text>
-                              <Text style={s.skinQuizSub}>
-                                {t('auth.profile.skinQuiz.emptySubtitle')}
-                              </Text>
-                            </>
-                          )}
-                        </View>
-                        <Text style={s.skinQuizArrow}>›</Text>
-                      </Pressable>
-                    );
-                  })()}
-                </View>
-
-                                <Text style={s.section}>{t('auth.profile.sections.mySpace')}</Text>
+        <Text style={s.section}>{t('auth.profile.sections.mySpace')}</Text>
         <ListRow
           title={t('auth.profile.rows.journal.title')}
           subtitle={t('auth.profile.rows.journal.subtitle')}

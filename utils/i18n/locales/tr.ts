@@ -60,6 +60,7 @@ export const tr: LocaleDict = {
     },
   },
   onboarding: {
+    openQuiz: 'Cilt anketini aç',
     swipeHint: 'Keşfetmek için kaydır',
     skip: 'Atla',
     next: 'Devam et',
@@ -107,6 +108,8 @@ export const tr: LocaleDict = {
   },
 
   skinQuiz: {
+    saveErrorTitle: 'Yanıtların kaydedilemedi',
+    saveErrorBody: 'Bağlantını kontrol edip tekrar dene.',
     header: {
       stepLabel: 'Soru {n} / {total}',
       skip: 'Atla',
@@ -401,8 +404,8 @@ export const tr: LocaleDict = {
       skinQuiz: {
         title: 'Cilt profilim',
         subtitle: 'Sana daha iyi eşlik etmek için birkaç yumuşak soru.',
-        emptyTitle: 'Cilt profilini tamamla',
-        emptySubtitle: 'Gerçekten sana özel öneriler için',
+        emptyTitle: 'Cilt anketi',
+        emptySubtitle: 'Cildinle ilgili altı isteğe bağlı soru.',
         update: 'Güncelle',
         summary: {
           skinType: '{value} cilt',

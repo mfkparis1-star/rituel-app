@@ -60,6 +60,7 @@ export const en: LocaleDict = {
     },
   },
   onboarding: {
+    openQuiz: 'Open skin questionnaire',
     swipeHint: 'Swipe to discover',
     skip: 'Skip',
     next: 'Continue',
@@ -107,6 +108,8 @@ export const en: LocaleDict = {
   },
 
   skinQuiz: {
+    saveErrorTitle: 'Could not save your answers',
+    saveErrorBody: 'Check your connection and try again.',
     header: {
       stepLabel: 'Question {n} / {total}',
       skip: 'Skip',
@@ -400,8 +403,8 @@ export const en: LocaleDict = {
       skinQuiz: {
         title: 'My skin profile',
         subtitle: 'A few gentle questions to accompany you better.',
-        emptyTitle: 'Complete your skin profile',
-        emptySubtitle: 'For truly personalized recommendations',
+        emptyTitle: 'Skin questionnaire',
+        emptySubtitle: 'Six optional questions about your skin.',
         update: 'Update',
         summary: {
           skinType: '{value} skin',

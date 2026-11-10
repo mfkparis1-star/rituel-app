@@ -60,6 +60,7 @@ export const fr = {
     },
   },
   onboarding: {
+    openQuiz: 'Ouvrir le questionnaire peau',
     swipeHint: 'Glissez pour découvrir',
     skip: 'Passer',
     next: 'Continuer',
@@ -108,6 +109,8 @@ export const fr = {
 
   // Skin profile quiz (Phase 17E)
   skinQuiz: {
+    saveErrorTitle: 'Réponses non enregistrées',
+    saveErrorBody: 'Vérifie ta connexion et réessaie.',
     header: {
       stepLabel: 'Question {n} / {total}',
       skip: 'Sauter',
@@ -405,8 +408,8 @@ export const fr = {
       skinQuiz: {
         title: 'Mon profil de peau',
         subtitle: 'Quelques questions douces pour mieux t\'accompagner.',
-        emptyTitle: 'Complète ton profil de peau',
-        emptySubtitle: 'Pour des recommandations vraiment personnalisées',
+        emptyTitle: 'Questionnaire peau',
+        emptySubtitle: 'Six questions facultatives sur ta peau.',
         update: 'Mettre à jour',
         summary: {
           skinType: 'Peau {value}',

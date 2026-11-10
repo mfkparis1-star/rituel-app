@@ -2,8 +2,8 @@
  * Phase 16F.1 — Welcome onboarding screen
  *
  * 3 luxury full-screen slides, swipeable. "Passer" top-right on every
- * slide. "Commencer" CTA at the bottom of the final slide. Both flip
- * profiles.onboarded to true and navigate to /(tabs).
+ * slide. "Commencer" CTA at the bottom of the final slide. The final action opens the optional skin quiz. Skipping leaves the
+ * quiz available from Profile.
  *
  * Triggered from the root layout when profile.onboarded === false.
  */
@@ -65,13 +65,14 @@ export default function OnboardingScreen() {
 
   const { markOnboarded } = useOnboarded(session?.user?.id);
 
-  const finish = async () => {
+  const finish = async (openQuiz: boolean) => {
     trackEvent('onboarding_completed');
     await markOnboarded();
     // Lead straight into the skin quiz so the first run personalizes
     // and shows value, instead of dropping onto an empty Accueil. The
     // quiz is fully skippable and exits to Accueil when reached this way.
-    router.replace('/profile/skin-quiz?from=onboarding' as any);
+    if (openQuiz) router.replace({ pathname: '/profile/skin-quiz', params: { from: 'onboarding' } });
+    else router.replace('/(tabs)');
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -108,7 +109,7 @@ export default function OnboardingScreen() {
 
       {/* Top-right Passer */}
       <SafeAreaView style={s.topBar} edges={['top']} pointerEvents="box-none">
-        <Pressable onPress={finish} hitSlop={16} style={s.skipBtn}>
+        <Pressable onPress={() => void finish(false)} accessibilityRole="button" hitSlop={16} style={s.skipBtn}>
           <Text style={s.skipTxt}>{t('onboarding.skip')}</Text>
         </Pressable>
       </SafeAreaView>
@@ -130,10 +131,10 @@ export default function OnboardingScreen() {
         {isLast ? (
           <View style={s.ctaWrap}>
             <PillButton
-              label={t('onboarding.start')}
+              label={t('onboarding.openQuiz')}
               variant="primary"
               fullWidth
-              onPress={finish}
+              onPress={() => void finish(true)}
             />
           </View>
         ) : (
