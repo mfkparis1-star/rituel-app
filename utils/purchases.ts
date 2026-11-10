@@ -16,6 +16,11 @@ export type PurchaseResult =
   | { ok: false; userCancelled: true }
   | { ok: false; error: string };
 
+export type RestoreResult =
+  | { status: 'success'; customerInfo: CustomerInfo }
+  | { status: 'unavailable' }
+  | { status: 'account_changed' };
+
 export type PendingGrant = {
   productId: string;
   amount: number;
@@ -25,6 +30,7 @@ export type PendingGrant = {
 let configured = false;
 let desiredAccount: string | null | undefined;
 let verifiedAccount: string | null | undefined;
+let accountRevision = 0;
 let operations: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(operation: () => Promise<T>): Promise<T> {
@@ -34,6 +40,7 @@ function enqueue<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 export function configurePurchases(userId: string | null): Promise<boolean> {
+  if (desiredAccount !== userId) accountRevision += 1;
   desiredAccount = userId;
   return enqueue(() => synchronizeAccount(userId));
 }
@@ -129,8 +136,27 @@ async function performPurchase(pkg: PurchasesPackage): Promise<PurchaseResult> {
   }
 }
 
-export function restorePurchases(account: string | null): Promise<CustomerInfo | null> {
-  return readForAccount(account, () => Purchases.restorePurchases());
+export function restorePurchasesWithStatus(account: string | null): Promise<RestoreResult> {
+  const revision = accountRevision;
+  const accountChanged = () => !account || desiredAccount !== account || revision !== accountRevision;
+  return enqueue(async () => {
+    if (accountChanged()) return { status: 'account_changed' };
+    const ready = await ensurePurchaseAccount(account);
+    if (accountChanged()) return { status: 'account_changed' };
+    if (!ready) return { status: 'unavailable' };
+
+    try {
+      const customerInfo = await Purchases.restorePurchases();
+      return accountChanged() ? { status: 'account_changed' } : { status: 'success', customerInfo };
+    } catch {
+      return accountChanged() ? { status: 'account_changed' } : { status: 'unavailable' };
+    }
+  });
+}
+
+export async function restorePurchases(account: string | null): Promise<CustomerInfo | null> {
+  const result = await restorePurchasesWithStatus(account);
+  return result.status === 'success' ? result.customerInfo : null;
 }
 
 export function getCustomerInfo(account: string | null): Promise<CustomerInfo | null> {

@@ -649,6 +649,8 @@ export const tr: LocaleDict = {
       restoreEmptyBody: 'Hesabına bağlı aktif bir satın alım bulamadık.',
       restoreErrorTitle: 'Geri yüklenemedi',
       restoreErrorBody: 'Bir hata oluştu. Birazdan tekrar dene.',
+      restoreAccountChangedTitle: 'Hesap değişti',
+      restoreAccountChangedBody: 'Geri yükleme sırasında Rituel hesabın değişti. Kullanmak istediğin hesapla tekrar dene.',
     },
   },
 

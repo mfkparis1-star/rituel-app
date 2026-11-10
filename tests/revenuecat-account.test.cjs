@@ -16,6 +16,7 @@ function setup() {
   let sdkId;
   let loginError;
   let pendingRead;
+  let restore = async () => ({ sdkId, entitlements: { active: {} } });
   const purchases = {
     configure({ appUserID }) { sdkId = appUserID ?? 'anonymous'; },
     getAppUserID: async () => sdkId,
@@ -27,7 +28,7 @@ function setup() {
     },
     async logOut() { calls.push(['logout', sdkId]); sdkId = 'anonymous'; },
     getCustomerInfo: async () => pendingRead ?? { sdkId },
-    restorePurchases: async () => ({ sdkId }),
+    restorePurchases: () => restore(),
     async purchasePackage() {
       calls.push(['purchase', sdkId]);
       return { customerInfo: { sdkId }, productIdentifier: 'synthetic' };
@@ -49,6 +50,7 @@ function setup() {
     failLogin: () => { loginError = true; },
     recoverLogin: () => { loginError = false; },
     holdRead: (promise) => { pendingRead = promise; },
+    setRestore: (fn) => { restore = fn; },
   };
 }
 
@@ -101,4 +103,42 @@ test('an offline account transition can recover without signing out again', asyn
   assert.equal(api.isCurrentPurchaseAccount('B'), true);
   assert.equal((await api.purchaseStorePackage({}, 'B')).ok, true);
   assert.deepEqual(calls, [['login', 'B'], ['login', 'B'], ['purchase', 'B']]);
+});
+
+test('restore distinguishes an empty receipt lookup from SDK failure', async () => {
+  const { api, setRestore } = setup();
+  await api.configurePurchases('A');
+  const empty = await api.restorePurchasesWithStatus('A');
+  assert.equal(empty.status, 'success');
+  assert.equal(api.hasActivePremium(empty.customerInfo), false);
+
+  setRestore(async () => ({ entitlements: { active: { 'Rituel Pro': {} } } }));
+  const premium = await api.restorePurchasesWithStatus('A');
+  assert.equal(premium.status, 'success');
+  assert.equal(api.hasActivePremium(premium.customerInfo), true);
+
+  setRestore(async () => { throw new Error('offline'); });
+  assert.equal((await api.restorePurchasesWithStatus('A')).status, 'unavailable');
+  assert.equal(await api.restorePurchases('A'), null);
+});
+
+test('restore discards an in-flight result even if the original account returns', async () => {
+  const { api, setRestore } = setup();
+  await api.configurePurchases('A');
+  let started;
+  const startedPromise = new Promise((resolve) => { started = resolve; });
+  let release;
+  const pending = new Promise((resolve) => { release = resolve; });
+  setRestore(() => {
+    started();
+    return pending;
+  });
+
+  const restoring = api.restorePurchasesWithStatus('A');
+  await startedPromise;
+  const switchAway = api.configurePurchases('B');
+  const switchBack = api.configurePurchases('A');
+  release({ sdkId: 'A' });
+  assert.equal((await restoring).status, 'account_changed');
+  await Promise.all([switchAway, switchBack]);
 });

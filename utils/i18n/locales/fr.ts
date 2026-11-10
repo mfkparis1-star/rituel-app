@@ -659,6 +659,8 @@ export const fr = {
       restoreEmptyBody: "Nous n'avons pas trouvé d'achat actif lié à ton compte.",
       restoreErrorTitle: 'Restauration impossible',
       restoreErrorBody: 'Une erreur est survenue. Réessaye dans un instant.',
+      restoreAccountChangedTitle: 'Compte modifié',
+      restoreAccountChangedBody: 'Ton compte Rituel a changé pendant la restauration. Réessaie avec le compte que tu souhaites utiliser.',
     },
   },
 

@@ -648,6 +648,8 @@ export const en: LocaleDict = {
       restoreEmptyBody: "We couldn't find any active purchase linked to your account.",
       restoreErrorTitle: "Couldn't restore",
       restoreErrorBody: 'Something went wrong. Try again in a moment.',
+      restoreAccountChangedTitle: 'Account changed',
+      restoreAccountChangedBody: 'Your Rituel account changed during the restore. Try again with the account you want to use.',
     },
   },
 

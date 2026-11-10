@@ -11,7 +11,7 @@ import { safeBack } from '../utils/safeBack';
 import { useLanguage } from '../hooks/useLanguage';
 import type { PurchasesPackage } from 'react-native-purchases';
 import { usePremium } from '../hooks/usePremium';
-import { getCurrentOffering, isCurrentPurchaseAccount, purchaseStorePackage, restorePurchases, hasActivePremium } from '../utils/purchases';
+import { getCurrentOffering, isCurrentPurchaseAccount, purchaseStorePackage, restorePurchasesWithStatus, hasActivePremium } from '../utils/purchases';
 
 type Plan = 'monthly' | 'yearly';
 
@@ -137,10 +137,21 @@ export default function PaywallScreen() {
     setRestoring(true);
     trackEvent('restore_clicked');
     try {
-      const customerInfo = await restorePurchases(userId);
-      if (!isCurrentPurchaseAccount(userId)) return;
-      const premium = hasActivePremium(customerInfo);
-      if (premium) {
+      const result = await restorePurchasesWithStatus(userId);
+      if (result.status === 'account_changed' ||
+          (result.status === 'success' && !isCurrentPurchaseAccount(userId))) {
+        trackEvent('restore_failed');
+        Alert.alert(
+          t('paywall.alerts.restoreAccountChangedTitle'),
+          t('paywall.alerts.restoreAccountChangedBody')
+        );
+      } else if (result.status === 'unavailable') {
+        trackEvent('restore_failed');
+        Alert.alert(
+          t('paywall.alerts.restoreErrorTitle'),
+          t('paywall.alerts.restoreErrorBody')
+        );
+      } else if (hasActivePremium(result.customerInfo)) {
         trackEvent('restore_success');
         Alert.alert(
           t('paywall.alerts.restoreSuccessTitle'),
