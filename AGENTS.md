@@ -13,7 +13,7 @@
 Run `npm ci`, `npm run lint`, `npm run typecheck`, and `npm test` before requesting review. Report failures honestly; do not weaken checks to make a PR pass.
 
 ## Roles
-Use the focused profiles in `.github/agents/` for design review, product strategy, market research, mobile engineering, security review, test quality, release readiness, product analytics, growth, and dependency review. Only use aggregate metrics for business reporting. Agents propose changes and deliver evidence for owner review. Use design, market, and analytics evidence to prioritize feature briefs before implementation. Verify changes with test, security, and release reviews before proposing distribution. See [quality tooling](docs/AI_STUDIO_TOOLING.md) for scanner and device-test boundaries.
+Use the [team workflow](docs/AI_STUDIO_TEAM.md) to assign the focused profiles in `.github/agents/` for design review, product strategy, market research, mobile engineering, security review, test quality, release readiness, product analytics, growth, and dependency review. Only use aggregate metrics for business reporting. Agents propose changes and deliver evidence for owner review. Use design, market, and analytics evidence to prioritize feature briefs before implementation. Verify changes with test, security, and release reviews before proposing distribution. See [quality tooling](docs/AI_STUDIO_TOOLING.md) for scanner and device-test boundaries.
 
 ## PR ownership
 Every PR remains unmerged until the owner reviews and merges it. Automated agents may create branches, commits, tests, and draft PRs only.
